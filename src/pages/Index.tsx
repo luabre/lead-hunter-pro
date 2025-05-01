@@ -10,9 +10,13 @@ import BusinessTypeChart from "@/components/dashboard/BusinessTypeChart";
 import CompanyHeatMap from "@/components/search/CompanyHeatMap";
 import CompanyDetails from "@/components/company/CompanyDetails";
 import AiAgentCard from "@/components/ai/AiAgentCard";
-import { Database, Search, Users, TrendingUp } from "lucide-react";
+import { Database, Search, Users, TrendingUp, Brain, Rocket, Calendar, Flame, Lightbulb } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { CompanyFilters } from "@/components/search/CompanySearch";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { AlertBox } from "@/components/common/AlertBox";
 
 // Mock Data
 const mockCompanies = [
@@ -169,6 +173,17 @@ const Index = () => {
     navigate('/contacts');
   };
 
+  const handleActivateAiScan = () => {
+    toast({
+      title: "Varredura IA Iniciada",
+      description: "Nossa IA está analisando seu mercado. Você receberá notificações quando encontrarmos novas oportunidades.",
+    });
+  };
+
+  const handleDiscoverOpportunities = () => {
+    navigate('/market-intel');
+  };
+
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-8">
@@ -184,6 +199,122 @@ const Index = () => {
         {/* Search Section */}
         <div className="grid gap-6">
           <CompanySearch onSearch={handleSearch} />
+
+          {/* Initial state - no search performed yet */}
+          {!searchPerformed && !selectedCompany && (
+            <>
+              {/* Intelligence Dashboard */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatsCard 
+                  title="Empresas Detectadas Hoje" 
+                  value="19" 
+                  description="Novas oportunidades" 
+                  icon={<Rocket className="h-8 w-8" />}
+                  onClick={handleNavigateToCompanies}
+                />
+                <StatsCard 
+                  title="Leads Quentes" 
+                  value="7" 
+                  description="Na sua conta" 
+                  icon={<Flame className="h-8 w-8" />}
+                  onClick={handleNavigateToHotOpportunities}
+                />
+                <StatsCard 
+                  title="Reuniões Agendadas" 
+                  value="3" 
+                  description="Esta semana" 
+                  icon={<Calendar className="h-8 w-8" />}
+                  onClick={() => navigate('/meetings')}
+                />
+                <StatsCard 
+                  title="Melhor Conversão" 
+                  value="21%" 
+                  description="Segmento: Clínicas Estéticas" 
+                  icon={<TrendingUp className="h-8 w-8" />}
+                />
+              </div>
+
+              {/* AI suggestion and call to action */}
+              <Card className="border-blue-200 bg-blue-50/50">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-100 p-2 rounded-full">
+                        <Brain className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-lg">IA Sugere:</h3>
+                        <p className="text-muted-foreground">"Aproveite o aumento de buscas no setor de Educação Online"</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      <Button 
+                        onClick={handleDiscoverOpportunities}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Lightbulb className="h-5 w-5 mr-2" />
+                        Descobrir Oportunidades
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={handleActivateAiScan}
+                        className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                      >
+                        <Rocket className="h-5 w-5 mr-2" />
+                        Ativar Varredura Inteligente
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Welcome message and alerts */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="col-span-1 md:col-span-2 bg-muted/40 rounded-lg p-8 text-left">
+                  <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+                    <Rocket className="h-6 w-6 text-primary" />
+                    Bem-vindo ao seu radar comercial com IA!
+                  </h2>
+                  <p className="text-muted-foreground max-w-3xl mb-6">
+                    Comece buscando por um segmento ou deixe a IA detectar novas oportunidades para você.
+                    Já encontramos <Badge variant="secondary">+450 empresas</Badge> com fit nos últimos 7 dias. 
+                    <strong> Está pronto para agir?</strong>
+                  </p>
+                  <div className="mt-4">
+                    <Button onClick={handleNavigateToCompanies}>
+                      Ver Todas as Empresas
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Alerts and Tips Section */}
+                <div className="col-span-1">
+                  <AlertBox 
+                    title="Alertas & Novidades" 
+                    alerts={[
+                      {
+                        icon: "bell",
+                        text: "2 leads responderam à IA SDR nas últimas 24h",
+                        type: "alert",
+                        action: () => navigate('/ia-sdr')
+                      },
+                      {
+                        icon: "pin",
+                        text: "Teste o novo módulo de Degustação com IA Closer",
+                        type: "tip",
+                        action: () => navigate('/ia-closer')
+                      },
+                      {
+                        icon: "megaphone",
+                        text: "Atualização v1.2 com painel de benchmarking liberado!",
+                        type: "update"
+                      }
+                    ]}
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           {searchPerformed && selectedCompany === null && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -278,24 +409,6 @@ const Index = () => {
           {/* Company Details View */}
           {selectedCompany && (
             <CompanyDetails company={selectedCompany} onClose={handleCloseDetails} />
-          )}
-
-          {/* Initial state - no search performed yet */}
-          {!searchPerformed && !selectedCompany && (
-            <div className="bg-muted/40 rounded-lg p-8 mt-6 text-center">
-              <h2 className="text-2xl font-semibold mb-4">Bem-vindo ao LeadHunter Pro</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-                Inicie sua busca informando um segmento de mercado. 
-                Nossa IA irá mapear empresas, decisores e oportunidades para seu negócio.
-              </p>
-              <div className="mt-4 flex justify-center">
-                <img 
-                  src="/placeholder.svg" 
-                  alt="Ilustração" 
-                  className="w-64 h-64 opacity-50"
-                />
-              </div>
-            </div>
           )}
         </div>
       </div>
