@@ -6,7 +6,7 @@ import CompanyCard from "@/components/search/CompanyCard";
 import CompanyDetails from "@/components/company/CompanyDetails";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Filter } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import AddCompanyDialog from "@/components/company/AddCompanyDialog";
 
 // Mock Data
 const mockCompanies = [
@@ -145,6 +146,7 @@ const Companies = () => {
   const [sortOption, setSortOption] = useState("name");
   const [oppFilter, setOppFilter] = useState("all");
   const [selectedCompany, setSelectedCompany] = useState<typeof mockCompanies[0] | null>(null);
+  const [companies, setCompanies] = useState(mockCompanies);
 
   const handleCompanyClick = (company: typeof mockCompanies[0]) => {
     setSelectedCompany(company);
@@ -154,7 +156,11 @@ const Companies = () => {
     setSelectedCompany(null);
   };
 
-  const filteredCompanies = mockCompanies.filter((company) => {
+  const handleAddCompany = (newCompany: typeof mockCompanies[0]) => {
+    setCompanies(prevCompanies => [newCompany, ...prevCompanies]);
+  };
+
+  const filteredCompanies = companies.filter((company) => {
     const matchesSearch =
       company.fantasyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -199,10 +205,12 @@ const Companies = () => {
             Gerencie e analise todas as empresas mapeadas
           </p>
         </div>
-        <Button onClick={() => navigate("/")}>
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Busca
-        </Button>
+        <div className="flex gap-3">
+          <AddCompanyDialog onAddCompany={handleAddCompany} />
+          <Button onClick={() => navigate("/")}>
+            Nova Busca
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filter Bar */}
