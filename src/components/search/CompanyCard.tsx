@@ -1,9 +1,11 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, TrendingUp, Users, MessageSquare } from "lucide-react";
+import { MapPin, TrendingUp, Users, MessageSquare, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface CompanyCardProps {
   company: {
@@ -17,6 +19,12 @@ interface CompanyCardProps {
     employees: string;
     opportunity?: 'hot' | 'warm' | 'cold';
     aiDetected?: boolean;
+    creator?: {
+      email: string;
+      name: string;
+      origin: string;
+      createdAt: string;
+    };
   };
   onClick?: () => void;
   className?: string;
@@ -63,6 +71,16 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
     navigate(`/ia-sdr?company=${company.id}&name=${encodeURIComponent(company.fantasyName)}`);
   };
 
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return format(date, "dd/MM/yyyy", { locale: ptBR });
+    } catch (e) {
+      return "Data desconhecida";
+    }
+  };
+
   return (
     <div className={cn("company-card animate-fade-in", className)} onClick={onClick}>
       <div className="flex justify-between items-start">
@@ -104,6 +122,17 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
           </Badge>
         )}
       </div>
+      
+      {/* Creator information */}
+      {company.creator && (
+        <div className="mt-2 flex items-center text-xs text-muted-foreground">
+          <FileText className="h-3 w-3 mr-1" />
+          <span>
+            {company.creator.origin === "manual" ? "Entrada Manual por " : "Adicionado via IA por "}
+            {company.creator.name} • {formatDate(company.creator.createdAt)}
+          </span>
+        </div>
+      )}
       
       <div className="mt-4 flex justify-between">
         <Button 

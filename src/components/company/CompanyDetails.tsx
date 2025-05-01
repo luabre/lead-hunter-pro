@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Building2, CircleUser, FileSearch, Globe, MapPin, MessageSquare, TrendingUp, Users } from "lucide-react";
+import { Building2, CircleUser, FileSearch, Globe, MapPin, MessageSquare, TrendingUp, Users, FileText, Calendar, Clock } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface CompanyDetailsProps {
   company: {
@@ -38,11 +40,38 @@ interface CompanyDetailsProps {
       newEntrants: number;
       supplierPower: number;
     };
+    creator?: {
+      email: string;
+      name: string;
+      origin: string;
+      createdAt: string;
+    };
   };
   onClose?: () => void;
 }
 
 const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
+  // Format date for display
+  const formatDateTime = (dateString?: string) => {
+    if (!dateString) return "Data desconhecida";
+    try {
+      const date = new Date(dateString);
+      return format(date, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+    } catch (e) {
+      return "Data desconhecida";
+    }
+  };
+
+  // Format origin label
+  const getOriginLabel = (origin?: string) => {
+    if (!origin) return "Origem desconhecida";
+    switch (origin) {
+      case "manual": return "Entrada Manual";
+      case "radar": return "Radar IA";
+      default: return origin;
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="border-b">
@@ -85,6 +114,23 @@ const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
             {company.employees} funcionários
           </div>
         </div>
+        
+        {/* Creator information */}
+        {company.creator && (
+          <div className="flex flex-col gap-1 mt-3 bg-muted/30 p-3 rounded-md">
+            <div className="text-sm font-medium">
+              📌 Origem do Lead: {getOriginLabel(company.creator.origin)}
+            </div>
+            <div className="text-sm text-muted-foreground flex items-center">
+              <CircleUser className="h-4 w-4 mr-1" />
+              Inserido por: {company.creator.name} ({company.creator.email})
+            </div>
+            <div className="text-sm text-muted-foreground flex items-center">
+              <Clock className="h-4 w-4 mr-1" />
+              Data: {formatDateTime(company.creator.createdAt)}
+            </div>
+          </div>
+        )}
       </CardHeader>
       
       <Tabs defaultValue="overview">

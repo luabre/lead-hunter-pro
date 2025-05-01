@@ -110,12 +110,22 @@ const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
   };
 
   const onSubmit = (data: FormValues) => {
-    // Create a new company with the form data
+    // Get current date and time in ISO format
+    const now = new Date().toISOString();
+    
+    // Create a new company with the form data and creator information
     const newCompany = {
       id: Math.random().toString(36).substring(2, 9),
       ...data,
       opportunity: "warm" as const,
       aiDetected: true,
+      // Add creator information
+      creator: {
+        email: "joao.sdr@empresa.com",
+        name: "João Silva",
+        origin: "manual",
+        createdAt: now,
+      }
     };
 
     onAddCompany(newCompany);
