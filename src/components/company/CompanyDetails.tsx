@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { CircleUser, FileSearch, Globe, MapPin, MessageSquare, TrendingUp, Users } from "lucide-react";
+import { Building2, CircleUser, FileSearch, Globe, MapPin, MessageSquare, TrendingUp, Users } from "lucide-react";
 
 interface CompanyDetailsProps {
   company: {
@@ -30,6 +30,7 @@ interface CompanyDetailsProps {
     digitalMaturity?: number;
     opportunity?: 'hot' | 'warm' | 'cold';
     aiDetected?: boolean;
+    companyType?: string;
     porterAnalysis?: {
       competition: number;
       clientPower: number;
@@ -121,6 +122,18 @@ const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
                   <p className="text-lg font-semibold">{company.yearFounded || "5-10 anos"}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Tipo de Empresa</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <p className="text-lg font-semibold">{company.companyType || "LTDA"}</p>
                 </CardContent>
               </Card>
             </div>

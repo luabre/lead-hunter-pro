@@ -42,6 +42,7 @@ const mockCompanies = [
     digitalMaturity: 82,
     website: "techsol.com.br",
     yearFounded: "2015",
+    companyType: "LTDA",
     porterAnalysis: {
       competition: 8,
       clientPower: 6,
@@ -60,6 +61,7 @@ const mockCompanies = [
     segment: "Logística",
     employees: "100-200",
     opportunity: "warm" as const,
+    companyType: "EIRELI",
   },
   {
     id: "3",
@@ -71,6 +73,7 @@ const mockCompanies = [
     segment: "Saúde",
     employees: "200-300",
     opportunity: "cold" as const,
+    companyType: "S.A.",
   },
   {
     id: "4",
@@ -83,6 +86,7 @@ const mockCompanies = [
     employees: "300-400",
     opportunity: "warm" as const,
     aiDetected: true,
+    companyType: "LTDA",
   },
   {
     id: "5",
@@ -94,6 +98,7 @@ const mockCompanies = [
     segment: "Alimentação",
     employees: "100-200",
     opportunity: "hot" as const,
+    companyType: "S.A.",
   },
   {
     id: "6",
@@ -105,6 +110,7 @@ const mockCompanies = [
     segment: "E-commerce",
     employees: "50-100",
     opportunity: "hot" as const,
+    companyType: "LTDA",
   },
   {
     id: "7",
@@ -116,6 +122,7 @@ const mockCompanies = [
     segment: "Finanças",
     employees: "20-50",
     opportunity: "cold" as const,
+    companyType: "S.A.",
   },
   {
     id: "8",
@@ -128,6 +135,7 @@ const mockCompanies = [
     employees: "20-50",
     opportunity: "warm" as const,
     aiDetected: true,
+    companyType: "EIRELI",
   },
 ];
 
