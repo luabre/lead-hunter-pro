@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import StatsCard from "@/components/dashboard/StatsCard";
 import CompanySearch from "@/components/search/CompanySearch";
@@ -122,6 +123,7 @@ const heatMapStates = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [searchResults, setSearchResults] = useState<typeof mockCompanies>([]);
   const [selectedCompany, setSelectedCompany] = useState<typeof mockCompanies[0] | null>(null);
@@ -155,6 +157,18 @@ const Index = () => {
     setSelectedCompany(null);
   };
 
+  const handleNavigateToCompanies = () => {
+    navigate('/companies');
+  };
+
+  const handleNavigateToHotOpportunities = () => {
+    navigate('/companies', { state: { filter: 'hot' } });
+  };
+
+  const handleNavigateToContacts = () => {
+    navigate('/contacts');
+  };
+
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-8">
@@ -180,6 +194,7 @@ const Index = () => {
                   value="5.120" 
                   description="No segmento selecionado" 
                   icon={<Database className="h-8 w-8" />}
+                  onClick={handleNavigateToCompanies}
                 />
                 <StatsCard 
                   title="Oportunidades Quentes" 
@@ -188,12 +203,14 @@ const Index = () => {
                   trend="up" 
                   trendValue="+12% este mês" 
                   icon={<TrendingUp className="h-8 w-8" />}
+                  onClick={handleNavigateToHotOpportunities}
                 />
                 <StatsCard 
                   title="Decisores Mapeados" 
                   value="3.842" 
                   description="Com contatos validados" 
                   icon={<Users className="h-8 w-8" />}
+                  onClick={handleNavigateToContacts}
                 />
                 <StatsCard 
                   title="Conversão Média" 

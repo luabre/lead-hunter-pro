@@ -5,7 +5,8 @@ import MarketChart from "@/components/dashboard/MarketChart";
 import BusinessTypeChart from "@/components/dashboard/BusinessTypeChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChartBar, FileText, TrendingUp, Users, Database, MessageSquare } from "lucide-react";
+import { ChartBar, FileText, TrendingUp, Users, Database, MessageSquare, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -58,6 +59,24 @@ const conversionData = [
 ];
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  
+  const handleNavigateToCompanies = () => {
+    navigate('/companies');
+  };
+
+  const handleNavigateToHotOpportunities = () => {
+    navigate('/companies', { state: { filter: 'hot' } });
+  };
+
+  const handleNavigateToContacts = () => {
+    navigate('/contacts');
+  };
+
+  const handleNavigateToMeetings = () => {
+    navigate('/meetings');
+  };
+
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-8">
@@ -93,7 +112,11 @@ const Dashboard = () => {
           value="5.120" 
           description="No segmento selecionado" 
           icon={<Database className="h-8 w-8" />}
-        />
+          onClick={handleNavigateToCompanies}
+          className="relative after:content-[''] after:absolute after:bottom-3 after:right-3 after:w-5 after:h-5 after:bg-muted-foreground/10 after:rounded-full after:flex after:items-center after:justify-center after:text-muted-foreground"
+        >
+          <ChevronRight className="absolute bottom-3 right-3 w-5 h-5 text-muted-foreground/70" />
+        </StatsCard>
         <StatsCard 
           title="Oportunidades Quentes" 
           value="287" 
@@ -101,13 +124,21 @@ const Dashboard = () => {
           trend="up" 
           trendValue="+12% este mês" 
           icon={<TrendingUp className="h-8 w-8" />}
-        />
+          onClick={handleNavigateToHotOpportunities}
+          className="relative"
+        >
+          <ChevronRight className="absolute bottom-3 right-3 w-5 h-5 text-muted-foreground/70" />
+        </StatsCard>
         <StatsCard 
           title="Decisores Mapeados" 
           value="3.842" 
           description="Com contatos validados" 
           icon={<Users className="h-8 w-8" />}
-        />
+          onClick={handleNavigateToContacts}
+          className="relative"
+        >
+          <ChevronRight className="absolute bottom-3 right-3 w-5 h-5 text-muted-foreground/70" />
+        </StatsCard>
         <StatsCard 
           title="Mensagens Enviadas" 
           value="1.458" 
@@ -115,7 +146,11 @@ const Dashboard = () => {
           trend="up" 
           trendValue="+8.2% vs período anterior" 
           icon={<MessageSquare className="h-8 w-8" />}
-        />
+          onClick={handleNavigateToMeetings}
+          className="relative"
+        >
+          <ChevronRight className="absolute bottom-3 right-3 w-5 h-5 text-muted-foreground/70" />
+        </StatsCard>
       </div>
 
       {/* Charts Section */}

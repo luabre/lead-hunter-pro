@@ -9,6 +9,7 @@ interface StatsCardProps {
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: string;
   className?: string;
+  onClick?: () => void;
 }
 
 const StatsCard = ({
@@ -19,9 +20,17 @@ const StatsCard = ({
   trend,
   trendValue,
   className,
+  onClick,
 }: StatsCardProps) => {
   return (
-    <div className={cn("metric-card", className)}>
+    <div 
+      className={cn(
+        "metric-card", 
+        onClick && "cursor-pointer hover:shadow-md transition-all", 
+        className
+      )}
+      onClick={onClick}
+    >
       <div className="flex justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
