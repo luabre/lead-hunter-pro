@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -52,6 +51,12 @@ const mockCompanies = [
       newEntrants: 7,
       supplierPower: 3,
     },
+    creator: {
+      email: "radar@ia.com",
+      name: "Radar IA",
+      origin: "radar",
+      createdAt: "2025-04-15T10:00:00Z",
+    },
   },
   {
     id: "2",
@@ -64,6 +69,12 @@ const mockCompanies = [
     employees: "100-200",
     opportunity: "warm" as const,
     companyType: "EIRELI",
+    creator: {
+      email: "joao.sdr@empresa.com",
+      name: "João Silva",
+      origin: "manual",
+      createdAt: "2025-05-01T14:30:00Z",
+    },
   },
   {
     id: "3",
@@ -76,6 +87,12 @@ const mockCompanies = [
     employees: "200-300",
     opportunity: "cold" as const,
     companyType: "S.A.",
+    creator: {
+      email: "maria.sdr@empresa.com",
+      name: "Maria Costa",
+      origin: "manual",
+      createdAt: "2025-04-28T09:15:00Z",
+    },
   },
   {
     id: "4",
@@ -89,6 +106,12 @@ const mockCompanies = [
     opportunity: "warm" as const,
     aiDetected: true,
     companyType: "LTDA",
+    creator: {
+      email: "radar@ia.com",
+      name: "Radar IA",
+      origin: "radar",
+      createdAt: "2025-04-20T16:45:00Z",
+    },
   },
   {
     id: "5",
@@ -101,6 +124,12 @@ const mockCompanies = [
     employees: "100-200",
     opportunity: "hot" as const,
     companyType: "S.A.",
+    creator: {
+      email: "radar@ia.com",
+      name: "Radar IA",
+      origin: "radar",
+      createdAt: "2025-04-22T11:20:00Z",
+    },
   },
   {
     id: "6",
@@ -113,6 +142,12 @@ const mockCompanies = [
     employees: "50-100",
     opportunity: "hot" as const,
     companyType: "LTDA",
+    creator: {
+      email: "pedro.sdr@empresa.com",
+      name: "Pedro Santos",
+      origin: "manual",
+      createdAt: "2025-04-30T08:45:00Z",
+    },
   },
   {
     id: "7",
@@ -125,6 +160,12 @@ const mockCompanies = [
     employees: "20-50",
     opportunity: "cold" as const,
     companyType: "S.A.",
+    creator: {
+      email: "joao.sdr@empresa.com",
+      name: "João Silva",
+      origin: "manual",
+      createdAt: "2025-04-25T15:30:00Z",
+    },
   },
   {
     id: "8",
@@ -138,6 +179,12 @@ const mockCompanies = [
     opportunity: "warm" as const,
     aiDetected: true,
     companyType: "EIRELI",
+    creator: {
+      email: "radar@ia.com",
+      name: "Radar IA",
+      origin: "radar",
+      createdAt: "2025-04-18T13:10:00Z",
+    },
   },
 ];
 
