@@ -11,6 +11,15 @@ interface BusinessTypeChartProps {
 const COLORS = ['#1E88E5', '#00BFA5', '#FFC107', '#FF5252', '#4CAF50', '#9C27B0'];
 
 const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps) => {
+  // Calculate total for percentage calculation
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  
+  // Add percentage to data
+  const dataWithPercentage = data.map(item => ({
+    ...item,
+    percentage: ((item.value / total) * 100).toFixed(1)
+  }));
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -22,20 +31,31 @@ const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps)
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={data}
+                data={dataWithPercentage}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
+                labelLine={true}
                 outerRadius={100}
                 dataKey="value"
+                label={({name, value, percentage}) => `${name}: ${percentage}%`}
               >
-                {data.map((entry, index) => (
+                {dataWithPercentage.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Legend layout="vertical" verticalAlign="middle" align="right" />
+              <Legend 
+                layout="vertical" 
+                verticalAlign="middle" 
+                align="right" 
+                formatter={(value, entry, index) => {
+                  const item = dataWithPercentage[index];
+                  return `${value}: ${item.value} (${item.percentage}%)`;
+                }}
+              />
               <Tooltip 
-                formatter={(value: number) => [`${value} empresas`, 'Quantidade']}
+                formatter={(value: number, name: string, props: any) => {
+                  return [`${value} empresas (${props.payload.percentage}%)`, 'Quantidade'];
+                }}
               />
             </PieChart>
           </ResponsiveContainer>
