@@ -18,7 +18,10 @@ const CompanyHeatMap = ({ title, description, states, maxCount }: CompanyHeatMap
   const totalCount = states.reduce((sum, state) => sum + state.count, 0);
   
   const getHeatIntensity = (count: number) => {
-    const percentage = (count / maxCount) * 100;
+    // Ensure maxCount is greater than 0 to avoid division by zero
+    const safeMaxCount = maxCount > 0 ? maxCount : 1;
+    const percentage = (count / safeMaxCount) * 100;
+    
     if (percentage > 75) return "bg-opacity-90";
     if (percentage > 50) return "bg-opacity-70";
     if (percentage > 25) return "bg-opacity-50";
@@ -36,8 +39,10 @@ const CompanyHeatMap = ({ title, description, states, maxCount }: CompanyHeatMap
         <div className="heat-map p-4 rounded-lg">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             {states.map((state) => {
-              // Calculate percentage for this state
-              const statePercentage = ((state.count / totalCount) * 100).toFixed(1);
+              // Calculate percentage for this state with safety check for division by zero
+              const statePercentage = totalCount > 0 ? 
+                ((state.count / totalCount) * 100).toFixed(1) : 
+                "0.0";
               
               return (
                 <div 

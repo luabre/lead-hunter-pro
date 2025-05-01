@@ -37,7 +37,7 @@ const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps)
                 labelLine={true}
                 outerRadius={100}
                 dataKey="value"
-                label={({name, value, percentage}) => `${name}: ${percentage}%`}
+                label={({name, value, percentage}) => `${name}: ${percentage || '0.0'}%`}
               >
                 {dataWithPercentage.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -48,13 +48,21 @@ const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps)
                 verticalAlign="middle" 
                 align="right" 
                 formatter={(value, entry, index) => {
-                  const item = dataWithPercentage[index];
-                  return `${value}: ${item.value} (${item.percentage}%)`;
+                  // Add null check for index and dataWithPercentage
+                  if (index !== undefined && dataWithPercentage[index]) {
+                    const item = dataWithPercentage[index];
+                    return `${value}: ${item.value} (${item.percentage || '0.0'}%)`;
+                  }
+                  return value;
                 }}
               />
               <Tooltip 
                 formatter={(value: number, name: string, props: any) => {
-                  return [`${value} empresas (${props.payload.percentage}%)`, 'Quantidade'];
+                  // Add null check before accessing payload properties
+                  if (props?.payload?.percentage) {
+                    return [`${value} empresas (${props.payload.percentage}%)`, 'Quantidade'];
+                  }
+                  return [`${value} empresas`, 'Quantidade'];
                 }}
               />
             </PieChart>

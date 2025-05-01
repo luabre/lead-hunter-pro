@@ -13,7 +13,7 @@ const MarketChart = ({ title, description, data, color = "#1E88E5" }: MarketChar
   // Calculate total for percentage calculation
   const total = data.reduce((sum, item) => sum + item.value, 0);
   
-  // Add percentage to data
+  // Add percentage to data - ensure it's always a string value
   const dataWithPercentage = data.map(item => ({
     ...item,
     percentage: ((item.value / total) * 100).toFixed(1)
@@ -37,8 +37,12 @@ const MarketChart = ({ title, description, data, color = "#1E88E5" }: MarketChar
               <YAxis />
               <Tooltip 
                 formatter={(value: number, name: string, props: any) => {
-                  if (name === 'value') {
-                    return [`${props.payload.value} empresas (${props.payload.percentage}%)`, 'Quantidade'];
+                  // Safely access the payload properties with null checks
+                  if (name === 'value' && props?.payload) {
+                    return [
+                      `${props.payload.value || 0} empresas (${props.payload.percentage || '0.0'}%)`, 
+                      'Quantidade'
+                    ];
                   }
                   return [value, name];
                 }}
@@ -52,6 +56,9 @@ const MarketChart = ({ title, description, data, color = "#1E88E5" }: MarketChar
                   position: 'top', 
                   content: (props: any) => {
                     const { x, y, width, value, payload } = props;
+                    // Add null check for payload before accessing percentage
+                    if (!payload) return null;
+                    
                     return (
                       <text 
                         x={x + width / 2} 
@@ -60,7 +67,7 @@ const MarketChart = ({ title, description, data, color = "#1E88E5" }: MarketChar
                         textAnchor="middle" 
                         fontSize={12}
                       >
-                        {`${payload.percentage}%`}
+                        {`${payload.percentage || '0.0'}%`}
                       </text>
                     );
                   }
