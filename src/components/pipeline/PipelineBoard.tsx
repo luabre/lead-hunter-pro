@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Phone, Mail, Calendar, Check, X } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Lead {
   id: string;
@@ -19,6 +20,7 @@ interface Lead {
 interface PipelineBoardProps {
   leads: Lead[];
   onLeadClick?: (lead: Lead) => void;
+  onLeadStatusChange?: (lead: Lead, newStatus: Lead["status"]) => void;
 }
 
 const PIPELINE_STAGES = [
@@ -31,9 +33,9 @@ const PIPELINE_STAGES = [
   { id: "lost", title: "Fechado - Perdeu" },
 ];
 
-const PipelineBoard = ({ leads, onLeadClick }: PipelineBoardProps) => {
-  // Adding drag and drop functionality
+const PipelineBoard = ({ leads, onLeadClick, onLeadStatusChange }: PipelineBoardProps) => {
   const [draggedLead, setDraggedLead] = useState<Lead | null>(null);
+  const { toast } = useToast();
 
   const handleDragStart = (lead: Lead) => {
     setDraggedLead(lead);
@@ -45,9 +47,19 @@ const PipelineBoard = ({ leads, onLeadClick }: PipelineBoardProps) => {
 
   const handleDrop = (stageId: string) => {
     if (draggedLead && draggedLead.status !== stageId) {
-      console.log(`Moving lead ${draggedLead.id} from ${draggedLead.status} to ${stageId}`);
       // In a real app, this would update the lead status in your state or backend
-      // For now, we'll just log it
+      const updatedLead = { ...draggedLead, status: stageId as Lead["status"] };
+      
+      // Call the callback if provided
+      if (onLeadStatusChange) {
+        onLeadStatusChange(draggedLead, stageId as Lead["status"]);
+      }
+      
+      toast({
+        title: "Lead movido com sucesso",
+        description: `${draggedLead.companyName} foi movido para ${PIPELINE_STAGES.find(stage => stage.id === stageId)?.title}`,
+      });
+      
       setDraggedLead(null);
     }
   };
@@ -131,9 +143,61 @@ interface LeadCardProps {
 }
 
 const LeadCard = ({ lead, onClick, onDragStart }: LeadCardProps) => {
+  const { toast } = useToast();
+
+  const handleActionClick = (action: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    switch(action) {
+      case 'call':
+        toast({
+          title: "Iniciando ligação",
+          description: `Ligando para ${lead.contactName} da ${lead.companyName}`,
+        });
+        break;
+      case 'email':
+        toast({
+          title: "Novo e-mail",
+          description: `Preparando e-mail para ${lead.contactName}`,
+        });
+        break;
+      case 'meeting':
+        toast({
+          title: "Agendar reunião",
+          description: `Configurando reunião com ${lead.companyName}`,
+        });
+        break;
+      case 'message':
+        toast({
+          title: "Nova mensagem",
+          description: `Redigindo mensagem para ${lead.contactName}`,
+        });
+        break;
+      case 'accept':
+        toast({
+          title: "Oportunidade ganha",
+          description: `${lead.companyName} marcada como cliente!`,
+        });
+        break;
+      case 'reject':
+        toast({
+          title: "Oportunidade perdida",
+          description: `${lead.companyName} marcada como perdida.`,
+        });
+        break;
+    }
+  };
+
   return (
     <Card 
-      className="cursor-pointer hover:shadow-md transition-all" 
+      className="cursor-grab active:cursor-grabbing hover:shadow-md transition-all border-l-4 animate-fade-in"
+      style={{ 
+        borderLeftColor: lead.opportunity === 'hot' 
+          ? 'var(--leadhunter-red)' 
+          : lead.opportunity === 'warm' 
+          ? 'var(--leadhunter-gold)' 
+          : 'var(--leadhunter-blue)' 
+      }}
       onClick={onClick}
       draggable
       onDragStart={onDragStart}
@@ -165,26 +229,79 @@ const LeadCard = ({ lead, onClick, onDragStart }: LeadCardProps) => {
           </div>
         )}
         
+        {/* Action buttons - top row */}
         <div className="flex justify-between items-center mt-2">
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="h-7 px-2" 
-            onClick={(e) => { 
-              e.stopPropagation();
-              // Handle reply action
-            }}
-          >
-            <MessageSquare className="h-3.5 w-3.5 mr-1" />
-            <span className="text-xs">Responder</span>
-          </Button>
-          
-          {lead.aiRecommendation && (
-            <Badge variant="secondary" className="text-xs">
+          <div className="flex space-x-1">
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="h-7 w-7 p-0" 
+              onClick={(e) => handleActionClick('message', e)}
+              title="Enviar mensagem"
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+            </Button>
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="h-7 w-7 p-0" 
+              onClick={(e) => handleActionClick('call', e)}
+              title="Ligar"
+            >
+              <Phone className="h-3.5 w-3.5" />
+            </Button>
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="h-7 w-7 p-0" 
+              onClick={(e) => handleActionClick('email', e)}
+              title="Enviar e-mail"
+            >
+              <Mail className="h-3.5 w-3.5" />
+            </Button>
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="h-7 w-7 p-0" 
+              onClick={(e) => handleActionClick('meeting', e)}
+              title="Agendar reunião"
+            >
+              <Calendar className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+        
+        {/* Conditional buttons for Won/Lost stages */}
+        {(lead.status === 'negotiation') && (
+          <div className="flex justify-end mt-2 gap-2">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="h-7 border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700" 
+              onClick={(e) => handleActionClick('accept', e)}
+            >
+              <Check className="h-3.5 w-3.5 mr-1" />
+              <span className="text-xs">Ganhou</span>
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="h-7 border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700" 
+              onClick={(e) => handleActionClick('reject', e)}
+            >
+              <X className="h-3.5 w-3.5 mr-1" />
+              <span className="text-xs">Perdeu</span>
+            </Button>
+          </div>
+        )}
+        
+        {lead.aiRecommendation && (
+          <div className="mt-2">
+            <Badge variant="secondary" className="text-xs w-full justify-start">
               <span className="text-leadhunter-teal mr-1">IA:</span> {lead.aiRecommendation}
             </Badge>
-          )}
-        </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
