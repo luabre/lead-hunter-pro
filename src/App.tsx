@@ -15,32 +15,36 @@ import IaCloser from "./pages/IaCloser";
 import Meetings from "./pages/Meetings";
 import MarketIntel from "./pages/MarketIntel";
 import AiManager from "./pages/AiManager";
+import { useState } from "react";
 
-const queryClient = new QueryClient();
+const App = () => {
+  // Create a client inside the component
+  const [queryClient] = useState(() => new QueryClient());
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/companies" element={<Companies />} />
-          <Route path="/contacts" element={<Contacts />} />
-          <Route path="/pipeline" element={<Pipeline />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/ia-sdr" element={<IaSdr />} />
-          <Route path="/ia-closer" element={<IaCloser />} />
-          <Route path="/meetings" element={<Meetings />} />
-          <Route path="/market-intel" element={<MarketIntel />} />
-          <Route path="/ai-manager" element={<AiManager />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/companies" element={<Companies />} />
+            <Route path="/contacts" element={<Contacts />} />
+            <Route path="/pipeline" element={<Pipeline />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/ia-sdr" element={<IaSdr />} />
+            <Route path="/ia-closer" element={<IaCloser />} />
+            <Route path="/meetings" element={<Meetings />} />
+            <Route path="/market-intel" element={<MarketIntel />} />
+            <Route path="/ai-manager" element={<AiManager />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
