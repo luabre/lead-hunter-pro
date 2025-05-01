@@ -6,7 +6,7 @@ import CompanyCard from "@/components/search/CompanyCard";
 import CompanyDetails from "@/components/company/CompanyDetails";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Plus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import AddCompanyDialog from "@/components/company/AddCompanyDialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Mock Data
 const mockCompanies = [
@@ -145,8 +146,16 @@ const Companies = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("name");
   const [oppFilter, setOppFilter] = useState("all");
+  const [originFilter, setOriginFilter] = useState("all");
   const [selectedCompany, setSelectedCompany] = useState<typeof mockCompanies[0] | null>(null);
   const [companies, setCompanies] = useState(mockCompanies);
+  const [activeTab, setActiveTab] = useState("todos");
+
+  // Mock current user - in a real app, this would come from authentication
+  const currentUser = {
+    email: "joao.sdr@empresa.com",
+    name: "João Silva"
+  };
 
   const handleCompanyClick = (company: typeof mockCompanies[0]) => {
     setSelectedCompany(company);
@@ -161,6 +170,7 @@ const Companies = () => {
   };
 
   const filteredCompanies = companies.filter((company) => {
+    // Filter by search query
     const matchesSearch =
       company.fantasyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -168,13 +178,25 @@ const Companies = () => {
       company.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
       company.state.toLowerCase().includes(searchQuery.toLowerCase());
 
+    // Filter by opportunity status
     const matchesOpportunity =
       oppFilter === "all" ||
       (oppFilter === "hot" && company.opportunity === "hot") ||
       (oppFilter === "warm" && company.opportunity === "warm") ||
       (oppFilter === "cold" && company.opportunity === "cold");
 
-    return matchesSearch && matchesOpportunity;
+    // Filter by origin
+    const matchesOrigin =
+      originFilter === "all" ||
+      (originFilter === "manual" && company.creator?.origin === "manual") ||
+      (originFilter === "radar" && company.creator?.origin === "radar");
+
+    // Filter by tab
+    const matchesTab =
+      activeTab === "todos" || 
+      (activeTab === "meus-leads" && company.creator?.email === currentUser.email);
+
+    return matchesSearch && matchesOpportunity && matchesOrigin && matchesTab;
   });
 
   // Sort companies based on the selected sort option
@@ -192,6 +214,10 @@ const Companies = () => {
         (opportunityRank[b.opportunity || "undefined"] || 0) -
         (opportunityRank[a.opportunity || "undefined"] || 0)
       );
+    } else if (sortOption === "date") {
+      const dateA = a.creator?.createdAt ? new Date(a.creator.createdAt).getTime() : 0;
+      const dateB = b.creator?.createdAt ? new Date(b.creator.createdAt).getTime() : 0;
+      return dateB - dateA; // Most recent first
     } else {
       return a.state.localeCompare(b.state);
     }
@@ -219,6 +245,16 @@ const Companies = () => {
           </Button>
         </div>
       </div>
+
+      {/* Tabs for All vs My Added Leads */}
+      {!selectedCompany && (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <TabsList>
+            <TabsTrigger value="todos">Todos os Leads</TabsTrigger>
+            <TabsTrigger value="meus-leads">Meus Leads Inseridos</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      )}
 
       {/* Search and Filter Bar */}
       {!selectedCompany && (
@@ -248,6 +284,20 @@ const Companies = () => {
             </SelectContent>
           </Select>
 
+          <Select value={originFilter} onValueChange={setOriginFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Origem" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Filtrar por origem</SelectLabel>
+                <SelectItem value="all">Todas</SelectItem>
+                <SelectItem value="manual">Entrada Manual</SelectItem>
+                <SelectItem value="radar">Radar IA</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -262,6 +312,7 @@ const Companies = () => {
                 <DropdownMenuRadioItem value="name">Nome</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="opportunity">Oportunidade</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="location">Localização</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="date">Data de Inserção</DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>

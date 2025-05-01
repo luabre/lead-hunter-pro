@@ -42,6 +42,12 @@ const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
   const [open, setOpen] = useState(false);
   const [isEnriching, setIsEnriching] = useState(false);
   
+  // Mock current user - in a real app, this would come from authentication
+  const currentUser = {
+    email: "joao.sdr@empresa.com",
+    name: "João Silva"
+  };
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -118,11 +124,11 @@ const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
       id: Math.random().toString(36).substring(2, 9),
       ...data,
       opportunity: "warm" as const,
-      aiDetected: true,
-      // Add creator information
+      aiDetected: false,
+      // Add creator information with proper field names
       creator: {
-        email: "joao.sdr@empresa.com",
-        name: "João Silva",
+        email: currentUser.email,
+        name: currentUser.name,
         origin: "manual",
         createdAt: now,
       }
@@ -134,7 +140,7 @@ const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
     
     toast({
       title: "Empresa adicionada",
-      description: "A empresa foi adicionada com sucesso.",
+      description: "A empresa foi adicionada com sucesso e registrada como sua inserção manual.",
     });
   };
 
