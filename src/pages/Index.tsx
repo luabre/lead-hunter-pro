@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -184,6 +183,10 @@ const Index = () => {
     navigate('/market-intel');
   };
 
+  const handleNavigateToAiManager = () => {
+    navigate('/ai-manager');
+  };
+
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-8">
@@ -268,7 +271,7 @@ const Index = () => {
                 </CardContent>
               </Card>
               
-              {/* Welcome message and alerts */}
+              {/* Welcome message, AI Manager button, and alerts */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="col-span-1 md:col-span-2 bg-muted/40 rounded-lg p-8 text-left">
                   <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
@@ -280,9 +283,17 @@ const Index = () => {
                     Já encontramos <Badge variant="secondary">+450 empresas</Badge> com fit nos últimos 7 dias. 
                     <strong> Está pronto para agir?</strong>
                   </p>
-                  <div className="mt-4">
+                  <div className="mt-4 flex flex-wrap gap-3">
                     <Button onClick={handleNavigateToCompanies}>
                       Ver Todas as Empresas
+                    </Button>
+                    <Button 
+                      onClick={handleNavigateToAiManager}
+                      variant="outline"
+                      className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                    >
+                      <Brain className="h-5 w-5 mr-2" />
+                      Acessar Gerente de IA
                     </Button>
                   </div>
                 </div>
