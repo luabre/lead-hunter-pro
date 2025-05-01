@@ -1,5 +1,6 @@
 
 import { cn } from '@/lib/utils';
+import React from 'react';
 
 interface StatsCardProps {
   title: string;
@@ -10,6 +11,7 @@ interface StatsCardProps {
   trendValue?: string;
   className?: string;
   onClick?: () => void;
+  children?: React.ReactNode;
 }
 
 const StatsCard = ({
@@ -21,11 +23,12 @@ const StatsCard = ({
   trendValue,
   className,
   onClick,
+  children,
 }: StatsCardProps) => {
   return (
     <div 
       className={cn(
-        "metric-card", 
+        "metric-card bg-background p-4 border rounded-lg", 
         onClick && "cursor-pointer hover:shadow-md transition-all", 
         className
       )}
@@ -55,6 +58,7 @@ const StatsCard = ({
         </div>
         {icon && <div className="text-muted-foreground">{icon}</div>}
       </div>
+      {children}
     </div>
   );
 };

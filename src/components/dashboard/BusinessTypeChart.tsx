@@ -11,14 +11,24 @@ interface BusinessTypeChartProps {
 const COLORS = ['#1E88E5', '#00BFA5', '#FFC107', '#FF5252', '#4CAF50', '#9C27B0'];
 
 const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps) => {
-  // Calculate total for percentage calculation
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  // Calculate total for percentage calculation (with safety check)
+  const total = data?.reduce((sum, item) => sum + (item?.value || 0), 0) || 0;
   
-  // Add percentage to data
-  const dataWithPercentage = data.map(item => ({
+  // Add percentage to data with null checks
+  const dataWithPercentage = data?.map(item => ({
     ...item,
-    percentage: ((item.value / total) * 100).toFixed(1)
-  }));
+    percentage: total > 0 ? ((item.value / total) * 100).toFixed(1) : '0.0'
+  })) || [];
+
+  const customLabel = ({ name, percentage }: { name?: string, percentage?: string }) => {
+    return name && percentage ? `${name}: ${percentage}%` : name || '';
+  };
+
+  const renderLegendText = (value: string, entry: any) => {
+    if (!entry || !entry.payload) return value;
+    const { value: itemValue, percentage } = entry.payload;
+    return `${value}: ${itemValue} (${percentage}%)`;
+  };
 
   return (
     <Card className="w-full">
@@ -34,35 +44,32 @@ const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps)
                 data={dataWithPercentage}
                 cx="50%"
                 cy="50%"
-                labelLine={true}
-                outerRadius={100}
+                labelLine={false}
+                outerRadius={80}
+                fill="#8884d8"
                 dataKey="value"
-                label={({name, value, percentage}) => `${name}: ${percentage || '0.0'}%`}
+                label={customLabel}
               >
                 {dataWithPercentage.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={COLORS[index % COLORS.length]} 
+                  />
                 ))}
               </Pie>
               <Legend 
                 layout="vertical" 
                 verticalAlign="middle" 
-                align="right" 
-                formatter={(value, entry, index) => {
-                  // Add null check for index and dataWithPercentage
-                  if (index !== undefined && dataWithPercentage[index]) {
-                    const item = dataWithPercentage[index];
-                    return `${value}: ${item.value} (${item.percentage || '0.0'}%)`;
-                  }
-                  return value;
-                }}
+                align="right"
+                formatter={renderLegendText}
               />
               <Tooltip 
                 formatter={(value: number, name: string, props: any) => {
-                  // Add null check before accessing payload properties
-                  if (props?.payload?.percentage) {
-                    return [`${value} empresas (${props.payload.percentage}%)`, 'Quantidade'];
-                  }
-                  return [`${value} empresas`, 'Quantidade'];
+                  const percentage = props?.payload?.percentage;
+                  return [
+                    `${value} empresas${percentage ? ` (${percentage}%)` : ''}`, 
+                    'Quantidade'
+                  ];
                 }}
               />
             </PieChart>
