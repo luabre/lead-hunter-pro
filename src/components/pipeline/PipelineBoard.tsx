@@ -32,6 +32,26 @@ const PIPELINE_STAGES = [
 ];
 
 const PipelineBoard = ({ leads, onLeadClick }: PipelineBoardProps) => {
+  // Adding drag and drop functionality
+  const [draggedLead, setDraggedLead] = useState<Lead | null>(null);
+
+  const handleDragStart = (lead: Lead) => {
+    setDraggedLead(lead);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const handleDrop = (stageId: string) => {
+    if (draggedLead && draggedLead.status !== stageId) {
+      console.log(`Moving lead ${draggedLead.id} from ${draggedLead.status} to ${stageId}`);
+      // In a real app, this would update the lead status in your state or backend
+      // For now, we'll just log it
+      setDraggedLead(null);
+    }
+  };
+
   return (
     <div className="overflow-x-auto pb-4">
       <div className="flex gap-4 min-w-[1200px]">
@@ -39,8 +59,12 @@ const PipelineBoard = ({ leads, onLeadClick }: PipelineBoardProps) => {
           <PipelineColumn 
             key={stage.id} 
             title={stage.title} 
+            stageId={stage.id}
             leads={leads.filter((lead) => lead.status === stage.id)}
             onLeadClick={onLeadClick}
+            onDragOver={handleDragOver}
+            onDrop={() => handleDrop(stage.id)}
+            onDragStart={handleDragStart}
           />
         ))}
       </div>
@@ -50,11 +74,23 @@ const PipelineBoard = ({ leads, onLeadClick }: PipelineBoardProps) => {
 
 interface PipelineColumnProps {
   title: string;
+  stageId: string;
   leads: Lead[];
   onLeadClick?: (lead: Lead) => void;
+  onDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
+  onDrop: () => void;
+  onDragStart: (lead: Lead) => void;
 }
 
-const PipelineColumn = ({ title, leads, onLeadClick }: PipelineColumnProps) => {
+const PipelineColumn = ({ 
+  title, 
+  stageId,
+  leads, 
+  onLeadClick,
+  onDragOver,
+  onDrop,
+  onDragStart 
+}: PipelineColumnProps) => {
   return (
     <div className="w-[250px] flex-shrink-0">
       <div className="bg-muted rounded-t-lg p-2 border">
@@ -64,9 +100,18 @@ const PipelineColumn = ({ title, leads, onLeadClick }: PipelineColumnProps) => {
         </div>
       </div>
       
-      <div className="bg-background rounded-b-lg border border-t-0 h-[calc(100vh-260px)] overflow-y-auto p-2 space-y-2">
+      <div 
+        className="bg-background rounded-b-lg border border-t-0 h-[calc(100vh-260px)] overflow-y-auto p-2 space-y-2"
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+      >
         {leads.map((lead) => (
-          <LeadCard key={lead.id} lead={lead} onClick={() => onLeadClick?.(lead)} />
+          <LeadCard 
+            key={lead.id} 
+            lead={lead} 
+            onClick={() => onLeadClick?.(lead)}
+            onDragStart={() => onDragStart(lead)}
+          />
         ))}
         
         {leads.length === 0 && (
@@ -82,11 +127,17 @@ const PipelineColumn = ({ title, leads, onLeadClick }: PipelineColumnProps) => {
 interface LeadCardProps {
   lead: Lead;
   onClick?: () => void;
+  onDragStart: () => void;
 }
 
-const LeadCard = ({ lead, onClick }: LeadCardProps) => {
+const LeadCard = ({ lead, onClick, onDragStart }: LeadCardProps) => {
   return (
-    <Card className="cursor-pointer hover:shadow-md transition-all" onClick={onClick}>
+    <Card 
+      className="cursor-pointer hover:shadow-md transition-all" 
+      onClick={onClick}
+      draggable
+      onDragStart={onDragStart}
+    >
       <CardHeader className="p-3 pb-1">
         <div className="flex justify-between items-start">
           <CardTitle className="text-sm">{lead.companyName}</CardTitle>

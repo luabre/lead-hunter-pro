@@ -12,6 +12,7 @@ import Pipeline from "./pages/Pipeline";
 import Dashboard from "./pages/Dashboard";
 import IaSdr from "./pages/IaSdr";
 import IaCloser from "./pages/IaCloser";
+import Meetings from "./pages/Meetings";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/ia-sdr" element={<IaSdr />} />
           <Route path="/ia-closer" element={<IaCloser />} />
+          <Route path="/meetings" element={<Meetings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
