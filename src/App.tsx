@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import IaSdr from "./pages/IaSdr";
 import IaCloser from "./pages/IaCloser";
 import Meetings from "./pages/Meetings";
+import MarketIntel from "./pages/MarketIntel";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/ia-sdr" element={<IaSdr />} />
           <Route path="/ia-closer" element={<IaCloser />} />
           <Route path="/meetings" element={<Meetings />} />
+          <Route path="/market-intel" element={<MarketIntel />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
