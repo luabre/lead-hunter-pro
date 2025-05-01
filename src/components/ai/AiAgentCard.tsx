@@ -1,0 +1,82 @@
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { MessageSquare, Mail } from "lucide-react";
+
+interface AiAgentCardProps {
+  type: "sdr" | "closer";
+  onClick?: () => void;
+}
+
+const AiAgentCard = ({ type, onClick }: AiAgentCardProps) => {
+  return (
+    <Card className="bg-leadhunter-blue-dark text-white overflow-hidden">
+      <CardHeader className="border-b border-white/20">
+        <div className="flex items-center gap-3">
+          {type === "sdr" ? (
+            <MessageSquare className="h-7 w-7 text-leadhunter-teal" />
+          ) : (
+            <Mail className="h-7 w-7 text-leadhunter-teal" />
+          )}
+          <div>
+            <CardTitle className="text-lg">
+              {type === "sdr" ? "IA SDR" : "IA Closer"}
+            </CardTitle>
+            <CardDescription className="text-gray-300">
+              {type === "sdr"
+                ? "Prospecção e Qualificação Humanizada"
+                : "Fechamento Inteligente e Personalizado"}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="p-6">
+        <div className="text-sm mb-4">
+          {type === "sdr" && (
+            <>
+              <p className="mb-2">
+                A IA SDR automatiza a primeira abordagem, com sequências de
+                mensagens personalizadas adaptadas ao perfil do lead.
+              </p>
+              <p>
+                Ela qualifica os leads, avalia interesse e facilita o trabalho do time
+                humano.
+              </p>
+            </>
+          )}
+
+          {type === "closer" && (
+            <>
+              <p className="mb-2">
+                A IA Closer analisa os leads já qualificados para entregar abordagens
+                de fechamento precisas e eficazes.
+              </p>
+              <p>
+                Envia propostas personalizadas e acompanha sinais de prontidão para
+                fechamento.
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="mt-6">
+          <Button
+            variant="outline"
+            className="w-full border-white/30 text-white hover:bg-white/10"
+            onClick={onClick}
+          >
+            {type === "sdr" ? "Iniciar Prospecção" : "Gerar Proposta"}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default AiAgentCard;
