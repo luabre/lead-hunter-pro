@@ -105,7 +105,7 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     {brazilianStates.map((state) => (
                       <SelectItem key={state} value={state}>
                         {state}
@@ -125,7 +125,7 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="small">Pequena</SelectItem>
                     <SelectItem value="medium">Média</SelectItem>
                     <SelectItem value="large">Grande</SelectItem>
@@ -143,7 +143,7 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="up-to-1m">Até R$ 1 milhão</SelectItem>
                     <SelectItem value="1m-10m">R$ 1 - 10 milhões</SelectItem>
                     <SelectItem value="10m-50m">R$ 10 - 50 milhões</SelectItem>
@@ -162,7 +162,7 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="1-10">1 - 10</SelectItem>
                     <SelectItem value="11-50">11 - 50</SelectItem>
                     <SelectItem value="51-200">51 - 200</SelectItem>
@@ -182,7 +182,7 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="mei">MEI</SelectItem>
                     <SelectItem value="ei">EI</SelectItem>
                     <SelectItem value="ltda">LTDA</SelectItem>
@@ -202,7 +202,7 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="0-1">Menos de 1 ano</SelectItem>
                     <SelectItem value="1-3">1 - 3 anos</SelectItem>
                     <SelectItem value="3-5">3 - 5 anos</SelectItem>
