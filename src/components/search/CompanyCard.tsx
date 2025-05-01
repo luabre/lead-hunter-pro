@@ -22,6 +22,38 @@ interface CompanyCardProps {
 }
 
 const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
+  // Define badge styles based on opportunity type
+  const getBadgeStyles = () => {
+    if (!company.opportunity) return "";
+    
+    switch (company.opportunity) {
+      case "hot":
+        return "bg-red-100 text-red-700 border-red-200";
+      case "warm":
+        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+      case "cold":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+      default:
+        return "";
+    }
+  };
+
+  // Label text based on opportunity type
+  const getOpportunityLabel = () => {
+    if (!company.opportunity) return "";
+    
+    switch (company.opportunity) {
+      case "hot":
+        return "Quente";
+      case "warm":
+        return "Morno";
+      case "cold":
+        return "Frio";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className={cn("company-card animate-fade-in", className)} onClick={onClick}>
       <div className="flex justify-between items-start">
@@ -34,14 +66,10 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
             <Badge 
               variant="outline"
               className={cn(
-                "opportunity-badge",
-                company.opportunity === 'hot' && "opportunity-hot",
-                company.opportunity === 'warm' && "opportunity-warm",
-                company.opportunity === 'cold' && "opportunity-cold"
+                getBadgeStyles()
               )}
             >
-              {company.opportunity === 'hot' ? 'Quente' : 
-               company.opportunity === 'warm' ? 'Morno' : 'Frio'}
+              {getOpportunityLabel()}
             </Badge>
           </div>
         )}
