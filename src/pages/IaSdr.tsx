@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,15 +23,26 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { MessageSquare, Mail, Mail as MailIcon } from "lucide-react";
+import { MessageSquare, Mail } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
 const IaSdr = () => {
+  const [searchParams] = useSearchParams();
+  const companyId = searchParams.get("company");
+  const companyName = searchParams.get("name");
+
   const [messageChannel, setMessageChannel] = useState("email");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedMessage, setGeneratedMessage] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>(undefined);
   
+  // If we have a company, pre-fill some message context
+  useEffect(() => {
+    if (companyName) {
+      setGeneratedMessage("");
+    }
+  }, [companyName]);
+
   const templates = [
     { id: "1", name: "Primeira Abordagem", content: "Olá {{nome}}, Notei que sua empresa {{empresa}} tem crescido no setor de {{setor}}. Gostaria de compartilhar como podemos ajudar a potencializar ainda mais esse crescimento com nossa solução." },
     { id: "2", name: "Follow-up", content: "Olá {{nome}}, Estou retornando o contato sobre como nossa solução pode ajudar {{empresa}} a superar os desafios do setor. Quando seria um bom momento para conversarmos?" },
@@ -45,23 +57,24 @@ const IaSdr = () => {
       setIsGenerating(false);
       
       let message = "";
+      const targetCompany = companyName || "TechSol";
       
       if (messageChannel === "email") {
-        message = `Assunto: Oportunidade de otimização para TechSol
+        message = `Assunto: Oportunidade de otimização para ${targetCompany}
 
 Olá João Silva,
 
-Espero que esteja tudo bem com você. Meu nome é [Seu Nome] e acompanho o crescimento da TechSol no mercado de tecnologia.
+Espero que esteja tudo bem com você. Meu nome é [Seu Nome] e acompanho o crescimento da ${targetCompany} no mercado.
 
 Notei que vocês têm expandido a equipe recentemente e imaginei que podem estar buscando otimizar os processos internos nesse momento de crescimento.
 
-Nossa plataforma tem ajudado empresas similares à TechSol a:
+Nossa plataforma tem ajudado empresas similares à ${targetCompany} a:
 
 • Reduzir em 30% o tempo gasto em tarefas administrativas
 • Aumentar a produtividade da equipe em até 25%
 • Melhorar a comunicação entre departamentos
 
-Gostaria de entender um pouco mais sobre os desafios atuais da TechSol. Teríamos cerca de 15 minutos para uma conversa inicial?
+Gostaria de entender um pouco mais sobre os desafios atuais da ${targetCompany}. Teríamos cerca de 15 minutos para uma conversa inicial?
 
 Seria útil saber:
 1. Quais são seus principais desafios operacionais atualmente?
@@ -74,13 +87,13 @@ Atenciosamente,
       } else if (messageChannel === "whatsapp") {
         message = `Olá João, tudo bem? 👋
 
-Acompanhando o crescimento da TechSol no mercado de tecnologia e gostaria de entender como vocês estão lidando com [desafio específico do setor].
+Acompanhando o crescimento da ${targetCompany} no mercado e gostaria de entender como vocês estão lidando com [desafio específico do setor].
 
-Trabalhamos com empresas do seu segmento que conseguiram [benefício concreto]. Podemos conversar brevemente sobre como isso poderia funcionar para a TechSol?
+Trabalhamos com empresas do seu segmento que conseguiram [benefício concreto]. Podemos conversar brevemente sobre como isso poderia funcionar para a ${targetCompany}?
 
 Qual seria o melhor horário para uma conversa rápida esta semana?`;
       } else {
-        message = `Olá João, notei que a TechSol tem se destacado no setor de tecnologia e imaginei que talvez estejam enfrentando desafios com [problema específico].
+        message = `Olá João, notei que a ${targetCompany} tem se destacado no setor e imaginei que talvez estejam enfrentando desafios com [problema específico].
 
 Nossa solução tem ajudado empresas como a sua a superarem esses obstáculos, resultando em [benefício concreto].
 
@@ -106,9 +119,10 @@ Seria interessante para você conhecer como isso funciona na prática? Podemos m
   const handleUseTemplate = (templateId: string) => {
     const template = templates.find(t => t.id === templateId);
     if (template) {
+      const targetCompany = companyName || "TechSol";
       setGeneratedMessage(template.content
         .replace("{{nome}}", "João Silva")
-        .replace("{{empresa}}", "TechSol")
+        .replace("{{empresa}}", targetCompany)
         .replace("{{setor}}", "tecnologia")
       );
       setSelectedTemplate(templateId);
@@ -168,14 +182,14 @@ Seria interessante para você conhecer como isso funciona na prática? Podemos m
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Label>Contato</Label>
-                    <Badge>João Silva - TechSol</Badge>
+                    <Badge>{companyName ? `${companyName}` : "João Silva - TechSol"}</Badge>
                   </div>
                   
                   {messageChannel === "email" && (
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="subject">Assunto</Label>
-                        <Input id="subject" placeholder="Insira o assunto do email" />
+                        <Input id="subject" placeholder={`Oportunidade para ${companyName || "sua empresa"}`} />
                       </div>
                     </div>
                   )}
@@ -241,8 +255,9 @@ Seria interessante para você conhecer como isso funciona na prática? Podemos m
               <div className="bg-leadhunter-blue-dark/50 p-3 rounded-lg border border-white/10">
                 <p className="text-sm font-medium mb-2">Dica de Abordagem</p>
                 <p className="text-xs text-gray-300">
-                  O decisor João Silva tem um perfil direto e objetivo. 
-                  Foque em resultados concretos e evite rodeios na sua abordagem.
+                  {companyName ? 
+                    `A empresa ${companyName} mostra sinais de interesse em soluções de otimização. Aproveite este momento para uma abordagem focada em resultados práticos.` : 
+                    "O decisor João Silva tem um perfil direto e objetivo. Foque em resultados concretos e evite rodeios na sua abordagem."}
                 </p>
               </div>
             </CardContent>

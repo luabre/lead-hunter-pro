@@ -1,8 +1,9 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, TrendingUp, Users } from "lucide-react";
+import { MapPin, TrendingUp, Users, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface CompanyCardProps {
   company: {
@@ -22,6 +23,8 @@ interface CompanyCardProps {
 }
 
 const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
+  const navigate = useNavigate();
+
   // Define badge styles based on opportunity type
   const getBadgeStyles = () => {
     if (!company.opportunity) return "";
@@ -52,6 +55,12 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
       default:
         return "";
     }
+  };
+
+  // Handle IA SDR activation
+  const handleIaSdrClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/ia-sdr?company=${company.id}&name=${encodeURIComponent(company.fantasyName)}`);
   };
 
   return (
@@ -96,11 +105,23 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
         )}
       </div>
       
-      <div className="mt-4 flex justify-end">
-        <Button size="sm" variant="outline" onClick={(e) => {
-          e.stopPropagation();
-          onClick?.();
-        }}>
+      <div className="mt-4 flex justify-between">
+        <Button 
+          size="sm" 
+          className="bg-leadhunter-teal hover:bg-leadhunter-teal/90"
+          onClick={handleIaSdrClick}
+        >
+          <MessageSquare className="h-4 w-4 mr-1" />
+          Ativar IA SDR
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick?.();
+          }}
+        >
           Ver Detalhes
         </Button>
       </div>
