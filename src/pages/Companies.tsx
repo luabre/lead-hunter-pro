@@ -5,7 +5,7 @@ import CompanyCard from "@/components/search/CompanyCard";
 import CompanyDetails from "@/components/company/CompanyDetails";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, Plus } from "lucide-react";
+import { Search, Filter, Plus, FileDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +26,9 @@ import {
 } from "@/components/ui/select";
 import AddCompanyDialog from "@/components/company/AddCompanyDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { exportAsCSV } from "@/utils/exportUtils";
+import { format } from "date-fns";
+import { toast } from "sonner";
 
 // Mock Data
 const mockCompanies = [
@@ -216,6 +219,63 @@ const Companies = () => {
     setCompanies(prevCompanies => [newCompany, ...prevCompanies]);
   };
 
+  const handleExportCompanies = () => {
+    // Define headers for the CSV file
+    const headers = {
+      'id': 'ID',
+      'name': 'Nome da Empresa',
+      'fantasyName': 'Nome Fantasia',
+      'cnpj': 'CNPJ',
+      'city': 'Cidade',
+      'state': 'Estado',
+      'segment': 'Segmento',
+      'employees': 'Funcionários',
+      'opportunity': 'Oportunidade',
+      'companyType': 'Tipo de Empresa',
+      'creator.origin': 'Origem',
+      'creator.name': 'Inserido por',
+      'creator.email': 'Email do Responsável',
+      'creator.createdAt': 'Data de Inserção'
+    };
+
+    // Format data for export
+    const dataToExport = filteredCompanies.map(company => {
+      // Format opportunity values to Portuguese
+      let opportunityValue = '';
+      if (company.opportunity === 'hot') opportunityValue = 'Quente';
+      else if (company.opportunity === 'warm') opportunityValue = 'Morna';
+      else if (company.opportunity === 'cold') opportunityValue = 'Fria';
+      
+      // Clone company object for export
+      const exportCompany = { 
+        ...company,
+        opportunity: opportunityValue
+      };
+      
+      // Format date if it exists
+      if (company.creator?.createdAt) {
+        try {
+          const date = new Date(company.creator.createdAt);
+          exportCompany.creator = {
+            ...company.creator,
+            createdAt: format(date, 'dd/MM/yyyy HH:mm')
+          };
+        } catch (e) {
+          console.error('Error formatting date', e);
+        }
+      }
+      
+      return exportCompany;
+    });
+
+    // Generate CSV and download
+    const timestamp = format(new Date(), 'yyyy-MM-dd_HHmm');
+    exportAsCSV(dataToExport, headers, `empresas_${timestamp}`);
+    
+    toast.success(`Relatório exportado com sucesso: ${dataToExport.length} empresas`);
+  };
+
+  // Filter companies based on the search query, opportunity status, and origin
   const filteredCompanies = companies.filter((company) => {
     // Filter by search query
     const matchesSearch =
@@ -286,6 +346,14 @@ const Companies = () => {
           </p>
         </div>
         <div className="flex gap-3">
+          <Button 
+            variant="outline" 
+            onClick={handleExportCompanies}
+            disabled={filteredCompanies.length === 0}
+          >
+            <FileDown className="h-4 w-4 mr-2" />
+            Exportar Relatório
+          </Button>
           <AddCompanyDialog onAddCompany={handleAddCompany} />
           <Button onClick={() => navigate("/")}>
             Nova Busca
