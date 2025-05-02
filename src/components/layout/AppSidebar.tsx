@@ -50,7 +50,7 @@ const AppSidebar = () => {
     {
       text: "Início",
       path: "/",
-      icon: Search,
+      icon: BarChart3,
     },
     {
       text: "Dashboard",

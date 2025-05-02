@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -15,18 +16,23 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const AppNavbar = () => {
+  const location = useLocation();
+  const showSearchInNavbar = location.pathname === '/companies';
+  
   return (
     <header className="border-b bg-background sticky top-0 z-10">
       <div className="flex items-center justify-between h-16 px-6">
         <div className="flex items-center gap-4">
           <SidebarTrigger />
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Buscar empresas, contatos..."
-              className="pl-8 h-9"
-            />
-          </div>
+          {showSearchInNavbar && (
+            <div className="relative w-64">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Buscar empresas..."
+                className="pl-8 h-9"
+              />
+            </div>
+          )}
         </div>
         
         <div className="flex items-center gap-4">

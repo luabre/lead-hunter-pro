@@ -1,27 +1,26 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import StatsCard from "@/components/dashboard/StatsCard";
-import CompanySearch from "@/components/search/CompanySearch";
-import CompanyCard from "@/components/search/CompanyCard";
-import CompanyDetails from "@/components/company/CompanyDetails";
 import AiAgentCard from "@/components/ai/AiAgentCard";
 import BusinessTypeChart from "@/components/dashboard/BusinessTypeChart";
 import MarketChart from "@/components/dashboard/MarketChart";
 import CompanyHeatMap from "@/components/search/CompanyHeatMap";
 import { 
-  Database, Search, Users, TrendingUp, Brain, Rocket, Calendar, 
-  Flame, Lightbulb, ChevronRight, AlertTriangle, Edit, ArrowRight
+  Database, Users, TrendingUp, Brain, Rocket, Calendar, 
+  Flame, Lightbulb, ChevronRight, AlertTriangle, Edit, ArrowRight, Search
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { CompanyFilters } from "@/components/search/CompanySearch";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertBox } from "@/components/common/AlertBox";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { CompanyFilters } from "@/components/search/CompanySearch";
+import CompanySearch from "@/components/search/CompanySearch";
+import CompanyCard from "@/components/search/CompanyCard";
+import CompanyDetails from "@/components/company/CompanyDetails";
 
 // Mock Data - mantido o mesmo
 const mockCompanies = [
