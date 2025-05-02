@@ -38,7 +38,11 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
       {/* Left side with login form */}
       <div className="w-full md:w-6/12 flex flex-col p-6 md:p-10 justify-center">
         <div className="mb-8">
-          <h1 className="font-bold text-2xl text-blue-600">LeadHunter Pro</h1>
+          <img 
+            src="/lovable-uploads/039c9c09-384f-4a6e-a325-10972460bfe1.png" 
+            alt="LeadHunter Pro Logo" 
+            className="h-12 mb-3"
+          />
           <p className="text-gray-700 mt-2">
             Inteligência comercial em ação. Acesse sua conta e comece a caçar oportunidades.
           </p>
@@ -120,7 +124,7 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
       {/* Right side with illustration and tagline */}
       <div className="hidden md:flex w-6/12 flex-col bg-blue-50 p-10 justify-between">
         <div className="mt-8">
-          <h1 className="font-bold text-2xl text-blue-600">LeadHunter Pro</h1>
+          {/* Removed LeadHunter Pro text */}
         </div>
         <div className="flex flex-col items-start">
           <img 
