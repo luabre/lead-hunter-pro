@@ -25,6 +25,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, FileText, Calendar, Check } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 
 const leadOptions = [
   { value: "1", label: "TechSol - João Silva" },
@@ -32,11 +34,30 @@ const leadOptions = [
   { value: "3", label: "NaturFood - Carlos Pereira" },
 ];
 
+const companyMap = {
+  "1": "TechSol",
+  "2": "LogEx",
+  "3": "NaturFood"
+};
+
+const contactMap = {
+  "1": "João Silva",
+  "2": "Maria Souza",
+  "3": "Carlos Pereira"
+};
+
 const IaCloser = () => {
+  const navigate = useNavigate();
   const [selectedLead, setSelectedLead] = useState<string>("1");
   const [generatingProposal, setGeneratingProposal] = useState(false);
   const [proposalGenerated, setProposalGenerated] = useState(false);
   const [selectedTab, setSelectedTab] = useState("proposal");
+  
+  // Meeting information state
+  const [meetingTitle, setMeetingTitle] = useState("Apresentação Final");
+  const [meetingAgenda, setMeetingAgenda] = useState("");
+  const [meetingDate, setMeetingDate] = useState("");
+  const [meetingTime, setMeetingTime] = useState("");
   
   const handleGenerateProposal = () => {
     setGeneratingProposal(true);
@@ -57,6 +78,48 @@ const IaCloser = () => {
       title: "Proposta enviada com sucesso",
       description: "A IA Closer enviará a proposta e notificará sobre aberturas e interações.",
     });
+  };
+
+  const handleScheduleMeeting = () => {
+    if (!meetingTitle || !meetingDate || !meetingTime) {
+      toast({
+        title: "Informações incompletas",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Get the existing meetings from localStorage or create an empty array
+    const existingMeetings = JSON.parse(localStorage.getItem('meetings') || '[]');
+    
+    // Create a new meeting object
+    const newMeeting = {
+      id: uuidv4(),
+      title: meetingTitle,
+      companyName: companyMap[selectedLead as keyof typeof companyMap],
+      contactName: contactMap[selectedLead as keyof typeof contactMap],
+      date: meetingDate,
+      time: meetingTime,
+      type: "proposal",
+      notes: meetingAgenda
+    };
+    
+    // Add the new meeting to the existing meetings
+    const updatedMeetings = [...existingMeetings, newMeeting];
+    
+    // Save the updated meetings to localStorage
+    localStorage.setItem('meetings', JSON.stringify(updatedMeetings));
+    
+    toast({
+      title: "Reunião agendada com sucesso",
+      description: "A reunião foi adicionada à sua agenda de compromissos.",
+    });
+    
+    // Navigate to the Meetings page after a short delay
+    setTimeout(() => {
+      navigate('/meetings');
+    }, 1500);
   };
   
   return (
@@ -251,6 +314,8 @@ Todos estes elementos foram pensados especificamente para atender às necessidad
                               <Input 
                                 id="meeting-title" 
                                 placeholder="Ex: Apresentação Final - TechSol"
+                                value={meetingTitle}
+                                onChange={(e) => setMeetingTitle(e.target.value)}
                               />
                             </div>
                             
@@ -260,6 +325,8 @@ Todos estes elementos foram pensados especificamente para atender às necessidad
                                 id="meeting-agenda"
                                 placeholder="Descreva os pontos principais a serem abordados na reunião..."
                                 className="min-h-[100px]"
+                                value={meetingAgenda}
+                                onChange={(e) => setMeetingAgenda(e.target.value)}
                               />
                             </div>
                             
@@ -269,6 +336,8 @@ Todos estes elementos foram pensados especificamente para atender às necessidad
                                 <Input 
                                   id="meeting-date" 
                                   type="date"
+                                  value={meetingDate}
+                                  onChange={(e) => setMeetingDate(e.target.value)}
                                 />
                               </div>
                               
@@ -277,13 +346,15 @@ Todos estes elementos foram pensados especificamente para atender às necessidad
                                 <Input 
                                   id="meeting-time" 
                                   type="time"
+                                  value={meetingTime}
+                                  onChange={(e) => setMeetingTime(e.target.value)}
                                 />
                               </div>
                             </div>
                           </div>
                           
                           <div className="flex justify-end">
-                            <Button>
+                            <Button onClick={handleScheduleMeeting}>
                               <Calendar className="h-4 w-4 mr-2" />
                               Agendar Reunião
                             </Button>
