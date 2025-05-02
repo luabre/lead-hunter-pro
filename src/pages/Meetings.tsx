@@ -9,7 +9,7 @@ import {
   CardDescription
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Plus } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Bell } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
   Dialog,
@@ -30,6 +30,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from 'uuid';
+import { AlertBox } from "@/components/common/AlertBox";
+import { Badge } from "@/components/ui/badge";
 
 interface Meeting {
   id: string;
@@ -46,6 +48,7 @@ const Meetings = () => {
   const [isAddMeetingDialogOpen, setIsAddMeetingDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [notifications, setNotifications] = useState<{ id: string; message: string; date: string }[]>([]);
   
   // Form state for adding a new meeting
   const [newMeeting, setNewMeeting] = useState({
@@ -65,10 +68,53 @@ const Meetings = () => {
     }
   }, []);
   
+  // Generate notifications based on upcoming meetings
+  useEffect(() => {
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0];
+    
+    // Filter meetings happening today or tomorrow
+    const upcomingMeetings = meetings.filter(meeting => {
+      const meetingDate = new Date(meeting.date);
+      const diffTime = meetingDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays >= 0 && diffDays <= 2; // Today or in the next 2 days
+    });
+    
+    const newNotifications = upcomingMeetings.map(meeting => {
+      const meetingDate = new Date(meeting.date);
+      const diffTime = meetingDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      let message = "";
+      if (diffDays === 0) {
+        message = `Reunião com ${meeting.companyName} hoje às ${meeting.time}`;
+      } else if (diffDays === 1) {
+        message = `Reunião com ${meeting.companyName} amanhã às ${meeting.time}`;
+      } else {
+        message = `Reunião com ${meeting.companyName} em 2 dias às ${meeting.time}`;
+      }
+      
+      return {
+        id: meeting.id,
+        message,
+        date: meeting.date
+      };
+    });
+    
+    setNotifications(newNotifications);
+  }, [meetings]);
+  
   // Filter meetings for selected date
   const meetingsForSelectedDate = selectedDate 
     ? meetings.filter(meeting => meeting.date === selectedDate.toISOString().split('T')[0])
     : [];
+
+  // Function to determine which dates have meetings
+  const getDatesWithMeetings = () => {
+    const dates = meetings.map(meeting => meeting.date);
+    return dates.filter((date, index) => dates.indexOf(date) === index);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setNewMeeting({
@@ -142,6 +188,28 @@ const Meetings = () => {
     });
   };
 
+  // Function to get meeting type color
+  const getMeetingTypeColor = (type: string) => {
+    switch (type) {
+      case "discovery": return "bg-blue-100 text-blue-800";
+      case "proposal": return "bg-green-100 text-green-800";
+      case "negotiation": return "bg-amber-100 text-amber-800";
+      case "closing": return "bg-purple-100 text-purple-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Function to translate meeting type
+  const getMeetingTypeText = (type: string) => {
+    switch (type) {
+      case "discovery": return "Descoberta";
+      case "proposal": return "Proposta";
+      case "negotiation": return "Negociação";
+      case "closing": return "Fechamento";
+      default: return type;
+    }
+  };
+
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-8">
@@ -158,20 +226,55 @@ const Meetings = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Calendário</CardTitle>
-            <CardDescription>Selecione uma data para ver as reuniões</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CalendarComponent
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              className="rounded-md border pointer-events-auto"
+        <div className="col-span-1 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Calendário</CardTitle>
+              <CardDescription>Selecione uma data para ver as reuniões</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CalendarComponent
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                className="rounded-md border pointer-events-auto"
+                modifiers={{
+                  hasMeeting: getDatesWithMeetings().map(dateString => new Date(dateString)),
+                }}
+                modifiersStyles={{
+                  hasMeeting: { 
+                    backgroundColor: "rgba(0, 122, 255, 0.1)",
+                    fontWeight: "bold",
+                    borderRadius: "50%",
+                    color: "var(--primary)",
+                    position: "relative"
+                  }
+                }}
+              />
+              <div className="mt-3 text-sm text-muted-foreground">
+                <div className="flex items-center mb-1">
+                  <span className="w-3 h-3 rounded-full bg-primary/20 mr-2"></span>
+                  <span>Dias com reuniões agendadas</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {notifications.length > 0 && (
+            <AlertBox
+              title="Notificações"
+              alerts={notifications.map(notification => ({
+                icon: "bell",
+                text: notification.message,
+                type: "alert",
+                action: () => {
+                  const date = new Date(notification.date);
+                  setSelectedDate(date);
+                }
+              }))}
             />
-          </CardContent>
-        </Card>
+          )}
+        </div>
 
         <Card className="col-span-1 md:col-span-2">
           <CardHeader>
@@ -201,11 +304,16 @@ const Meetings = () => {
                     </CardHeader>
                     <CardContent className="pt-0">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(meeting.date).toLocaleDateString('pt-BR')}
-                          </span>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center">
+                            <CalendarIcon className="h-4 w-4 mr-1 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(meeting.date).toLocaleDateString('pt-BR')}
+                            </span>
+                          </div>
+                          <Badge variant="outline" className={`text-xs ${getMeetingTypeColor(meeting.type)}`}>
+                            {getMeetingTypeText(meeting.type)}
+                          </Badge>
                         </div>
                         <div>
                           <Button size="sm" variant="outline">
@@ -224,7 +332,7 @@ const Meetings = () => {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-48 text-center p-4">
-                <Calendar className="h-10 w-10 text-muted-foreground mb-2" />
+                <CalendarIcon className="h-10 w-10 text-muted-foreground mb-2" />
                 <p className="text-muted-foreground">
                   {selectedDate 
                     ? "Nenhuma reunião agendada para esta data" 
