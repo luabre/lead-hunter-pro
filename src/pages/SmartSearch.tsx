@@ -1,4 +1,6 @@
+
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import CompanySearch from "@/components/search/CompanySearch";
 import CompanyCard from "@/components/search/CompanyCard";
@@ -121,6 +123,7 @@ const heatMapStates = [
 ];
 
 const SmartSearch = () => {
+  const navigate = useNavigate();
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [searchResults, setSearchResults] = useState<typeof mockCompanies>([]);
   const [selectedCompany, setSelectedCompany] = useState<typeof mockCompanies[0] | null>(null);

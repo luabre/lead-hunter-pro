@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MessageSquare, Mail, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface AiAgentCardProps {
   type: "sdr" | "closer" | "search";
@@ -15,6 +16,18 @@ interface AiAgentCardProps {
 }
 
 const AiAgentCard = ({ type, onClick }: AiAgentCardProps) => {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else if (type === "sdr") {
+      navigate("/ia-sdr");
+    } else if (type === "closer") {
+      navigate("/ia-closer");
+    }
+  };
+
   return (
     <Card className="bg-leadhunter-blue-dark text-white overflow-hidden">
       <CardHeader className="border-b border-white/20">
@@ -84,7 +97,7 @@ const AiAgentCard = ({ type, onClick }: AiAgentCardProps) => {
           <Button
             variant="outline"
             className="w-full border-white text-white hover:bg-white/20 font-medium"
-            onClick={onClick}
+            onClick={handleClick}
           >
             {type === "sdr" 
               ? "Iniciar Prospecção" 
