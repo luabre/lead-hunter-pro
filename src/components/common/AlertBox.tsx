@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 
 type AlertType = 'alert' | 'tip' | 'update';
 type IconType = 'bell' | 'pin' | 'megaphone';
+type AlertVariant = 'default' | 'warning' | 'destructive' | 'success';
 
 interface Alert {
   icon: IconType;
@@ -16,11 +17,13 @@ interface Alert {
 
 interface AlertBoxProps {
   title: string;
-  alerts: Alert[];
+  alerts?: Alert[];
   className?: string;
+  description?: string;
+  variant?: AlertVariant;
 }
 
-export const AlertBox = ({ title, alerts, className }: AlertBoxProps) => {
+export const AlertBox = ({ title, alerts = [], description, variant = 'default', className }: AlertBoxProps) => {
   const getIcon = (type: IconType) => {
     switch (type) {
       case 'bell':
@@ -47,12 +50,34 @@ export const AlertBox = ({ title, alerts, className }: AlertBoxProps) => {
     }
   };
 
+  const getVariantStyle = (variant: AlertVariant) => {
+    switch (variant) {
+      case 'warning':
+        return 'bg-amber-50 border-amber-100';
+      case 'destructive':
+        return 'bg-red-50 border-red-100';
+      case 'success':
+        return 'bg-green-50 border-green-100';
+      default:
+        return 'bg-gray-50 border-gray-100';
+    }
+  };
+
   return (
     <Card className={cn("h-full", className)}>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">{title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 pt-0">
+        {description && (
+          <div className={cn(
+            "border rounded-md p-3 text-sm",
+            getVariantStyle(variant)
+          )}>
+            {description}
+          </div>
+        )}
+        
         {alerts.map((alert, index) => (
           <div 
             key={index}
