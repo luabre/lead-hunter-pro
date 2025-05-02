@@ -29,6 +29,11 @@ export interface ProcessedData {
   enriched: number;
   failed: number;
   leads: any[];
+  stats?: {
+    total: number;
+    enriched: number;
+    corrected: number;
+  };
 }
 
 const LeadImportStepper = ({ 
@@ -58,7 +63,16 @@ const LeadImportStepper = ({
   };
 
   const handleCleanseComplete = (data: ProcessedData) => {
-    setProcessedData(data);
+    // Ensure the data has the stats property for the completion step
+    const enhancedData = {
+      ...data,
+      stats: {
+        total: data.total,
+        enriched: data.enriched,
+        corrected: data.corrected
+      }
+    };
+    setProcessedData(enhancedData);
     goToNextStep();
   };
 
