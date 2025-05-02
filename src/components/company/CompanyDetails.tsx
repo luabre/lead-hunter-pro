@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -52,6 +53,12 @@ interface CompanyDetailsProps {
     socialActive?: boolean; // New property for social activity
     sector?: string;
     subSector?: string;
+    swot?: {
+      strengths: string[];
+      weaknesses: string[];
+      opportunities: string[];
+      threats: string[];
+    };
   };
   onClose?: () => void;
   isFromAiSearch?: boolean;
@@ -60,6 +67,7 @@ interface CompanyDetailsProps {
 const CompanyDetails = ({ company, onClose, isFromAiSearch = false }: CompanyDetailsProps) => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+  const [activeAnalysisTab, setActiveAnalysisTab] = useState<'porter' | 'swot'>('porter');
   
   // Format date for display
   const formatDateTime = (dateString?: string) => {
@@ -97,6 +105,30 @@ const CompanyDetails = ({ company, onClose, isFromAiSearch = false }: CompanyDet
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Mock SWOT data if not provided
+  const swotData = company.swot || {
+    strengths: [
+      "Forte presença no segmento de mercado",
+      "Equipe qualificada e experiente",
+      "Boa reputação com clientes"
+    ],
+    weaknesses: [
+      "Processos internos que podem ser otimizados",
+      "Presença digital limitada",
+      "Recursos financeiros restritos para expansão"
+    ],
+    opportunities: [
+      "Expansão para novos mercados",
+      "Parcerias estratégicas potenciais",
+      "Adoção de novas tecnologias"
+    ],
+    threats: [
+      "Concorrentes bem estabelecidos",
+      "Mudanças regulatórias no setor",
+      "Instabilidade econômica"
+    ]
   };
 
   return (
@@ -255,7 +287,26 @@ const CompanyDetails = ({ company, onClose, isFromAiSearch = false }: CompanyDet
         
         <TabsContent value="analysis" className="p-0">
           <CardContent className="p-6 space-y-6">
-            {company.porterAnalysis && (
+            {/* Tabs para alternar entre análise de Porter e SWOT */}
+            <div className="flex space-x-2 mb-4">
+              <Button 
+                variant={activeAnalysisTab === 'porter' ? 'default' : 'outline'}
+                onClick={() => setActiveAnalysisTab('porter')}
+                className="text-sm"
+              >
+                5 Forças de Porter
+              </Button>
+              <Button 
+                variant={activeAnalysisTab === 'swot' ? 'default' : 'outline'}
+                onClick={() => setActiveAnalysisTab('swot')}
+                className="text-sm"
+              >
+                Análise SWOT
+              </Button>
+            </div>
+
+            {/* Análise de Porter */}
+            {activeAnalysisTab === 'porter' && company.porterAnalysis && (
               <div>
                 <h3 className="text-lg font-semibold mb-4">Análise de 5 Forças de Porter</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -279,6 +330,78 @@ const CompanyDetails = ({ company, onClose, isFromAiSearch = false }: CompanyDet
                     title="Poder dos Fornecedores" 
                     value={company.porterAnalysis.supplierPower}
                   />
+                </div>
+              </div>
+            )}
+            
+            {/* Análise SWOT */}
+            {activeAnalysisTab === 'swot' && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Análise SWOT</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="bg-green-50 border-green-200">
+                    <CardHeader className="pb-2 border-b border-green-200">
+                      <CardTitle className="text-green-700 text-sm font-medium">FORÇAS (Strengths)</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <ul className="space-y-2">
+                        {swotData.strengths.map((item, index) => (
+                          <li key={`strength-${index}`} className="flex items-start gap-2">
+                            <span className="text-green-600 font-bold">+</span>
+                            <span className="text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-red-50 border-red-200">
+                    <CardHeader className="pb-2 border-b border-red-200">
+                      <CardTitle className="text-red-700 text-sm font-medium">FRAQUEZAS (Weaknesses)</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <ul className="space-y-2">
+                        {swotData.weaknesses.map((item, index) => (
+                          <li key={`weakness-${index}`} className="flex items-start gap-2">
+                            <span className="text-red-600 font-bold">-</span>
+                            <span className="text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-blue-50 border-blue-200">
+                    <CardHeader className="pb-2 border-b border-blue-200">
+                      <CardTitle className="text-blue-700 text-sm font-medium">OPORTUNIDADES (Opportunities)</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <ul className="space-y-2">
+                        {swotData.opportunities.map((item, index) => (
+                          <li key={`opportunity-${index}`} className="flex items-start gap-2">
+                            <span className="text-blue-600 font-bold">→</span>
+                            <span className="text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-yellow-50 border-yellow-200">
+                    <CardHeader className="pb-2 border-b border-yellow-200">
+                      <CardTitle className="text-yellow-700 text-sm font-medium">AMEAÇAS (Threats)</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <ul className="space-y-2">
+                        {swotData.threats.map((item, index) => (
+                          <li key={`threat-${index}`} className="flex items-start gap-2">
+                            <span className="text-yellow-600 font-bold">!</span>
+                            <span className="text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             )}
