@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -123,7 +122,7 @@ const heatMapStates = [
   { uf: "PB", name: "Paraíba", count: 140 },
 ];
 
-// Sample company names to simulate AI-generated companies based on segment
+// Sample company names map - updated to be more specific by segment
 const segmentCompanyMap: Record<string, string[]> = {
   "tecnologia": [
     "TechSolutions Brasil", 
@@ -180,37 +179,53 @@ const segmentCompanyMap: Record<string, string[]> = {
     "CapitalSmart Investimentos", 
     "CreditoBrasil Financeira", 
     "MoneyWise Consultoria"
+  ],
+  "agronegócio": [
+    "AgroBrasil Commodities",
+    "RuralTech Insumos",
+    "CampoForte Agropecuária",
+    "TerraFértil Agricultura",
+    "AgricolaVerde Produção"
+  ],
+  "imobiliário": [
+    "ImóveisPrime Incorporação",
+    "LarIdeal Imobiliária",
+    "MoraBem Empreendimentos",
+    "CasaNova Negócios",
+    "TerraCerta Administração"
   ]
 };
 
-// Function to get random companies based on segment
+// Enhanced function to get segment-specific company names
 const getSegmentCompanies = (segment: string): string[] => {
-  const lowerSegment = segment.toLowerCase();
+  // Normalize the segment for matching (lowercase, remove accents)
+  const normalizedSegment = segment.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   
-  // Try to find an exact match
+  // Try to find an exact match first
   for (const key in segmentCompanyMap) {
-    if (key === lowerSegment) {
+    if (key === normalizedSegment) {
       return segmentCompanyMap[key];
     }
   }
   
-  // If no exact match, try to find a partial match
+  // If no exact match, try partial match with keywords
   for (const key in segmentCompanyMap) {
-    if (lowerSegment.includes(key) || key.includes(lowerSegment)) {
+    if (normalizedSegment.includes(key) || key.includes(normalizedSegment)) {
       return segmentCompanyMap[key];
     }
   }
   
-  // If no match at all, return a random set
-  const allCompanies = Object.values(segmentCompanyMap).flat();
-  const randomCompanies = [];
+  // If no match at all, generate segment-specific company names
+  const segmentPrefix = segment.split(' ')[0];
+  const suffixes = ["Brasil", "Tech", "Soluções", "Serviços", "Group"];
+  const types = ["Ltda", "S.A.", "Empresarial", "Corporativo", "Nacional"];
   
-  for (let i = 0; i < 5; i++) {
-    const randomIndex = Math.floor(Math.random() * allCompanies.length);
-    randomCompanies.push(allCompanies[randomIndex]);
-  }
-  
-  return randomCompanies;
+  // Generate 5 companies with the segment name incorporated
+  return Array(5).fill(0).map((_, i) => {
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+    const type = types[Math.floor(Math.random() * types.length)];
+    return `${segmentPrefix} ${suffix} ${type}`;
+  });
 };
 
 // Generate Brazilian states
@@ -246,18 +261,17 @@ const SmartSearch = () => {
     setIsSearching(true);
 
     try {
-      // Get company names based on segment
+      // Get segment-specific company names
       const segmentCompanies = getSegmentCompanies(filters.segment);
       const generatedCompanies = [];
       
-      // Generate 5 mock companies based on the segment
+      // Generate companies based on the segment with enriched data
       for (let i = 0; i < segmentCompanies.length; i++) {
         const companyName = segmentCompanies[i];
         const randomState = brazilianStates[Math.floor(Math.random() * brazilianStates.length)];
         const randomCity = randomState === "SP" ? "São Paulo" : 
                           randomState === "RJ" ? "Rio de Janeiro" : 
                           randomState === "MG" ? "Belo Horizonte" : "Cidade Principal";
-        const randomEmployees = employeeRanges[Math.floor(Math.random() * employeeRanges.length)];
         
         // Generate CNPJ
         const cnpj = `${Math.floor(10 + Math.random() * 90)}.${Math.floor(100 + Math.random() * 900)}.${Math.floor(100 + Math.random() * 900)}/0001-${Math.floor(10 + Math.random() * 90)}`;
@@ -269,42 +283,49 @@ const SmartSearch = () => {
         // AI detected for some companies
         const aiDetected = Math.random() > 0.6;
         
-        // Enrich company data using GPT
+        // Enrich company data using GPT with explicit segment parameter
         let enrichedData = null;
         try {
           enrichedData = await enrichCompanyWithGPT(companyName, randomCity, filters.segment);
           console.log("Enriched data for", companyName, enrichedData);
+
+          // Use enriched data for employee count if available, otherwise use random
+          const employeeCount = enrichedData?.employees || employeeRanges[Math.floor(Math.random() * employeeRanges.length)];
+          
+          // Generate company object with enriched data
+          generatedCompanies.push({
+            id: `gen-${i + 1}`,
+            name: companyName,
+            fantasyName: companyName.split(" ")[0],
+            cnpj,
+            city: randomCity,
+            state: randomState,
+            segment: filters.segment,
+            employees: employeeCount,
+            opportunity,
+            aiDetected,
+            website: enrichedData?.website,
+            digitalPresence: enrichedData?.digitalPresence,
+            revenue: enrichedData?.revenue,
+            sector: enrichedData?.sector,
+            subSector: enrichedData?.subSector,
+            decisionMakerName: enrichedData?.decisionMaker?.name,
+            decisionMakerPosition: enrichedData?.decisionMaker?.position,
+            companyType: enrichedData?.companyType,
+            opportunitySignals: enrichedData?.opportunitySignals,
+            recommendedChannels: enrichedData?.recommendedChannels,
+            yearFounded: Math.floor(1990 + Math.random() * 30).toString(), // Random year between 1990-2020
+            creator: {
+              name: "IA LeadHunter",
+              email: "ia@leadhunter.ai",
+              origin: "radar",
+              createdAt: new Date().toISOString(),
+            }
+          });
         } catch (error) {
           console.error("Failed to enrich company data:", error);
+          // Skip adding this company or add with minimal data
         }
-        
-        // Generate company object
-        generatedCompanies.push({
-          id: `gen-${i + 1}`,
-          name: companyName,
-          fantasyName: companyName.split(" ")[0],
-          cnpj,
-          city: randomCity,
-          state: randomState,
-          segment: filters.segment,
-          employees: randomEmployees,
-          opportunity,
-          aiDetected,
-          website: enrichedData?.website,
-          digitalPresence: enrichedData?.digitalPresence,
-          revenue: enrichedData?.revenue,
-          decisionMakerName: enrichedData?.decisionMaker?.name,
-          decisionMakerPosition: enrichedData?.decisionMaker?.position,
-          companyType: enrichedData?.companyType,
-          opportunitySignals: enrichedData?.opportunitySignals,
-          recommendedChannels: enrichedData?.recommendedChannels,
-          creator: {
-            name: "IA LeadHunter",
-            email: "ia@leadhunter.ai",
-            origin: "radar",
-            createdAt: new Date().toISOString(),
-          }
-        });
       }
       
       // Apply any text filtering from filters

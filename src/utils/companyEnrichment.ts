@@ -44,13 +44,15 @@ export async function enrichCompanyWithGPT(
       return null;
     }
 
-    // Create the prompt for the GPT model
+    // Create the prompt for the GPT model with more specific instructions about matching the segment
     const prompt = `
 Com base no nome da empresa abaixo, e se possível, na cidade e segmento, gere um perfil resumido da empresa para fins comerciais.
 
 Nome da empresa: ${companyName}
 Cidade (se houver): ${city || ""}
 Segmento (se houver): ${segment || ""}
+
+IMPORTANTE: O perfil deve ser específico para o segmento "${segment || ""}". Se não for possível determinar o segmento exato, escolha um subsegmento apropriado dentro do segmento principal solicitado.
 
 Retorne em formato estruturado:
 - Site provável:
@@ -76,6 +78,7 @@ Retorne em formato estruturado:
       },
       body: JSON.stringify({
         prompt,
+        segment, // Pass segment explicitly to the edge function
       }),
     });
 
