@@ -86,6 +86,19 @@ const CompanyDetails = ({ company, onClose, isFromAiSearch = false }: CompanyDet
     setIsSaving(true);
 
     try {
+      // First, check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Erro ao salvar",
+          description: "Você precisa estar autenticado para salvar empresas.",
+          variant: "destructive",
+        });
+        setIsSaving(false);
+        return;
+      }
+
       // Map the company data to the structure expected by the database
       const companyData = {
         name: company.name,
@@ -100,7 +113,8 @@ const CompanyDetails = ({ company, onClose, isFromAiSearch = false }: CompanyDet
         website: company.website,
         year_founded: company.yearFounded,
         digital_maturity: company.digitalMaturity || 50, // Default value if not provided
-        created_at: new Date().toISOString() // Fixed: Convert Date to string
+        created_at: new Date().toISOString(), // Convert Date to string
+        created_by: session.user.id // Add the user ID as creator
       };
 
       // Insert the company into the database

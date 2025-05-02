@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 interface CompanyCardProps {
   company: {
@@ -44,6 +45,7 @@ interface CompanyCardProps {
 
 const CompanyCard = ({ company, onClick, className, showSaveButton = false }: CompanyCardProps) => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
 
   // Define badge styles based on opportunity type
   const getBadgeStyles = () => {
@@ -92,8 +94,22 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
   // Handle Save to Database
   const handleSaveToDatabase = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsSaving(true);
 
     try {
+      // First, check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Erro ao salvar",
+          description: "Você precisa estar autenticado para salvar empresas.",
+          variant: "destructive",
+        });
+        setIsSaving(false);
+        return;
+      }
+
       // Map the company data to the structure expected by the database
       const companyData = {
         name: company.name,
@@ -108,7 +124,8 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
         website: company.website || company.digitalPresence,
         year_founded: company.yearFounded,
         digital_maturity: 50, // Default value
-        created_at: new Date().toISOString() // Convert Date to string
+        created_at: new Date().toISOString(), // Convert Date to string
+        created_by: session.user.id // Add the user ID as creator
       };
 
       // Insert the company into the database
@@ -124,6 +141,7 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
           description: "Não foi possível incluir a empresa na base de dados.",
           variant: "destructive",
         });
+        setIsSaving(false);
         return;
       }
 
@@ -141,6 +159,7 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
         description: "Ocorreu um erro ao processar sua solicitação.",
         variant: "destructive",
       });
+      setIsSaving(false);
     }
   };
 
@@ -289,9 +308,10 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
             variant="outline" 
             className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
             onClick={handleSaveToDatabase}
+            disabled={isSaving}
           >
             <Database className="h-4 w-4 mr-1" />
-            Incluir na Base de Dados
+            {isSaving ? "Salvando..." : "Incluir na Base de Dados"}
           </Button>
         )}
       </div>
