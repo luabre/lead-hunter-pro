@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Bell, Search, Settings, Users } from 'lucide-react';
+import { Bell, Search, Settings, Users, Camera } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -14,10 +14,48 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from '@/components/ui/use-toast';
 
 const AppNavbar = () => {
   const location = useLocation();
   const showSearchInNavbar = location.pathname === '/companies';
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (error) throw error;
+      setUserProfile(data);
+    } catch (error: any) {
+      console.error("Error fetching user profile:", error.message);
+    }
+  };
+
+  const handleUploadClick = () => {
+    // Redirect to sidebar's file input
+    const fileInput = document.getElementById('avatar-upload');
+    if (fileInput) fileInput.click();
+  };
+
+  const getInitials = (profile: any) => {
+    if (!profile) return "U";
+    return `${profile.first_name?.charAt(0) || ""}${profile.last_name?.charAt(0) || ""}`;
+  };
   
   return (
     <header className="border-b bg-background sticky top-0 z-10">
@@ -50,14 +88,18 @@ const AppNavbar = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src="/placeholder.svg" alt="User" />
-                  <AvatarFallback>JP</AvatarFallback>
+                  <AvatarImage src={userProfile?.avatar_url || "/placeholder.svg"} alt="User" />
+                  <AvatarFallback>{getInitials(userProfile)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleUploadClick}>
+                <Camera className="mr-2 h-4 w-4" />
+                <span>Atualizar foto</span>
+              </DropdownMenuItem>
               <DropdownMenuItem>Perfil</DropdownMenuItem>
               <DropdownMenuItem>Configurações</DropdownMenuItem>
               <DropdownMenuItem>Plano e Faturamento</DropdownMenuItem>
