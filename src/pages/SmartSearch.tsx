@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -296,16 +297,17 @@ const employeeRanges = [
   "1-10", "11-50", "51-100", "101-200", "201-500", "500+"
 ];
 
-export interface CompanyFilters {
-  searchTerm: string; // Updated to use a single search term
-  state?: string;
-  size?: string;
-  revenue?: string;
-  employees?: string;
-  type?: string;
-  yearsInBusiness?: string;
-  sortBy?: 'name' | 'opportunity' | 'state';
-}
+// Remove this duplicate interface definition since we're importing it from CompanySearch
+// export interface CompanyFilters {
+//   searchTerm: string; // Updated to use a single search term
+//   state?: string;
+//   size?: string;
+//   revenue?: string;
+//   employees?: string;
+//   type?: string;
+//   yearsInBusiness?: string;
+//   sortBy?: 'name' | 'opportunity' | 'state';
+// }
 
 const SmartSearch = () => {
   const navigate = useNavigate();
