@@ -61,6 +61,13 @@ const AppSidebar = () => {
       text: "Empresas",
       path: "/companies",
       icon: Building2,
+      subItems: [
+        {
+          text: "Busca Inteligente",
+          path: "/smart-search",
+          icon: Search,
+        }
+      ]
     },
     {
       text: "Contatos",
@@ -151,6 +158,22 @@ const AppSidebar = () => {
                       )}
                     </a>
                   </SidebarMenuButton>
+                  
+                  {item.subItems && (
+                    <SidebarMenuSub>
+                      {item.subItems.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.path}>
+                          <SidebarMenuSubButton
+                            href={subItem.path}
+                            isActive={isActivePath(subItem.path)}
+                          >
+                            <subItem.icon className="h-4 w-4 mr-2" />
+                            <span>{subItem.text}</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

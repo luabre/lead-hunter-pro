@@ -17,9 +17,6 @@ import { Badge } from "@/components/ui/badge";
 import { AlertBox } from "@/components/common/AlertBox";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import { CompanyFilters } from "@/components/search/CompanySearch";
-import CompanySearch from "@/components/search/CompanySearch";
-import CompanyCard from "@/components/search/CompanyCard";
 import CompanyDetails from "@/components/company/CompanyDetails";
 
 // Mock Data - mantido o mesmo
@@ -167,35 +164,7 @@ const quickStartGuide = [
 
 const Index = () => {
   const navigate = useNavigate();
-  const [searchPerformed, setSearchPerformed] = useState(false);
-  const [searchResults, setSearchResults] = useState<typeof mockCompanies>([]);
   const [selectedCompany, setSelectedCompany] = useState<typeof mockCompanies[0] | null>(null);
-  const [searchPanelOpen, setSearchPanelOpen] = useState(false);
-
-  const handleSearch = (filters: CompanyFilters) => {
-    if (!filters.segment) {
-      toast({
-        title: "Por favor, informe um segmento",
-        description: "O segmento é obrigatório para a busca.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Simulate API call with delay
-    setTimeout(() => {
-      setSearchResults(mockCompanies);
-      setSearchPerformed(true);
-      toast({
-        title: "Busca realizada com sucesso",
-        description: `Encontramos ${mockCompanies.length} empresas no segmento de ${filters.segment}.`,
-      });
-    }, 500);
-  };
-
-  const handleCompanyClick = (company: typeof mockCompanies[0]) => {
-    setSelectedCompany(company);
-  };
 
   const handleCloseDetails = () => {
     setSelectedCompany(null);
@@ -232,8 +201,8 @@ const Index = () => {
     navigate(route);
   };
 
-  const toggleSearchPanel = () => {
-    setSearchPanelOpen(!searchPanelOpen);
+  const handleNavigateToSmartSearch = () => {
+    navigate('/smart-search');
   };
 
   return (
@@ -249,9 +218,9 @@ const Index = () => {
             O Gerente de IA já trabalhou enquanto você dormia.
           </p>
         </div>
-        <Button onClick={toggleSearchPanel} variant="outline" className="gap-2">
+        <Button onClick={handleNavigateToSmartSearch} className="gap-2">
           <Search className="h-4 w-4" />
-          Buscar com IA
+          Buscar Empresas com IA
         </Button>
       </div>
 
@@ -323,267 +292,167 @@ const Index = () => {
       </Card>
 
       <div className="space-y-6">
-        {/* Busca inteligente - colapsável */}
-        {searchPanelOpen && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle>Busca Inteligente</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CompanySearch onSearch={handleSearch} />
-            </CardContent>
-          </Card>
-        )}
+        {/* Intelligence Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard 
+            title="Empresas Detectadas Hoje" 
+            value="19" 
+            description="Novas oportunidades" 
+            icon={<Rocket className="h-8 w-8" />}
+            onClick={handleNavigateToCompanies}
+          />
+          <StatsCard 
+            title="Leads Quentes" 
+            value="7" 
+            description="Na sua conta" 
+            icon={<Flame className="h-8 w-8" />}
+            onClick={handleNavigateToHotOpportunities}
+          />
+          <StatsCard 
+            title="Reuniões Agendadas" 
+            value="3" 
+            description="Esta semana" 
+            icon={<Calendar className="h-8 w-8" />}
+            onClick={() => navigate('/meetings')}
+          />
+          <StatsCard 
+            title="Melhor Conversão" 
+            value="21%" 
+            description="Segmento: Clínicas Estéticas" 
+            icon={<TrendingUp className="h-8 w-8" />}
+          />
+        </div>
 
-        {/* Initial state - no search performed yet */}
-        {!searchPerformed && !selectedCompany && (
-          <>
-            {/* Intelligence Dashboard */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatsCard 
-                title="Empresas Detectadas Hoje" 
-                value="19" 
-                description="Novas oportunidades" 
-                icon={<Rocket className="h-8 w-8" />}
-                onClick={handleNavigateToCompanies}
-              />
-              <StatsCard 
-                title="Leads Quentes" 
-                value="7" 
-                description="Na sua conta" 
-                icon={<Flame className="h-8 w-8" />}
-                onClick={handleNavigateToHotOpportunities}
-              />
-              <StatsCard 
-                title="Reuniões Agendadas" 
-                value="3" 
-                description="Esta semana" 
-                icon={<Calendar className="h-8 w-8" />}
-                onClick={() => navigate('/meetings')}
-              />
-              <StatsCard 
-                title="Melhor Conversão" 
-                value="21%" 
-                description="Segmento: Clínicas Estéticas" 
-                icon={<TrendingUp className="h-8 w-8" />}
-              />
-            </div>
-
-            {/* Cards com Ações Imediatas */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {actionCards.map(card => (
-                <Card 
-                  key={card.id} 
-                  className={`border-l-4 ${
-                    card.priority === 'high' ? 'border-l-red-500' : 
-                    card.priority === 'medium' ? 'border-l-amber-500' : 'border-l-blue-500'
-                  }`}
+        {/* Cards com Ações Imediatas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {actionCards.map(card => (
+            <Card 
+              key={card.id} 
+              className={`border-l-4 ${
+                card.priority === 'high' ? 'border-l-red-500' : 
+                card.priority === 'medium' ? 'border-l-amber-500' : 'border-l-blue-500'
+              }`}
+            >
+              <CardContent className="p-5">
+                <h3 className="font-medium text-base mb-2">{card.title}</h3>
+                <p className="text-muted-foreground text-sm mb-3">{card.description}</p>
+                <Button 
+                  size="sm" 
+                  onClick={() => navigate(card.buttonAction)}
+                  className="w-full"
                 >
-                  <CardContent className="p-5">
-                    <h3 className="font-medium text-base mb-2">{card.title}</h3>
-                    <p className="text-muted-foreground text-sm mb-3">{card.description}</p>
-                    <Button 
-                      size="sm" 
-                      onClick={() => navigate(card.buttonAction)}
-                      className="w-full"
-                    >
-                      {card.buttonText}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Mini Guia + Alertas */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Mini guia interativo */}
-              <Card className="col-span-1 md:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Lightbulb className="h-5 w-5 text-amber-500" />
-                    Não sabe por onde começar?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {quickStartGuide.map((item, index) => (
-                    <Button 
-                      key={index} 
-                      variant="ghost" 
-                      className="w-full justify-start gap-2 text-left hover:bg-slate-100" 
-                      onClick={() => navigate(item.route, item.filter ? { state: { filter: item.filter } } : undefined)}
-                    >
-                      <ArrowRight className="h-4 w-4 text-blue-500" />
-                      {item.text}
-                    </Button>
-                  ))}
-                </CardContent>
-              </Card>
-                
-              {/* Alertas e Dicas */}
-              <div className="col-span-1">
-                <AlertBox 
-                  title="Alertas & Novidades" 
-                  alerts={[
-                    {
-                      icon: "bell",
-                      text: "2 leads responderam à IA SDR nas últimas 24h",
-                      type: "alert",
-                      action: () => navigate('/ia-sdr')
-                    },
-                    {
-                      icon: "pin",
-                      text: "Teste o novo módulo de Degustação com IA Closer",
-                      type: "tip",
-                      action: () => navigate('/ia-closer')
-                    },
-                    {
-                      icon: "megaphone",
-                      text: "Atualização v1.2 com painel de benchmarking liberado!",
-                      type: "update"
-                    }
-                  ]}
-                />
-              </div>
-            </div>
-
-            {/* AI suggestion and call to action */}
-            <Card className="border-blue-200 bg-blue-50/50">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 p-2 rounded-full">
-                      <Brain className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-lg">IA Sugere:</h3>
-                      <p className="text-muted-foreground">"Aproveite o aumento de buscas no setor de Educação Online"</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    <Button 
-                      onClick={handleDiscoverOpportunities}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Lightbulb className="h-5 w-5 mr-2" />
-                      Descobrir Oportunidades
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleActivateAiScan}
-                      className="border-blue-300 text-blue-700 hover:bg-blue-100"
-                    >
-                      <Rocket className="h-5 w-5 mr-2" />
-                      Ativar Varredura Inteligente
-                    </Button>
-                  </div>
-                </div>
+                  {card.buttonText}
+                </Button>
               </CardContent>
             </Card>
-            
-            {/* Gerente de IA Button */}
-            <div className="mt-6 flex justify-center">
+          ))}
+        </div>
+
+        {/* Mini Guia + Alertas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Mini guia interativo */}
+          <Card className="col-span-1 md:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Lightbulb className="h-5 w-5 text-amber-500" />
+                Não sabe por onde começar?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {quickStartGuide.map((item, index) => (
+                <Button 
+                  key={index} 
+                  variant="ghost" 
+                  className="w-full justify-start gap-2 text-left hover:bg-slate-100" 
+                  onClick={() => navigate(item.route, item.filter ? { state: { filter: item.filter } } : undefined)}
+                >
+                  <ArrowRight className="h-4 w-4 text-blue-500" />
+                  {item.text}
+                </Button>
+              ))}
               <Button 
-                onClick={handleNavigateToAiManager}
-                size="lg"
-                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 gap-2"
+                variant="ghost" 
+                className="w-full justify-start gap-2 text-left hover:bg-slate-100" 
+                onClick={handleNavigateToSmartSearch}
               >
-                <Brain className="h-5 w-5" />
-                Acessar Gerente de IA
+                <ArrowRight className="h-4 w-4 text-blue-500" />
+                Buscar empresas com IA
               </Button>
-            </div>
-          </>
-        )}
-
-        {/* Search Results */}
-        {searchPerformed && selectedCompany === null && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Stats Cards */}
-            <div className="md:col-span-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-              <StatsCard 
-                title="Total de Empresas" 
-                value="5.120" 
-                description="No segmento selecionado" 
-                icon={<Database className="h-8 w-8" />}
-                onClick={handleNavigateToCompanies}
-              />
-              <StatsCard 
-                title="Oportunidades Quentes" 
-                value="287" 
-                description="Identificadas pela IA" 
-                trend="up" 
-                trendValue="+12% este mês" 
-                icon={<TrendingUp className="h-8 w-8" />}
-                onClick={handleNavigateToHotOpportunities}
-              />
-              <StatsCard 
-                title="Decisores Mapeados" 
-                value="3.842" 
-                description="Com contatos validados" 
-                icon={<Users className="h-8 w-8" />}
-                onClick={handleNavigateToContacts}
-              />
-              <StatsCard 
-                title="Conversão Média" 
-                value="4.8%" 
-                description="De abordagem para reunião" 
-                trend="up" 
-                trendValue="+0.5% vs período anterior" 
-                icon={<Search className="h-8 w-8" />}
-              />
-            </div>
-
-            {/* Companies List */}
-            <div className="col-span-1 md:col-span-2">
-              <h2 className="text-xl font-semibold mb-4">
-                Empresas Encontradas ({searchResults.length})
-              </h2>
-              <div className="space-y-4">
-                {searchResults.map((company) => (
-                  <CompanyCard
-                    key={company.id}
-                    company={company}
-                    onClick={() => handleCompanyClick(company)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* AI Agents */}
-            <div className="col-span-1 md:col-span-1">
-              <h2 className="text-xl font-semibold mb-4">Assistentes de IA</h2>
-              <div className="space-y-4">
-                <AiAgentCard type="sdr" />
-                <AiAgentCard type="closer" />
-              </div>
-            </div>
-
-            {/* Market Distribution Chart */}
-            <div className="col-span-1 md:col-span-1">
-              <BusinessTypeChart 
-                title="Tipos de Empresa"
-                data={businessTypeData}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Search visualization section */}
-        {searchPerformed && selectedCompany === null && (
-          <div className="grid grid-cols-1 gap-6">
-            <MarketChart 
-              title="Distribuição por Estado"
-              description="Total de empresas por estado"
-              data={stateData}
-            />
-            
-            <CompanyHeatMap 
-              title="Mapa de Calor por Estado"
-              description="Concentração de empresas do segmento por estado"
-              states={heatMapStates}
-              maxCount={Math.max(...heatMapStates.map(state => state.count))}
+            </CardContent>
+          </Card>
+              
+          {/* Alertas e Dicas */}
+          <div className="col-span-1">
+            <AlertBox 
+              title="Alertas & Novidades" 
+              alerts={[
+                {
+                  icon: "bell",
+                  text: "2 leads responderam à IA SDR nas últimas 24h",
+                  type: "alert",
+                  action: () => navigate('/ia-sdr')
+                },
+                {
+                  icon: "pin",
+                  text: "Teste o novo módulo de Degustação com IA Closer",
+                  type: "tip",
+                  action: () => navigate('/ia-closer')
+                },
+                {
+                  icon: "megaphone",
+                  text: "Atualização v1.2 com painel de benchmarking liberado!",
+                  type: "update"
+                }
+              ]}
             />
           </div>
-        )}
+        </div>
+
+        {/* AI suggestion and call to action */}
+        <Card className="border-blue-200 bg-blue-50/50">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <Brain className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-lg">IA Sugere:</h3>
+                  <p className="text-muted-foreground">"Aproveite o aumento de buscas no setor de Educação Online"</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Button 
+                  onClick={handleDiscoverOpportunities}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Lightbulb className="h-5 w-5 mr-2" />
+                  Descobrir Oportunidades
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={handleActivateAiScan}
+                  className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                >
+                  <Rocket className="h-5 w-5 mr-2" />
+                  Ativar Varredura Inteligente
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Gerente de IA Button */}
+        <div className="mt-6 flex justify-center">
+          <Button 
+            onClick={handleNavigateToAiManager}
+            size="lg"
+            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 gap-2"
+          >
+            <Brain className="h-5 w-5" />
+            Acessar Gerente de IA
+          </Button>
+        </div>
 
         {/* Company Details View */}
         {selectedCompany && (
