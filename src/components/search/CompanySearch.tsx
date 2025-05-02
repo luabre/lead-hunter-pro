@@ -63,7 +63,7 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <CardTitle>Descoberta de Empresas com IA</CardTitle>
+          <CardTitle>Buscador Inteligente</CardTitle>
           <Sparkles className="text-amber-500 h-5 w-5" />
         </div>
         <CardDescription>

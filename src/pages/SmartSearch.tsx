@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -536,7 +537,7 @@ const SmartSearch = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold">Descoberta de Empresas com IA</h1>
+            <h1 className="text-3xl font-bold">Prospecção Inteligente</h1>
             <Sparkles className="h-6 w-6 text-amber-500" />
           </div>
           <p className="text-muted-foreground text-lg">
