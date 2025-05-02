@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Brain, Calendar, FileText, MessageSquare, Phone, Import } from "lucide-react";
+import { Brain, Calendar, FileText, MessageSquare, Phone, Import, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -36,6 +37,9 @@ const SdrPipelineActions = () => {
         break;
       case "import":
         navigate("/lead-import");
+        break;
+      case "search":
+        navigate("/smart-search");
         break;
       default:
         console.log("Action not implemented:", actionType);
@@ -95,6 +99,16 @@ const SdrPipelineActions = () => {
           >
             <Import className="h-3.5 w-3.5 mr-1" />
             <span className="text-xs">Importar Leads</span>
+          </Button>
+          
+          <Button 
+            variant="outline"
+            size="sm"
+            className="h-8 w-auto px-2 flex-shrink-0 whitespace-nowrap"
+            onClick={() => handleAction("search")}
+          >
+            <Search className="h-3.5 w-3.5 mr-1" />
+            <span className="text-xs">Buscar Empresas com IA</span>
           </Button>
         </div>
       </div>

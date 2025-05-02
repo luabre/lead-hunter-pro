@@ -7,10 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MessageSquare, Mail } from "lucide-react";
+import { MessageSquare, Mail, Search } from "lucide-react";
 
 interface AiAgentCardProps {
-  type: "sdr" | "closer";
+  type: "sdr" | "closer" | "search";
   onClick?: () => void;
 }
 
@@ -21,17 +21,21 @@ const AiAgentCard = ({ type, onClick }: AiAgentCardProps) => {
         <div className="flex items-center gap-3">
           {type === "sdr" ? (
             <MessageSquare className="h-7 w-7 text-leadhunter-teal" />
-          ) : (
+          ) : type === "closer" ? (
             <Mail className="h-7 w-7 text-leadhunter-teal" />
+          ) : (
+            <Search className="h-7 w-7 text-leadhunter-teal" />
           )}
           <div>
             <CardTitle className="text-lg text-white">
-              {type === "sdr" ? "IA SDR" : "IA Closer"}
+              {type === "sdr" ? "IA SDR" : type === "closer" ? "IA Closer" : "Busca com IA"}
             </CardTitle>
             <CardDescription className="text-gray-100">
               {type === "sdr"
                 ? "Prospecção e Qualificação Humanizada"
-                : "Fechamento Inteligente e Personalizado"}
+                : type === "closer"
+                ? "Fechamento Inteligente e Personalizado"
+                : "Encontre empresas do mercado com IA"}
             </CardDescription>
           </div>
         </div>
@@ -63,6 +67,17 @@ const AiAgentCard = ({ type, onClick }: AiAgentCardProps) => {
               </p>
             </>
           )}
+
+          {type === "search" && (
+            <>
+              <p className="mb-2">
+                Nossa IA extrai empresas do mercado com apenas o segmento que você informar.
+              </p>
+              <p>
+                Descubra novos leads potenciais com dados completos e enriquecidos automaticamente.
+              </p>
+            </>
+          )}
         </div>
 
         <div className="mt-6">
@@ -71,7 +86,11 @@ const AiAgentCard = ({ type, onClick }: AiAgentCardProps) => {
             className="w-full border-white text-white hover:bg-white/20 font-medium"
             onClick={onClick}
           >
-            {type === "sdr" ? "Iniciar Prospecção" : "Gerar Proposta"}
+            {type === "sdr" 
+              ? "Iniciar Prospecção" 
+              : type === "closer" 
+              ? "Gerar Proposta" 
+              : "Descobrir Empresas"}
           </Button>
         </div>
       </CardContent>

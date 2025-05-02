@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Search } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 
 interface CompanySearchProps {
   onSearch: (filters: CompanyFilters) => void;
@@ -61,15 +61,18 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Busca de Empresas</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle>Descoberta de Empresas com IA</CardTitle>
+          <Sparkles className="text-amber-500 h-5 w-5" />
+        </div>
         <CardDescription>
-          Encontre empresas por segmento, região, porte e mais
+          Digite apenas o segmento e nossa IA encontrará empresas no mercado para você
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6">
           <div className="grid gap-3">
-            <Label htmlFor="segment">Segmento</Label>
+            <Label htmlFor="segment">Qual segmento você busca?</Label>
             <div className="flex gap-2">
               <Input
                 id="segment"
@@ -78,11 +81,14 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
                 value={filters.segment}
                 onChange={(e) => handleInputChange("segment", e.target.value)}
               />
-              <Button onClick={handleSearchClick}>
-                <Search className="h-4 w-4 mr-2" />
-                Buscar
+              <Button onClick={handleSearchClick} className="gap-1">
+                <Search className="h-4 w-4 mr-1" />
+                Descobrir Empresas
               </Button>
             </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Nossa IA buscará empresas deste segmento no mercado e trará dados enriquecidos automaticamente.
+            </p>
           </div>
           
           <div className="flex items-center">

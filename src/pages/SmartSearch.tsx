@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import CompanySearch from "@/components/search/CompanySearch";
@@ -9,7 +8,7 @@ import AiAgentCard from "@/components/ai/AiAgentCard";
 import BusinessTypeChart from "@/components/dashboard/BusinessTypeChart";
 import MarketChart from "@/components/dashboard/MarketChart";
 import CompanyHeatMap from "@/components/search/CompanyHeatMap";
-import { Database, Users, TrendingUp, Search } from "lucide-react";
+import { Database, Users, TrendingUp, Search, Sparkles } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import StatsCard from "@/components/dashboard/StatsCard";
 
@@ -127,6 +126,7 @@ const SmartSearch = () => {
   const [selectedCompany, setSelectedCompany] = useState<typeof mockCompanies[0] | null>(null);
   const [sortBy, setSortBy] = useState<"name" | "opportunity" | "state">("name");
   const [filterText, setFilterText] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = (filters: CompanyFilters) => {
     if (!filters.segment) {
@@ -138,13 +138,18 @@ const SmartSearch = () => {
       return;
     }
 
+    // Show loading state
+    setIsSearching(true);
+
     // Simulate API call with delay
     setTimeout(() => {
+      setIsSearching(false);
+      
       // Apply any text filtering from filters
       let filtered = [...mockCompanies];
       if (filters.segment) {
         setFilterText(filters.segment);
-        // Simple filtering - in a real app this would be done server-side
+        // Simple filtering - in a real app this would be done server-side with AI
         filtered = filtered.filter(company => 
           company.segment.toLowerCase().includes(filters.segment.toLowerCase())
         );
@@ -156,10 +161,10 @@ const SmartSearch = () => {
       setSearchResults(sortedResults);
       setSearchPerformed(true);
       toast({
-        title: "Busca realizada com sucesso",
-        description: `Encontramos ${sortedResults.length} empresas no segmento de ${filters.segment}.`,
+        title: "Busca IA realizada com sucesso",
+        description: `Nossa IA encontrou ${sortedResults.length} empresas no segmento de ${filters.segment}.`,
       });
-    }, 500);
+    }, 1500);
   };
 
   const sortResults = (companies: typeof mockCompanies, sortField: string) => {
@@ -214,9 +219,12 @@ const SmartSearch = () => {
     <AppLayout>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Busca Inteligente</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold">Descoberta de Empresas com IA</h1>
+            <Sparkles className="h-6 w-6 text-amber-500" />
+          </div>
           <p className="text-muted-foreground text-lg">
-            Encontre empresas ideais para seu negócio usando nossa IA
+            Digite apenas o segmento e nossa IA encontrará empresas do mercado para você
           </p>
         </div>
       </div>
@@ -226,8 +234,17 @@ const SmartSearch = () => {
         <CompanySearch onSearch={handleSearch} />
       </div>
 
+      {/* Loading State */}
+      {isSearching && (
+        <div className="text-center py-12 animate-pulse">
+          <Sparkles className="mx-auto h-12 w-12 mb-4 text-amber-500" />
+          <p className="text-lg font-medium">Nossa IA está buscando empresas no mercado...</p>
+          <p className="text-muted-foreground mt-2">Isso pode levar alguns segundos</p>
+        </div>
+      )}
+
       {/* Search Results */}
-      {searchPerformed && selectedCompany === null && (
+      {searchPerformed && !isSearching && selectedCompany === null && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Stats Cards */}
           <div className="md:col-span-4 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -310,8 +327,9 @@ const SmartSearch = () => {
           <div className="col-span-1 md:col-span-1">
             <h2 className="text-xl font-semibold mb-4">Assistentes de IA</h2>
             <div className="space-y-4">
-              <AiAgentCard type="sdr" />
-              <AiAgentCard type="closer" />
+              <AiAgentCard type="search" onClick={() => {}} />
+              <AiAgentCard type="sdr" onClick={() => navigate("/ia-sdr")} />
+              <AiAgentCard type="closer" onClick={() => navigate("/ia-closer")} />
             </div>
           </div>
 
@@ -326,7 +344,7 @@ const SmartSearch = () => {
       )}
 
       {/* Search visualization section */}
-      {searchPerformed && selectedCompany === null && (
+      {searchPerformed && !isSearching && selectedCompany === null && (
         <div className="grid grid-cols-1 gap-6">
           <MarketChart 
             title="Distribuição por Estado"
@@ -349,10 +367,21 @@ const SmartSearch = () => {
       )}
 
       {/* Initial state - no search performed yet */}
-      {!searchPerformed && !selectedCompany && (
-        <div className="text-center py-12 text-muted-foreground">
-          <Search className="mx-auto h-12 w-12 mb-4 opacity-50" />
-          <p className="text-lg">Informe um segmento para iniciar sua busca de empresas</p>
+      {!searchPerformed && !isSearching && !selectedCompany && (
+        <div className="text-center py-12">
+          <div className="flex justify-center mb-8">
+            <AiAgentCard type="search" onClick={() => {
+              // Scroll to search input
+              const searchInput = document.querySelector('#segment') as HTMLElement;
+              if (searchInput) {
+                searchInput.focus();
+                searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }} />
+          </div>
+          <p className="text-lg text-muted-foreground mt-6">
+            Informe um segmento para que nossa IA descubra empresas do mercado para você
+          </p>
         </div>
       )}
     </AppLayout>
