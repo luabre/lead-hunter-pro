@@ -31,7 +31,6 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Improved auth check that uses Supabase's session
   useEffect(() => {
     const checkAuth = async () => {
       setIsLoading(true);
@@ -96,21 +95,20 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <Routes>
-            {/* Login route - always accessible */}
-            <Route 
-              path="/login" 
-              element={
-                isAuthenticated ? 
-                <Navigate to="/" replace /> : 
-                <Login onLoginSuccess={handleLoginSuccess} />
-              } 
-            />
-            
-            {/* Default route redirects to login if not authenticated */}
-            <Route
-              path="/"
-              element={
+          {isAuthenticated === false ? (
+            // If definitely not authenticated, show just the login route
+            <Routes>
+              <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+              <Route path="/*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          ) : (
+            // If authenticated or still checking, show all routes with protection
+            <Routes>
+              <Route path="/login" element={
+                isAuthenticated ? <Navigate to="/" replace /> : <Login onLoginSuccess={handleLoginSuccess} />
+              } />
+              
+              <Route path="/" element={
                 isAuthenticated ? (
                   <SidebarProvider defaultOpen={true}>
                     <Index />
@@ -118,35 +116,149 @@ const App = () => {
                 ) : (
                   <Navigate to="/login" replace />
                 )
-              }
-            />
-            
-            {/* All other protected routes */}
-            <Route path="/*" element={
-              isAuthenticated ? (
-                <SidebarProvider defaultOpen={true}>
-                  <Routes>
-                    <Route path="/companies" element={<Companies />} />
-                    <Route path="/contacts" element={<Contacts />} />
-                    <Route path="/pipeline" element={<Pipeline />} />
-                    <Route path="/my-pipeline" element={<MyPipeline />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/ia-sdr" element={<IaSdr />} />
-                    <Route path="/ia-closer" element={<IaCloser />} />
-                    <Route path="/meetings" element={<Meetings />} />
-                    <Route path="/market-intel" element={<MarketIntel />} />
-                    <Route path="/ai-manager" element={<AiManager />} />
-                    <Route path="/social-selling" element={<SocialSelling />} />
-                    <Route path="/lead-import" element={<LeadImport />} />
-                    <Route path="/smart-search" element={<SmartSearch />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </SidebarProvider>
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            } />
-          </Routes>
+              } />
+              
+              <Route path="/companies" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <Companies />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/contacts" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <Contacts />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/pipeline" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <Pipeline />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/my-pipeline" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <MyPipeline />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/dashboard" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <Dashboard />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/ia-sdr" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <IaSdr />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/ia-closer" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <IaCloser />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/meetings" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <Meetings />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/market-intel" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <MarketIntel />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/ai-manager" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <AiManager />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/social-selling" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <SocialSelling />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/lead-import" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <LeadImport />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="/smart-search" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <SmartSearch />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              <Route path="*" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <NotFound />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+            </Routes>
+          )}
         </TooltipProvider>
       </BrowserRouter>
     </QueryClientProvider>
