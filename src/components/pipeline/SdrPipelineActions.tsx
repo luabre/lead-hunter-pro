@@ -44,45 +44,45 @@ const SdrPipelineActions = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium mb-3">Ações Rápidas</h3>
-        <div className="grid grid-cols-4 gap-1">
+        <div className="flex gap-1 overflow-x-auto">
           <Button 
             variant="outline"
             size="sm"
-            className="h-auto py-1 px-1 flex flex-col items-center"
+            className="h-8 w-auto px-2 flex-shrink-0 whitespace-nowrap"
             onClick={() => handleAction("meeting")}
           >
-            <Calendar className="h-3 w-3 mb-0.5" />
-            <span className="text-[10px]">Reuniões</span>
+            <Calendar className="h-3.5 w-3.5 mr-1" />
+            <span className="text-xs">Agendar Reuniões</span>
           </Button>
           
           <Button 
             variant="outline"
             size="sm"
-            className="h-auto py-1 px-1 flex flex-col items-center"
+            className="h-8 w-auto px-2 flex-shrink-0 whitespace-nowrap"
             onClick={() => handleAction("report")}
           >
-            <FileText className="h-3 w-3 mb-0.5" />
-            <span className="text-[10px]">Relatórios</span>
+            <FileText className="h-3.5 w-3.5 mr-1" />
+            <span className="text-xs">Ver Relatórios</span>
           </Button>
           
           <Button 
             variant="outline"
             size="sm"
-            className="h-auto py-1 px-1 flex flex-col items-center"
+            className="h-8 w-auto px-2 flex-shrink-0 whitespace-nowrap"
             onClick={() => handleAction("message")}
           >
-            <MessageSquare className="h-3 w-3 mb-0.5" />
-            <span className="text-[10px]">Mensagens</span>
+            <MessageSquare className="h-3.5 w-3.5 mr-1" />
+            <span className="text-xs">Mensagens</span>
           </Button>
           
           <Button 
             variant="outline"
             size="sm"
-            className="h-auto py-1 px-1 flex flex-col items-center"
+            className="h-8 w-auto px-2 flex-shrink-0 whitespace-nowrap"
             onClick={() => handleAction("call")}
           >
-            <Phone className="h-3 w-3 mb-0.5" />
-            <span className="text-[10px]">Ligações</span>
+            <Phone className="h-3.5 w-3.5 mr-1" />
+            <span className="text-xs">Ligações</span>
           </Button>
         </div>
       </div>
