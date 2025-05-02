@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Clock, FileDown, FileUp, Brain, RefreshCcw, Activity, Rocket, Database } from "lucide-react";
+import { Zap, FileUp, Trash, Radar, Clock, Brain, Rocket, Activity } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -99,7 +99,7 @@ const AdvancedFeaturesToggle = () => {
             <div className="flex items-center justify-between space-x-2">
               <div className="flex items-start gap-3">
                 <div className="bg-green-100 p-2 rounded-full text-green-600 mt-1">
-                  <Brain className="h-5 w-5" />
+                  <Zap className="h-5 w-5" />
                 </div>
                 <div>
                   <Label htmlFor="ia-closer" className="text-base font-medium">Degustação com IA Closer</Label>
@@ -120,7 +120,7 @@ const AdvancedFeaturesToggle = () => {
             <div className="flex items-center justify-between space-x-2">
               <div className="flex items-start gap-3">
                 <div className="bg-blue-100 p-2 rounded-full text-blue-600 mt-1">
-                  <Activity className="h-5 w-5" />
+                  <Radar className="h-5 w-5" />
                 </div>
                 <div>
                   <Label htmlFor="silent-radar" className="text-base font-medium">Radar Silencioso</Label>
@@ -173,7 +173,7 @@ const AdvancedFeaturesToggle = () => {
             <div className="flex items-center justify-between space-x-2">
               <div className="flex items-start gap-3">
                 <div className="bg-purple-100 p-2 rounded-full text-purple-600 mt-1">
-                  <Database className="h-5 w-5" />
+                  <Trash className="h-5 w-5" />
                 </div>
                 <div>
                   <Label htmlFor="cleanse-base" className="text-base font-medium">
@@ -221,7 +221,7 @@ const AdvancedFeaturesToggle = () => {
             <div className="flex items-center justify-between space-x-2">
               <div className="flex items-start gap-3">
                 <div className="bg-red-100 p-2 rounded-full text-red-600 mt-1">
-                  <RefreshCcw className="h-5 w-5" />
+                  <Brain className="h-5 w-5" />
                 </div>
                 <div>
                   <Label htmlFor="learning-conversion" className="text-base font-medium">
