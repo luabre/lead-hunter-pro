@@ -1,11 +1,13 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, TrendingUp, Users, MessageSquare, FileText, Calendar, Globe, Briefcase } from "lucide-react";
+import { MapPin, TrendingUp, Users, MessageSquare, FileText, Calendar, Globe, Briefcase, Database, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CompanyCardProps {
   company: {
@@ -35,9 +37,10 @@ interface CompanyCardProps {
   };
   onClick?: () => void;
   className?: string;
+  showSaveButton?: boolean;
 }
 
-const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
+const CompanyCard = ({ company, onClick, className, showSaveButton = false }: CompanyCardProps) => {
   const navigate = useNavigate();
 
   // Define badge styles based on opportunity type
@@ -82,6 +85,61 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
   const handleSocialSellingClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigate(`/social-selling`);
+  };
+
+  // Handle Save to Database
+  const handleSaveToDatabase = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    try {
+      // Map the company data to the structure expected by the database
+      const companyData = {
+        name: company.name,
+        fantasy_name: company.fantasyName,
+        cnpj: company.cnpj,
+        city: company.city,
+        state: company.state,
+        segment: company.segment,
+        employees: company.employees,
+        opportunity: company.opportunity,
+        ai_detected: company.aiDetected || false,
+        website: company.digitalPresence || company.website,
+        year_founded: company.yearFounded,
+        digital_maturity: 50, // Default value
+        created_at: new Date()
+      };
+
+      // Insert the company into the database
+      const { data, error } = await supabase
+        .from('companies')
+        .insert(companyData)
+        .select();
+
+      if (error) {
+        console.error("Error saving company to database:", error);
+        toast({
+          title: "Erro ao salvar",
+          description: "Não foi possível incluir a empresa na base de dados.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Empresa salva com sucesso",
+        description: `${company.fantasyName} foi adicionada à base de dados.`,
+      });
+
+      // Redirect to the companies page to view the saved company
+      navigate('/companies');
+    } catch (error) {
+      console.error("Error in save operation:", error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Ocorreu um erro ao processar sua solicitação.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Format date for display
@@ -222,6 +280,18 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
         >
           Ver Detalhes
         </Button>
+
+        {showSaveButton && (
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+            onClick={handleSaveToDatabase}
+          >
+            <Database className="h-4 w-4 mr-1" />
+            Incluir na Base de Dados
+          </Button>
+        )}
       </div>
     </div>
   );

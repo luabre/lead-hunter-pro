@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,10 +10,14 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Building2, CircleUser, FileSearch, Globe, MapPin, MessageSquare, TrendingUp, Users, FileText, Calendar, Clock } from "lucide-react";
+import { Building2, CircleUser, FileSearch, Globe, MapPin, MessageSquare, TrendingUp, Users, FileText, Calendar, Clock, Database, Save } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 interface CompanyDetailsProps {
   company: {
@@ -49,9 +54,13 @@ interface CompanyDetailsProps {
     socialActive?: boolean; // New property for social activity
   };
   onClose?: () => void;
+  isFromAiSearch?: boolean;
 }
 
-const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
+const CompanyDetails = ({ company, onClose, isFromAiSearch = false }: CompanyDetailsProps) => {
+  const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
+  
   // Format date for display
   const formatDateTime = (dateString?: string) => {
     if (!dateString) return "Data desconhecida";
@@ -70,6 +79,63 @@ const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
       case "manual": return "Entrada Manual";
       case "radar": return "Radar IA";
       default: return origin;
+    }
+  };
+  
+  // Handle Save to Database
+  const handleSaveToDatabase = async () => {
+    setIsSaving(true);
+
+    try {
+      // Map the company data to the structure expected by the database
+      const companyData = {
+        name: company.name,
+        fantasy_name: company.fantasyName,
+        cnpj: company.cnpj,
+        city: company.city,
+        state: company.state,
+        segment: company.segment,
+        employees: company.employees,
+        opportunity: company.opportunity,
+        ai_detected: company.aiDetected || false,
+        website: company.website,
+        year_founded: company.yearFounded,
+        digital_maturity: company.digitalMaturity || 50, // Default value if not provided
+        created_at: new Date()
+      };
+
+      // Insert the company into the database
+      const { data, error } = await supabase
+        .from('companies')
+        .insert(companyData)
+        .select();
+
+      if (error) {
+        console.error("Error saving company to database:", error);
+        toast({
+          title: "Erro ao salvar",
+          description: "Não foi possível incluir a empresa na base de dados.",
+          variant: "destructive",
+        });
+        setIsSaving(false);
+        return;
+      }
+
+      toast({
+        title: "Empresa salva com sucesso",
+        description: `${company.fantasyName} foi adicionada à base de dados.`,
+      });
+
+      // Redirect to the companies page to view the saved company
+      navigate('/companies');
+    } catch (error) {
+      console.error("Error in save operation:", error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Ocorreu um erro ao processar sua solicitação.",
+        variant: "destructive",
+      });
+      setIsSaving(false);
     }
   };
 
@@ -488,6 +554,17 @@ const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
           Voltar
         </Button>
         <div className="flex gap-2">
+          {isFromAiSearch && (
+            <Button 
+              variant="outline" 
+              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+              onClick={handleSaveToDatabase}
+              disabled={isSaving}
+            >
+              <Database className="h-4 w-4 mr-2" />
+              {isSaving ? "Salvando..." : "Incluir na Base de Dados"}
+            </Button>
+          )}
           <Button variant="outline">
             <FileSearch className="h-4 w-4 mr-2" />
             Ver Documentos

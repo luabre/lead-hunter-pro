@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -527,7 +528,11 @@ const SmartSearch = () => {
 
       {/* Company Details View */}
       {selectedCompany && (
-        <CompanyDetails company={selectedCompany} onClose={handleCloseDetails} />
+        <CompanyDetails 
+          company={selectedCompany} 
+          onClose={handleCloseDetails}
+          isFromAiSearch={true} 
+        />
       )}
 
       {/* Initial state - no search performed yet */}
