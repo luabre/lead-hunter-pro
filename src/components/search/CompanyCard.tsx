@@ -31,6 +31,8 @@ interface CompanyCardProps {
     recommendedChannels?: string[];
     website?: string;
     yearFounded?: string;
+    sector?: string;       // Primary, Secondary, Tertiary, or Quaternary
+    subSector?: string;    // More specific industry category
     creator?: {
       email: string;
       name: string;
@@ -79,6 +81,23 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
     }
   };
 
+  // Get sector badge style
+  const getSectorBadge = () => {
+    if (!company.sector) return null;
+    
+    const sector = company.sector.toLowerCase();
+    if (sector.includes('primário')) {
+      return <Badge className="bg-green-600 text-white hover:bg-green-700">Setor Primário</Badge>;
+    } else if (sector.includes('secundário')) {
+      return <Badge className="bg-blue-600 text-white hover:bg-blue-700">Setor Secundário</Badge>;
+    } else if (sector.includes('terciário')) {
+      return <Badge className="bg-purple-600 text-white hover:bg-purple-700">Setor Terciário</Badge>;
+    } else if (sector.includes('quaternário')) {
+      return <Badge className="bg-indigo-600 text-white hover:bg-indigo-700">Setor Quaternário</Badge>;
+    }
+    return null;
+  };
+
   // Handle IA SDR activation
   const handleIaSdrClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -118,6 +137,8 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
         city: company.city,
         state: company.state,
         segment: company.segment,
+        sector: company.sector || null,
+        subsector: company.subSector || null,
         employees: company.employees,
         opportunity: company.opportunity,
         ai_detected: company.aiDetected || false,
@@ -221,6 +242,7 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
             </Badge>
           )}
           {getDigitalPresenceBadge()}
+          {getSectorBadge()}
         </div>
       </div>
       
@@ -241,6 +263,13 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
         )}
       </div>
       
+      {company.subSector && (
+        <div className="mt-2 text-sm text-muted-foreground">
+          <span className="font-medium">Subsetor: </span>
+          {company.subSector}
+        </div>
+      )}
+
       <div className="mt-3 flex items-center justify-between">
         <div className="text-sm text-muted-foreground">{company.cnpj}</div>
         {company.aiDetected && (

@@ -10,6 +10,8 @@ export interface EnrichedCompanyData {
   employees?: string;
   revenue?: string;
   digitalPresence?: string;
+  sector?: string;       // Primary, Secondary, Tertiary, or Quaternary
+  subSector?: string;    // More specific industry category
   decisionMaker?: {
     name?: string;
     position?: string;
@@ -54,6 +56,8 @@ Retorne em formato estruturado:
 - Site provável:
 - Tipo jurídico:
 - Porte estimado:
+- Classificação por setor: (Primário/Secundário/Terciário/Quaternário)
+- Subsetor específico:
 - Número de funcionários:
 - Faturamento estimado:
 - Presença digital (baixa, média, alta):
@@ -113,6 +117,14 @@ function parseGPTResponse(text: string): EnrichedCompanyData {
   // Check for company size
   const sizeMatch = text.match(/Porte estimado: (.+?)($|\n)/);
   if (sizeMatch) result.size = sizeMatch[1].trim();
+
+  // Check for sector classification
+  const sectorMatch = text.match(/Classificação por setor: (.+?)($|\n)/);
+  if (sectorMatch) result.sector = sectorMatch[1].trim();
+
+  // Check for subsector
+  const subSectorMatch = text.match(/Subsetor específico: (.+?)($|\n)/);
+  if (subSectorMatch) result.subSector = subSectorMatch[1].trim();
 
   // Check for employee count
   const employeesMatch = text.match(/Número de funcionários: (.+?)($|\n)/);
