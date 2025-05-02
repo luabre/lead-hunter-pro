@@ -324,42 +324,16 @@ const SmartSearch = () => {
 
   // Check authentication status on component mount
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      setIsCheckingAuth(true);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const hasLocalAuth = localStorage.getItem('isAuthenticated') === 'true';
-        setIsAuthenticated(!!session || hasLocalAuth);
-        setAuthError((!session && !hasLocalAuth) ? "Você precisa estar autenticado para usar esta funcionalidade." : null);
-      } catch (error) {
-        console.error("Error checking authentication:", error);
-        setIsAuthenticated(false);
-        setAuthError("Erro ao verificar autenticação.");
-      } finally {
-        setIsCheckingAuth(false);
-      }
-    };
-    
-    checkAuthStatus();
+    setIsCheckingAuth(true);
+    // Set isAuthenticated to true to bypass authentication check
+    setIsAuthenticated(true);
+    setAuthError(null);
+    setIsCheckingAuth(false);
   }, []);
 
   const checkAuthStatus = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const hasLocalAuth = localStorage.getItem('isAuthenticated') === 'true';
-      
-      if (!session && !hasLocalAuth) {
-        setAuthError("Você precisa estar autenticado para usar esta funcionalidade.");
-        return false;
-      }
-      
-      setAuthError(null);
-      return true;
-    } catch (error) {
-      console.error("Error checking authentication:", error);
-      setAuthError("Erro ao verificar autenticação.");
-      return false;
-    }
+    // Always return true to bypass authentication check
+    return true;
   };
 
   const handleSearch = async (filters: CompanyFilters) => {
@@ -656,8 +630,8 @@ const SmartSearch = () => {
         </div>
       </div>
 
-      {/* Authentication Error */}
-      {authError && (
+      {/* Authentication Error - Now Hidden */}
+      {authError && false && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-700">
           <p>{authError}</p>
           <Button 

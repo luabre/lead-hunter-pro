@@ -1,4 +1,3 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, TrendingUp, Users, MessageSquare, FileText, Calendar, Globe, Briefcase, Database } from "lucide-react";
@@ -46,7 +45,7 @@ interface CompanyCardProps {
   keywords?: string[]; // Add keywords property
 }
 
-const CompanyCard = ({ company, onClick, className, showSaveButton = false, keywords }: CompanyCardProps) => {
+const CompanyCard = ({ company, onClick, className, showSaveButton = true, keywords }: CompanyCardProps) => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
 

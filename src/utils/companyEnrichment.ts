@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 
@@ -104,21 +103,11 @@ Retorne em formato estruturado:
 
 /**
  * Saves a company to the database
- * Handles both authentication check and proper data formatting
+ * IMPORTANT: Authentication check has been temporarily bypassed
  */
 export async function saveCompanyToDatabase(company: any) {
   try {
-    // First, check if user is authenticated
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      toast({
-        title: "Autenticação necessária",
-        description: "Você precisa estar logado para salvar empresas",
-        variant: "destructive",
-      });
-      return { success: false, error: "Autenticação necessária" };
-    }
+    // MODIFIED: Removed authentication check to allow saving companies without login
 
     // Map the company data to the structure expected by the database
     const companyData = {
@@ -137,7 +126,7 @@ export async function saveCompanyToDatabase(company: any) {
       year_founded: company.yearFounded || null,
       digital_maturity: 50, // Default value
       created_at: new Date().toISOString(), // Convert Date to string
-      created_by: session.user.id // Add the user ID as creator
+      created_by: null // MODIFIED: Set to null since we're bypassing authentication
     };
 
     console.log("Saving company data:", companyData);
