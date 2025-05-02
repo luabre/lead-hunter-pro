@@ -18,6 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { enrichCompanyWithGPT, EnrichedCompanyData } from "@/utils/companyEnrichment";
 
 // Define the form schema
 const formSchema = z.object({
@@ -30,6 +31,10 @@ const formSchema = z.object({
   segment: z.string(),
   employees: z.string(),
   companyType: z.string(),
+  digitalPresence: z.string().optional(),
+  revenue: z.string().optional(),
+  decisionMakerName: z.string().optional(),
+  decisionMakerPosition: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -41,6 +46,7 @@ interface AddCompanyDialogProps {
 const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
   const [open, setOpen] = useState(false);
   const [isEnriching, setIsEnriching] = useState(false);
+  const [enrichmentData, setEnrichmentData] = useState<EnrichedCompanyData | null>(null);
   
   // Mock current user - in a real app, this would come from authentication
   const currentUser = {
@@ -60,50 +66,74 @@ const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
       segment: "",
       employees: "",
       companyType: "",
+      digitalPresence: "",
+      revenue: "",
+      decisionMakerName: "",
+      decisionMakerPosition: "",
     },
   });
 
   const handleEnrichData = async () => {
-    const nameOrWebsite = form.getValues("name") || form.getValues("website");
+    const companyName = form.getValues("name");
+    const city = form.getValues("city");
+    const segment = form.getValues("segment");
     
-    if (!nameOrWebsite) {
+    if (!companyName) {
       toast({
         title: "Informação insuficiente",
-        description: "Informe pelo menos o nome da empresa ou o website para enriquecimento.",
+        description: "Informe pelo menos o nome da empresa para enriquecimento.",
         variant: "destructive",
       });
       return;
     }
 
     setIsEnriching(true);
+    setEnrichmentData(null);
 
     try {
-      // Simulate AI enrichment with a timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const enrichedData = await enrichCompanyWithGPT(companyName, city, segment);
       
-      // Mock enrichment data based on input
-      const companyName = form.getValues("name");
-      const mockEnrichment = {
-        fantasyName: companyName ? `${companyName.split(' ')[0]}` : "Nome Fantasia",
-        cnpj: "12.345.678/0001-99",
-        city: "São Paulo",
-        state: "SP",
-        segment: "Tecnologia",
-        employees: "50-100",
-        companyType: "LTDA",
-      };
-      
-      // Update form with enriched data
-      Object.entries(mockEnrichment).forEach(([key, value]) => {
-        if (!form.getValues(key as keyof FormValues)) {
-          form.setValue(key as keyof FormValues, value as string);
+      if (enrichedData) {
+        setEnrichmentData(enrichedData);
+        
+        // Update form with enriched data
+        if (enrichedData.website) 
+          form.setValue("website", enrichedData.website);
+          
+        if (enrichedData.companyType) 
+          form.setValue("companyType", enrichedData.companyType);
+          
+        if (enrichedData.employees) 
+          form.setValue("employees", enrichedData.employees);
+          
+        if (enrichedData.digitalPresence) 
+          form.setValue("digitalPresence", enrichedData.digitalPresence);
+          
+        if (enrichedData.revenue) 
+          form.setValue("revenue", enrichedData.revenue);
+          
+        if (enrichedData.decisionMaker?.name) 
+          form.setValue("decisionMakerName", enrichedData.decisionMaker.name);
+          
+        if (enrichedData.decisionMaker?.position) 
+          form.setValue("decisionMakerPosition", enrichedData.decisionMaker.position);
+          
+        // Set fantasy name if it's not already set
+        if (!form.getValues("fantasyName") && companyName) {
+          // Extract potential fantasy name from the company name
+          const parts = companyName.split(' ');
+          if (parts.length > 1) {
+            form.setValue("fantasyName", parts[0]);
+          } else {
+            form.setValue("fantasyName", companyName);
+          }
         }
-      });
-      
-      toast({
-        title: "Dados enriquecidos",
-        description: "A IA enriqueceu os dados da empresa com base nas informações fornecidas.",
-      });
+        
+        toast({
+          title: "Dados enriquecidos",
+          description: "A IA enriqueceu os dados da empresa com base nas informações fornecidas.",
+        });
+      }
     } catch (error) {
       toast({
         title: "Erro ao enriquecer dados",
@@ -124,19 +154,30 @@ const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
       id: Math.random().toString(36).substring(2, 9),
       ...data,
       opportunity: "warm" as const,
-      aiDetected: false,
+      aiDetected: !!enrichmentData, // Mark as AI-detected if enrichment was used
       // Add creator information with proper field names
       creator: {
         email: currentUser.email,
         name: currentUser.name,
         origin: "manual",
         createdAt: now,
-      }
+      },
+      // Add additional enriched data if available
+      ...(enrichmentData?.opportunitySignals && { 
+        opportunitySignals: enrichmentData.opportunitySignals 
+      }),
+      ...(enrichmentData?.observations && { 
+        observations: enrichmentData.observations 
+      }),
+      ...(enrichmentData?.recommendedChannels && { 
+        recommendedChannels: enrichmentData.recommendedChannels 
+      }),
     };
 
     onAddCompany(newCompany);
     setOpen(false);
     form.reset();
+    setEnrichmentData(null);
     
     toast({
       title: "Empresa adicionada",
@@ -303,7 +344,86 @@ const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="revenue"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Faturamento Estimado</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: R$ 1-5 milhões/ano" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="digitalPresence"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Presença Digital</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Alta, Média, Baixa" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="decisionMakerName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome do Decisor</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: João Silva" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="decisionMakerPosition"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cargo do Decisor</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Diretor de Tecnologia" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
+
+            {enrichmentData?.opportunitySignals && enrichmentData.opportunitySignals.length > 0 && (
+              <div>
+                <Label>Sinais de Oportunidade Detectados</Label>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {enrichmentData.opportunitySignals.join(', ')}
+                </p>
+              </div>
+            )}
+
+            {enrichmentData?.recommendedChannels && enrichmentData.recommendedChannels.length > 0 && (
+              <div>
+                <Label>Canais Recomendados</Label>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {enrichmentData.recommendedChannels.join(', ')}
+                </p>
+              </div>
+            )}
+
+            {enrichmentData?.observations && (
+              <div>
+                <Label>Observações Relevantes</Label>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {enrichmentData.observations}
+                </p>
+              </div>
+            )}
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>

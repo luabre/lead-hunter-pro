@@ -1,7 +1,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, TrendingUp, Users, MessageSquare, FileText, Calendar } from "lucide-react";
+import { MapPin, TrendingUp, Users, MessageSquare, FileText, Calendar, Globe, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -19,7 +19,13 @@ interface CompanyCardProps {
     employees: string;
     opportunity?: 'hot' | 'warm' | 'cold';
     aiDetected?: boolean;
-    socialActive?: boolean; // New property for social activity
+    socialActive?: boolean;
+    digitalPresence?: string;
+    revenue?: string;
+    decisionMakerName?: string;
+    decisionMakerPosition?: string;
+    opportunitySignals?: string[];
+    recommendedChannels?: string[];
     creator?: {
       email: string;
       name: string;
@@ -97,6 +103,21 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
     }
   };
 
+  // Get digital presence badge style
+  const getDigitalPresenceBadge = () => {
+    if (!company.digitalPresence) return null;
+    
+    const presence = company.digitalPresence.toLowerCase();
+    if (presence.includes('alta')) {
+      return <Badge className="bg-green-600 text-white hover:bg-green-700">Alta Presença Digital</Badge>;
+    } else if (presence.includes('média')) {
+      return <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">Média Presença Digital</Badge>;
+    } else if (presence.includes('baixa')) {
+      return <Badge className="bg-gray-500 text-white hover:bg-gray-600">Baixa Presença Digital</Badge>;
+    }
+    return null;
+  };
+
   return (
     <div className={cn("company-card animate-fade-in", className)} onClick={onClick}>
       <div className="flex justify-between items-start">
@@ -120,10 +141,11 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
               Social Ativo
             </Badge>
           )}
+          {getDigitalPresenceBadge()}
         </div>
       </div>
       
-      <div className="mt-3 flex gap-4">
+      <div className="mt-3 flex flex-wrap gap-4">
         <div className="flex items-center text-sm text-muted-foreground">
           <MapPin className="h-4 w-4 mr-1" />
           {company.city}, {company.state}
@@ -132,6 +154,12 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
           <Users className="h-4 w-4 mr-1" />
           {company.employees} funcionários
         </div>
+        {company.revenue && (
+          <div className="flex items-center text-sm text-muted-foreground">
+            <Briefcase className="h-4 w-4 mr-1" />
+            {company.revenue}
+          </div>
+        )}
       </div>
       
       <div className="mt-3 flex items-center justify-between">
@@ -143,6 +171,15 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
           </Badge>
         )}
       </div>
+
+      {/* Decision maker information if available */}
+      {(company.decisionMakerName || company.decisionMakerPosition) && (
+        <div className="mt-2 text-sm border-t pt-2">
+          <span className="font-medium">Decisor: </span>
+          {company.decisionMakerName}
+          {company.decisionMakerPosition && `, ${company.decisionMakerPosition}`}
+        </div>
+      )}
       
       {/* Creator information */}
       {company.creator && (
