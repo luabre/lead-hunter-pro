@@ -20,14 +20,10 @@ const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps)
     percentage: total > 0 ? ((item.value / total) * 100).toFixed(1) : '0.0'
   })) || [];
 
-  const customLabel = ({ name, percentage }: { name?: string, percentage?: string }) => {
-    return name && percentage ? `${name}: ${percentage}%` : name || '';
-  };
-
-  const renderLegendText = (value: string, entry: any) => {
-    if (!entry || !entry.payload) return value;
-    const { value: itemValue, percentage } = entry.payload;
-    return `${value}: ${itemValue} (${percentage}%)`;
+  // Format for tooltip display only
+  const formatTooltipValue = (value: number, name: string, item: any) => {
+    const percentage = item?.payload?.percentage;
+    return [`${value} empresas (${percentage}%)`, name];
   };
 
   return (
@@ -48,7 +44,7 @@ const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps)
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
-                label={customLabel}
+                label={false} // Remove direct labels from pie segments
               >
                 {dataWithPercentage.map((entry, index) => (
                   <Cell 
@@ -60,17 +56,15 @@ const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps)
               <Legend 
                 layout="vertical" 
                 verticalAlign="middle" 
-                align="right"
-                formatter={renderLegendText}
+                align="right" 
+                formatter={(value, entry) => {
+                  if (!entry || !entry.payload) return value;
+                  const { name, value: itemValue, percentage } = entry.payload;
+                  return `${name}: ${itemValue} (${percentage}%)`;
+                }}
               />
               <Tooltip 
-                formatter={(value: number, name: string, props: any) => {
-                  const percentage = props?.payload?.percentage;
-                  return [
-                    `${value} empresas${percentage ? ` (${percentage}%)` : ''}`, 
-                    'Quantidade'
-                  ];
-                }}
+                formatter={formatTooltipValue}
               />
             </PieChart>
           </ResponsiveContainer>
