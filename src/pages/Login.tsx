@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
@@ -68,8 +67,8 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Left side with login form */}
-      <div className="w-full md:w-6/12 flex flex-col p-6 md:p-10 justify-center">
+      {/* Left side with login form - now with white background */}
+      <div className="w-full md:w-6/12 flex flex-col p-6 md:p-10 justify-center bg-white">
         <div className="mb-8">
           <img 
             src="/lovable-uploads/039c9c09-384f-4a6e-a325-10972460bfe1.png" 
@@ -154,16 +153,13 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
         </div>
       </div>
 
-      {/* Right side with illustration and tagline */}
+      {/* Right side with better illustration */}
       <div className="hidden md:flex w-6/12 flex-col bg-blue-50 p-10 justify-between">
-        <div className="mt-8">
-          {/* Removed LeadHunter Pro text */}
-        </div>
-        <div className="flex flex-col items-start">
+        <div className="flex flex-col items-start h-full justify-center">
           <img 
-            src="/lovable-uploads/17b4a589-6394-459b-b81d-18b299c5042f.png" 
-            alt="Ilustração de prospecção inteligente" 
-            className="max-w-[80%] mx-auto mb-8"
+            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80" 
+            alt="Ilustração de ambiente de trabalho moderno" 
+            className="max-w-[90%] rounded-xl shadow-lg mx-auto mb-8"
           />
           <h2 className="text-xl md:text-2xl font-semibold text-gray-800 max-w-md">
             Inteligência comercial em ação.
@@ -172,7 +168,6 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
             Acesse sua conta e comece a caçar oportunidades.
           </p>
         </div>
-        <div className="opacity-0">Placeholder para espaçamento</div>
       </div>
     </div>
   );
