@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -101,7 +100,7 @@ const CompanyDetails = ({ company, onClose, isFromAiSearch = false }: CompanyDet
         website: company.website,
         year_founded: company.yearFounded,
         digital_maturity: company.digitalMaturity || 50, // Default value if not provided
-        created_at: new Date()
+        created_at: new Date().toISOString() // Fixed: Convert Date to string
       };
 
       // Insert the company into the database
