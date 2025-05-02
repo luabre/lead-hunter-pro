@@ -1,10 +1,10 @@
 
 import { useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
-  SidebarProvider,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -141,7 +141,7 @@ const AppSidebar = () => {
                     isActive={isActivePath(item.path)}
                     tooltip={item.text}
                   >
-                    <a href={item.path}>
+                    <Link to={item.path}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.text}</span>
                       {item.badge && (
@@ -156,7 +156,7 @@ const AppSidebar = () => {
                           {item.badge.text}
                         </span>
                       )}
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                   
                   {item.subItems && (
@@ -164,11 +164,13 @@ const AppSidebar = () => {
                       {item.subItems.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.path}>
                           <SidebarMenuSubButton
-                            href={subItem.path}
+                            asChild
                             isActive={isActivePath(subItem.path)}
                           >
-                            <subItem.icon className="h-4 w-4 mr-2" />
-                            <span>{subItem.text}</span>
+                            <Link to={subItem.path}>
+                              <subItem.icon className="h-4 w-4 mr-2" />
+                              <span>{subItem.text}</span>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
