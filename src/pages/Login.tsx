@@ -20,17 +20,50 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // This is just a placeholder for demonstration - replace with actual auth
-    setTimeout(() => {
-      // Simulating successful login for demonstration
+    try {
+      // Validações básicas
+      if (!email.trim()) {
+        toast({ 
+          title: "Campo obrigatório", 
+          description: "Por favor, informe seu e-mail." 
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (!password) {
+        toast({ 
+          title: "Campo obrigatório", 
+          description: "Por favor, informe sua senha." 
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Este é um login simulado para demonstração
+      // Em produção, isso seria substituído por uma chamada real de autenticação
+      setTimeout(() => {
+        // Simulando login bem-sucedido para qualquer credencial
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        toast({
+          title: "Login bem-sucedido",
+          description: "Redirecionando para o dashboard...",
+        });
+        
+        onLoginSuccess();
+        navigate("/");
+        setIsLoading(false);
+      }, 1000);
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
       toast({
-        title: "Login bem-sucedido",
-        description: "Redirecionando para o dashboard...",
+        title: "Erro ao fazer login",
+        description: "Verifique suas credenciais e tente novamente.",
+        variant: "destructive",
       });
-      onLoginSuccess();
-      navigate("/");
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
