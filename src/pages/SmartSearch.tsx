@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -541,7 +540,7 @@ const SmartSearch = () => {
             <Sparkles className="h-6 w-6 text-amber-500" />
           </div>
           <p className="text-muted-foreground text-lg">
-            Digite o segmento, nome da empresa ou palavras-chave para que nossa IA encontre empresas do mercado
+            Utilize a busca para encontrar empresas por segmento, nome ou palavras-chave
           </p>
         </div>
       </div>
@@ -707,7 +706,7 @@ const SmartSearch = () => {
           <div className="flex justify-center mb-8">
             <AiAgentCard type="search" onClick={() => {
               // Scroll to search input
-              const searchInput = document.querySelector('#segment') as HTMLElement;
+              const searchInput = document.querySelector('#searchTerm') as HTMLElement;
               if (searchInput) {
                 searchInput.focus();
                 searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -715,7 +714,7 @@ const SmartSearch = () => {
             }} />
           </div>
           <p className="text-lg text-muted-foreground mt-6">
-            Informe um segmento para que nossa IA descubra empresas do mercado para você
+            Utilize a busca para encontrar empresas por segmento, nome ou palavras-chave
           </p>
         </div>
       )}

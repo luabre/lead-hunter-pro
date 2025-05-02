@@ -89,7 +89,7 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
                       <Button variant="outline" className="w-8 p-0">?</Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
-                      <p>Digite segmento (ex: Tecnologia), nome da empresa (ex: TechSol), ou palavras-chave (ex: inovação, sustentável) para sua busca</p>
+                      <p>Digite segmento para prospector por setor, nome da empresa para busca específica, ou palavras-chave para encontrar empresas com características relevantes</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
