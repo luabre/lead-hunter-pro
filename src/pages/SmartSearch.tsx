@@ -14,6 +14,7 @@ import { toast } from "@/components/ui/use-toast";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { enrichCompanyWithGPT } from "@/utils/companyEnrichment";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 // Mock Data - using the same data as in Index.tsx
 const mockCompanies = [
