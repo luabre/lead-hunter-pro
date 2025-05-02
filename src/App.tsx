@@ -28,7 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 const App = () => {
   // Create a client inside the component
   const [queryClient] = useState(() => new QueryClient());
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Improved auth check that uses Supabase's session
@@ -51,6 +51,7 @@ const App = () => {
           description: "Houve um problema ao verificar seu login. Por favor, tente novamente.",
           variant: "destructive"
         });
+        setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
       }
@@ -96,7 +97,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <Routes>
-            {/* Public routes */}
+            {/* Login route - always accessible */}
             <Route 
               path="/login" 
               element={
@@ -106,35 +107,45 @@ const App = () => {
               } 
             />
             
-            {/* Protected routes - wrapped with SidebarProvider */}
-            <Route 
-              path="/*" 
+            {/* Default route redirects to login if not authenticated */}
+            <Route
+              path="/"
               element={
                 isAuthenticated ? (
                   <SidebarProvider defaultOpen={true}>
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/companies" element={<Companies />} />
-                      <Route path="/contacts" element={<Contacts />} />
-                      <Route path="/pipeline" element={<Pipeline />} />
-                      <Route path="/my-pipeline" element={<MyPipeline />} />
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/ia-sdr" element={<IaSdr />} />
-                      <Route path="/ia-closer" element={<IaCloser />} />
-                      <Route path="/meetings" element={<Meetings />} />
-                      <Route path="/market-intel" element={<MarketIntel />} />
-                      <Route path="/ai-manager" element={<AiManager />} />
-                      <Route path="/social-selling" element={<SocialSelling />} />
-                      <Route path="/lead-import" element={<LeadImport />} />
-                      <Route path="/smart-search" element={<SmartSearch />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
+                    <Index />
                   </SidebarProvider>
                 ) : (
                   <Navigate to="/login" replace />
                 )
-              } 
+              }
             />
+            
+            {/* All other protected routes */}
+            <Route path="/*" element={
+              isAuthenticated ? (
+                <SidebarProvider defaultOpen={true}>
+                  <Routes>
+                    <Route path="/companies" element={<Companies />} />
+                    <Route path="/contacts" element={<Contacts />} />
+                    <Route path="/pipeline" element={<Pipeline />} />
+                    <Route path="/my-pipeline" element={<MyPipeline />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/ia-sdr" element={<IaSdr />} />
+                    <Route path="/ia-closer" element={<IaCloser />} />
+                    <Route path="/meetings" element={<Meetings />} />
+                    <Route path="/market-intel" element={<MarketIntel />} />
+                    <Route path="/ai-manager" element={<AiManager />} />
+                    <Route path="/social-selling" element={<SocialSelling />} />
+                    <Route path="/lead-import" element={<LeadImport />} />
+                    <Route path="/smart-search" element={<SmartSearch />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </SidebarProvider>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } />
           </Routes>
         </TooltipProvider>
       </BrowserRouter>
