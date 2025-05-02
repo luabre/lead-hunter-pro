@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import CompanySearch from "@/components/search/CompanySearch";
@@ -10,12 +9,14 @@ import AiAgentCard from "@/components/ai/AiAgentCard";
 import BusinessTypeChart from "@/components/dashboard/BusinessTypeChart";
 import MarketChart from "@/components/dashboard/MarketChart";
 import CompanyHeatMap from "@/components/search/CompanyHeatMap";
-import { Database, Users, TrendingUp, Search, Sparkles } from "lucide-react";
+import { Database, Users, TrendingUp, Search, Sparkles, LogIn } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { enrichCompanyWithGPT } from "@/utils/companyEnrichment";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertBox } from "@/components/common/AlertBox";
 
 // Mock Data - using the same data as in Index.tsx
 const mockCompanies = [
@@ -318,14 +319,47 @@ const SmartSearch = () => {
   const [filterText, setFilterText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      setIsCheckingAuth(true);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const hasLocalAuth = localStorage.getItem('isAuthenticated') === 'true';
+        setIsAuthenticated(!!session || hasLocalAuth);
+        setAuthError((!session && !hasLocalAuth) ? "Você precisa estar autenticado para usar esta funcionalidade." : null);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setIsAuthenticated(false);
+        setAuthError("Erro ao verificar autenticação.");
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+    
+    checkAuthStatus();
+  }, []);
 
   const checkAuthStatus = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      setAuthError("Você precisa estar autenticado para usar esta funcionalidade.");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const hasLocalAuth = localStorage.getItem('isAuthenticated') === 'true';
+      
+      if (!session && !hasLocalAuth) {
+        setAuthError("Você precisa estar autenticado para usar esta funcionalidade.");
+        return false;
+      }
+      
+      setAuthError(null);
+      return true;
+    } catch (error) {
+      console.error("Error checking authentication:", error);
+      setAuthError("Erro ao verificar autenticação.");
       return false;
     }
-    return true;
   };
 
   const handleSearch = async (filters: CompanyFilters) => {
@@ -339,8 +373,8 @@ const SmartSearch = () => {
     }
 
     // Check authentication status before proceeding
-    const isAuthenticated = await checkAuthStatus();
-    if (!isAuthenticated) {
+    const isUserAuthenticated = await checkAuthStatus();
+    if (!isUserAuthenticated) {
       toast({
         title: "Autenticação necessária",
         description: "Você precisa estar logado para realizar buscas.",
@@ -531,6 +565,82 @@ const SmartSearch = () => {
     company.state.toLowerCase().includes(filterText.toLowerCase())
     : true
   );
+
+  // If still checking authentication status
+  if (isCheckingAuth) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center h-[70vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // If not authenticated, show login prompt
+  if (isAuthenticated === false) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-bold">Prospecção Inteligente</h1>
+              <Sparkles className="h-6 w-6 text-amber-500" />
+            </div>
+            <p className="text-muted-foreground text-lg">
+              Utilize a busca para encontrar empresas por segmento, nome ou palavras-chave
+            </p>
+          </div>
+        </div>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Autenticação Necessária</CardTitle>
+            <CardDescription>
+              Para acessar a funcionalidade de busca inteligente, é necessário fazer login.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center gap-4 p-4">
+              <AlertBox 
+                title="Acesso Restrito" 
+                description="Esta funcionalidade está disponível apenas para usuários autenticados."
+                variant="warning"
+              />
+              <Button 
+                className="mt-4 gap-2" 
+                size="lg" 
+                onClick={() => navigate('/login')}
+              >
+                <LogIn className="h-5 w-5" />
+                Fazer Login
+              </Button>
+              <p className="text-sm text-muted-foreground mt-2">
+                Após fazer login, você será redirecionado automaticamente para esta página.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <AiAgentCard type="search" onClick={() => navigate('/login')} />
+          <div className="p-6 border rounded-lg bg-gray-50">
+            <h2 className="text-xl font-semibold mb-4">Busca Inteligente</h2>
+            <p className="mb-4">
+              Nossa ferramenta utiliza IA para encontrar empresas com base em critérios específicos,
+              enriquecendo automaticamente os dados com informações relevantes para prospecção.
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+              <li>Busca por segmento, nome ou palavras-chave</li>
+              <li>Enriquecimento automático de dados</li>
+              <li>Visualização de oportunidades em potencial</li>
+              <li>Análise de mercado integrada</li>
+            </ul>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
