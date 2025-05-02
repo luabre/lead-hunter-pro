@@ -28,6 +28,7 @@ import {
   BarChartHorizontal,
   Network,
   Search,
+  Download,
 } from "lucide-react";
 import { Logo } from "./Logo";
 import AppVersion from "./AppVersion";
@@ -41,6 +42,7 @@ const AppSidebar = () => {
   const getBadge = (path: string) => {
     if (path === "/my-pipeline") return { text: "Novo", variant: "green" as const };
     if (path === "/ia-closer") return { text: "Beta", variant: "purple" as const };
+    if (path === "/lead-import") return { text: "Novo", variant: "green" as const };
     return null;
   };
 
@@ -75,6 +77,12 @@ const AppSidebar = () => {
       path: "/my-pipeline",
       icon: User,
       badge: getBadge("/my-pipeline"),
+    },
+    {
+      text: "Importar Base de Leads",
+      path: "/lead-import",
+      icon: Download,
+      badge: getBadge("/lead-import"),
     },
     {
       text: "IA SDR",

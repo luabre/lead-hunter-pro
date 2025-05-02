@@ -1,212 +1,166 @@
 
-import { useState, useEffect } from "react";
-import { Progress } from "@/components/ui/progress";
-import { Loader } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
+import { ProcessedData } from '../LeadImportStepper';
+import { useToast } from '@/hooks/use-toast';
 
 interface CleanseStepProps {
   file: File;
-  onComplete: (data: any) => void;
+  onComplete: (data: ProcessedData) => void;
 }
 
-const CleanseStep = ({ file, onComplete }: CleanseStepProps) => {
+const CleanseStep: React.FC<CleanseStepProps> = ({ file, onComplete }) => {
+  const [processing, setProcessing] = useState(true);
   const [progress, setProgress] = useState(0);
-  const [currentTask, setCurrentTask] = useState("");
-  const [stats, setStats] = useState({
-    total: 0,
-    processed: 0,
-    corrected: 0,
-    enriched: 0,
-    failed: 0
-  });
-
-  // Simulate the AI cleansing process
+  const [status, setStatus] = useState('Iniciando processamento...');
+  const { toast } = useToast();
+  
+  // Simulated cleansing and enrichment process
   useEffect(() => {
-    const simulateProcessing = async () => {
-      // Initialize
-      setProgress(5);
-      setCurrentTask("Analisando arquivo...");
-      await sleep(1000);
+    const mockProcessFile = async () => {
+      // Initial delay to simulate file parsing
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setProgress(10);
+      setStatus('Analisando estrutura do arquivo...');
       
-      // Extract data
-      setProgress(15);
-      setCurrentTask("Extraindo dados...");
-      await sleep(1500);
-      
-      // Set total count
-      const totalRecords = Math.floor(Math.random() * 100) + 50;
-      setStats(prev => ({ ...prev, total: totalRecords }));
-      
-      // Validate data
+      // Simulate CNPJ validation
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setProgress(30);
-      setCurrentTask("Validando dados...");
-      await sleep(1000);
+      setStatus('Validando CNPJs e removendo duplicados...');
       
-      // CNPJ validation
-      setProgress(45);
-      setCurrentTask("Verificando CNPJs...");
-      await sleep(1500);
+      // Simulate email validation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setProgress(50);
+      setStatus('Corrigindo e validando e-mails...');
       
-      // Clean and enrich
-      setProgress(60);
-      setCurrentTask("Limpando e enriquecendo dados...");
+      // Simulate AI enrichment
+      await new Promise(resolve => setTimeout(resolve, 2500));
+      setProgress(70);
+      setStatus('Enriquecendo dados com IA...');
       
-      // Process each record
-      const batchSize = Math.floor(totalRecords / 10);
-      for (let i = 0; i < 10; i++) {
-        await sleep(600);
-        
-        const processed = Math.min((i + 1) * batchSize, totalRecords);
-        const corrected = Math.floor(processed * 0.3);
-        const enriched = Math.floor(processed * 0.4);
-        const failed = Math.floor(processed * 0.05);
-        
-        setStats({
-          total: totalRecords,
-          processed,
-          corrected,
-          enriched,
-          failed
-        });
-        
-        setProgress(60 + Math.floor((i + 1) * 3));
-      }
+      // Simulate segmentation
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setProgress(90);
+      setStatus('Classificando leads por potencial...');
       
-      // Finalizing
-      setProgress(95);
-      setCurrentTask("Finalizando processamento...");
-      await sleep(1000);
-      
-      // Complete
+      // Simulate completion
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setProgress(100);
-      setCurrentTask("Processamento concluído!");
+      setStatus('Processamento concluído');
       
-      // Generate mock processed data
-      const mockProcessedData = {
-        fileName: file.name,
-        fileSize: file.size,
-        processedAt: new Date().toISOString(),
-        stats: {
-          total: totalRecords,
-          valid: totalRecords - failed,
-          corrected,
-          enriched,
-          failed
-        },
-        leads: generateMockLeads(totalRecords, corrected, enriched, failed)
+      // Mock data
+      const mockData: ProcessedData = {
+        total: 250,
+        corrected: 45,
+        enriched: 187,
+        failed: 8,
+        leads: Array(250).fill(null).map((_, i) => ({
+          id: `lead-${i}`,
+          companyName: `Empresa ${i+1}`,
+          cnpj: `${Math.floor(10000000000000 + Math.random() * 90000000000000)}`,
+          contactName: `Contato ${i+1}`,
+          email: `contato${i+1}@empresa${i+1}.com`,
+          segment: ['Tecnologia', 'Saúde', 'Educação', 'Varejo', 'Finanças'][Math.floor(Math.random() * 5)]
+        }))
       };
       
-      await sleep(1000);
-      onComplete(mockProcessedData);
+      setProcessing(false);
+      toast({
+        title: "Base processada com sucesso!",
+        description: `${mockData.total} leads processados, ${mockData.failed} falhas.`
+      });
+      
+      onComplete(mockData);
     };
     
-    simulateProcessing();
-  }, [file, onComplete]);
-
-  // Helper functions
-  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    mockProcessFile();
+  }, [file, onComplete, toast]);
   
-  const generateMockLeads = (total: number, corrected: number, enriched: number, failed: number) => {
-    const leads = [];
-    const segments = ["Tecnologia", "Saúde", "Varejo", "Serviços", "Educação", "Finanças", "Indústria"];
-    const states = ["SP", "RJ", "MG", "PR", "SC", "RS", "BA", "PE", "CE"];
-    
-    for (let i = 0; i < total; i++) {
-      const isFailed = i < failed;
-      const isCorrected = !isFailed && i < (failed + corrected);
-      const isEnriched = !isFailed && !isCorrected && i < (failed + corrected + enriched);
-      
-      leads.push({
-        id: `lead-${i + 1}`,
-        companyName: `Empresa ${i + 1} LTDA`,
-        cnpj: isCorrected ? "CNPJ Corrigido" : `${Math.floor(Math.random() * 90000000) + 10000000}0001${Math.floor(Math.random() * 90) + 10}`,
-        contactName: `Contato ${i + 1}`,
-        email: isCorrected ? `corrigido${i + 1}@empresa.com` : `contato${i + 1}@empresa.com`,
-        phone: `(${Math.floor(Math.random() * 90) + 10}) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
-        position: isEnriched ? "Cargo Enriquecido" : ["CEO", "Diretor", "Gerente", "Coordenador", "Analista"][Math.floor(Math.random() * 5)],
-        website: isEnriched ? "Site Enriquecido" : `www.empresa${i + 1}.com.br`,
-        segment: segments[Math.floor(Math.random() * segments.length)],
-        state: states[Math.floor(Math.random() * states.length)],
-        status: isFailed ? "Falhou" : isCorrected ? "Corrigido" : isEnriched ? "Enriquecido" : "OK"
-      });
-    }
-    
-    return leads;
-  };
-
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold">Limpeza e Enriquecimento</h2>
-        <p className="text-muted-foreground mt-1">
-          Nossa IA está processando sua base de leads
+        <h2 className="text-2xl font-semibold mb-2">Processando sua base de leads</h2>
+        <p className="text-muted-foreground">
+          Estamos limpando, validando e enriquecendo automaticamente seus dados
         </p>
       </div>
       
-      <div className="p-6 border rounded-lg bg-muted/30">
-        <div className="space-y-4">
-          <div className="flex justify-between items-center text-sm">
-            <div className="flex items-center">
-              <Loader className="h-4 w-4 mr-2 animate-spin" />
-              <span>{currentTask}</span>
+      <Card className="border border-muted">
+        <CardContent className="pt-6">
+          <div className="space-y-8">
+            {/* Progress bar */}
+            <div className="w-full bg-muted rounded-full h-4 dark:bg-gray-700">
+              <div 
+                className="bg-primary h-4 rounded-full transition-all duration-500 ease-out" 
+                style={{ width: `${progress}%` }}
+              ></div>
             </div>
-            <span className="font-mono">{progress}%</span>
+            
+            {/* Status text */}
+            <div className="text-center text-sm font-medium">
+              {status}
+            </div>
+            
+            {/* Processing activities */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span>Verificação de CNPJs</span>
+                {progress < 30 ? <Skeleton className="h-4 w-20" /> : <span className="text-green-600">✓ Concluído</span>}
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Validação de e-mails</span>
+                {progress < 50 ? <Skeleton className="h-4 w-20" /> : <span className="text-green-600">✓ Concluído</span>}
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Enriquecimento com IA</span>
+                {progress < 70 ? <Skeleton className="h-4 w-20" /> : <span className="text-green-600">✓ Concluído</span>}
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Classificação por potencial</span>
+                {progress < 90 ? <Skeleton className="h-4 w-20" /> : <span className="text-green-600">✓ Concluído</span>}
+              </div>
+            </div>
+            
+            {/* Processing stats (only show when complete) */}
+            {progress === 100 && (
+              <div className="bg-muted/50 p-4 rounded-md">
+                <h3 className="font-medium mb-2">Resumo do processamento</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total processado:</p>
+                    <p className="font-medium">{250} leads</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Dados corrigidos:</p>
+                    <p className="font-medium">{45} leads</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Dados enriquecidos:</p>
+                    <p className="font-medium">{187} leads</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Falhas:</p>
+                    <p className="font-medium">{8} leads</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          
-          <Progress value={progress} className="h-2" />
-          
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="bg-background p-3 rounded border text-center">
-              <div className="text-sm text-muted-foreground">Total</div>
-              <div className="text-xl font-bold">{stats.total}</div>
-            </div>
-            <div className="bg-background p-3 rounded border text-center">
-              <div className="text-sm text-muted-foreground">Processados</div>
-              <div className="text-xl font-bold">{stats.processed}</div>
-            </div>
-            <div className="bg-background p-3 rounded border text-center">
-              <div className="text-sm text-muted-foreground">Corrigidos</div>
-              <div className="text-xl font-bold text-amber-500">{stats.corrected}</div>
-            </div>
-            <div className="bg-background p-3 rounded border text-center">
-              <div className="text-sm text-muted-foreground">Enriquecidos</div>
-              <div className="text-xl font-bold text-blue-500">{stats.enriched}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-5">
-          <h3 className="text-sm font-medium mb-3">O que estamos fazendo:</h3>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-start">
-              <div className="bg-blue-100 text-blue-700 rounded-full p-1 mr-2 mt-0.5">✓</div>
-              <div>
-                <span className="font-medium">Validando CNPJs</span>
-                <p className="text-muted-foreground text-xs">Verificando a existência e formatação</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-blue-100 text-blue-700 rounded-full p-1 mr-2 mt-0.5">✓</div>
-              <div>
-                <span className="font-medium">Verificando e-mails</span>
-                <p className="text-muted-foreground text-xs">Validando formato e existência de domínio</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-amber-100 text-amber-700 rounded-full p-1 mr-2 mt-0.5">⋯</div>
-              <div>
-                <span className="font-medium">Enriquecendo dados</span>
-                <p className="text-muted-foreground text-xs">Adicionando informações via IA</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-gray-100 text-gray-700 rounded-full p-1 mr-2 mt-0.5">○</div>
-              <div>
-                <span className="font-medium">Classificando leads</span>
-                <p className="text-muted-foreground text-xs">Atribuindo pontuação inicial com base no fit</p>
-              </div>
-            </li>
-          </ul>
-        </div>
+        </CardContent>
+      </Card>
+      
+      <div className="flex justify-end">
+        <Button disabled={processing} onClick={() => onComplete({
+          total: 250,
+          corrected: 45,
+          enriched: 187,
+          failed: 8,
+          leads: []
+        })}>
+          {processing ? "Processando..." : "Pular etapa"}
+        </Button>
       </div>
     </div>
   );

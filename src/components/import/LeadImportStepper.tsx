@@ -23,13 +23,21 @@ const steps = [
   { id: 5, name: "Conclusão" }
 ];
 
+export interface ProcessedData {
+  total: number;
+  corrected: number;
+  enriched: number;
+  failed: number;
+  leads: any[];
+}
+
 const LeadImportStepper = ({ 
   currentStep, 
   onStepChange,
   onComplete 
 }: LeadImportStepperProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [processedData, setProcessedData] = useState<any>(null);
+  const [processedData, setProcessedData] = useState<ProcessedData | null>(null);
   const [assignmentType, setAssignmentType] = useState<string>("auto");
 
   const goToNextStep = () => {
@@ -49,7 +57,7 @@ const LeadImportStepper = ({
     goToNextStep();
   };
 
-  const handleCleanseComplete = (data: any) => {
+  const handleCleanseComplete = (data: ProcessedData) => {
     setProcessedData(data);
     goToNextStep();
   };
@@ -98,7 +106,7 @@ const LeadImportStepper = ({
         {currentStep === 4 && (
           <AssignmentStep onComplete={handleAssignmentComplete} onBack={goToPreviousStep} />
         )}
-        {currentStep === 5 && (
+        {currentStep === 5 && processedData && (
           <CompletionStep 
             file={uploadedFile}
             processedData={processedData}
