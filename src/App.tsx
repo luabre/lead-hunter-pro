@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import Companies from "./pages/Companies";
 import Contacts from "./pages/Contacts";
 import Pipeline from "./pages/Pipeline";
+import MyPipeline from "./pages/MyPipeline";
 import Dashboard from "./pages/Dashboard";
 import IaSdr from "./pages/IaSdr";
 import IaCloser from "./pages/IaCloser";
@@ -33,6 +34,7 @@ const App = () => {
             <Route path="/companies" element={<Companies />} />
             <Route path="/contacts" element={<Contacts />} />
             <Route path="/pipeline" element={<Pipeline />} />
+            <Route path="/my-pipeline" element={<MyPipeline />} /> {/* Nova rota para pipeline personalizado */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/ia-sdr" element={<IaSdr />} />
             <Route path="/ia-closer" element={<IaCloser />} />
