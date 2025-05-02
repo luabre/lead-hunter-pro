@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import CompanySearch from "@/components/search/CompanySearch";
@@ -124,6 +125,8 @@ const SmartSearch = () => {
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [searchResults, setSearchResults] = useState<typeof mockCompanies>([]);
   const [selectedCompany, setSelectedCompany] = useState<typeof mockCompanies[0] | null>(null);
+  const [sortBy, setSortBy] = useState<"name" | "opportunity" | "state">("name");
+  const [filterText, setFilterText] = useState("");
 
   const handleSearch = (filters: CompanyFilters) => {
     if (!filters.segment) {
@@ -137,13 +140,57 @@ const SmartSearch = () => {
 
     // Simulate API call with delay
     setTimeout(() => {
-      setSearchResults(mockCompanies);
+      // Apply any text filtering from filters
+      let filtered = [...mockCompanies];
+      if (filters.segment) {
+        setFilterText(filters.segment);
+        // Simple filtering - in a real app this would be done server-side
+        filtered = filtered.filter(company => 
+          company.segment.toLowerCase().includes(filters.segment.toLowerCase())
+        );
+      }
+      
+      // Sort the results based on current sort parameter
+      const sortedResults = sortResults([...filtered], sortBy);
+      
+      setSearchResults(sortedResults);
       setSearchPerformed(true);
       toast({
         title: "Busca realizada com sucesso",
-        description: `Encontramos ${mockCompanies.length} empresas no segmento de ${filters.segment}.`,
+        description: `Encontramos ${sortedResults.length} empresas no segmento de ${filters.segment}.`,
       });
     }, 500);
+  };
+
+  const sortResults = (companies: typeof mockCompanies, sortField: string) => {
+    return [...companies].sort((a, b) => {
+      switch (sortField) {
+        case "name":
+          return a.fantasyName.localeCompare(b.fantasyName);
+        case "opportunity":
+          // Convert opportunity to numeric value for sorting
+          const opportunityValue = {
+            hot: 3,
+            warm: 2,
+            cold: 1,
+            undefined: 0
+          };
+          const aValue = a.opportunity ? opportunityValue[a.opportunity] : 0;
+          const bValue = b.opportunity ? opportunityValue[b.opportunity] : 0;
+          return bValue - aValue; // Descending order (hot first)
+        case "state":
+          return a.state.localeCompare(b.state);
+        default:
+          return 0;
+      }
+    });
+  };
+
+  const handleSortChange = (newSortBy: "name" | "opportunity" | "state") => {
+    setSortBy(newSortBy);
+    // Re-sort the existing results
+    const sortedResults = sortResults([...searchResults], newSortBy);
+    setSearchResults(sortedResults);
   };
 
   const handleCompanyClick = (company: typeof mockCompanies[0]) => {
@@ -153,6 +200,15 @@ const SmartSearch = () => {
   const handleCloseDetails = () => {
     setSelectedCompany(null);
   };
+
+  // Filter results by current filterText
+  const filteredResults = searchResults.filter(company => 
+    filterText ? 
+    company.fantasyName.toLowerCase().includes(filterText.toLowerCase()) || 
+    company.segment.toLowerCase().includes(filterText.toLowerCase()) ||
+    company.state.toLowerCase().includes(filterText.toLowerCase())
+    : true
+  );
 
   return (
     <AppLayout>
@@ -205,19 +261,48 @@ const SmartSearch = () => {
             />
           </div>
 
-          {/* Companies List */}
+          {/* Companies List with Sorting Controls */}
           <div className="col-span-1 md:col-span-2">
-            <h2 className="text-xl font-semibold mb-4">
-              Empresas Encontradas ({searchResults.length})
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">
+                Empresas Encontradas ({filteredResults.length})
+              </h2>
+              <div className="flex gap-2">
+                <button 
+                  className={`px-3 py-1 text-sm border rounded-md ${sortBy === 'name' ? 'bg-primary text-white' : 'border-gray-300'}`}
+                  onClick={() => handleSortChange("name")}
+                >
+                  Nome
+                </button>
+                <button 
+                  className={`px-3 py-1 text-sm border rounded-md ${sortBy === 'opportunity' ? 'bg-primary text-white' : 'border-gray-300'}`}
+                  onClick={() => handleSortChange("opportunity")}
+                >
+                  Oportunidade
+                </button>
+                <button 
+                  className={`px-3 py-1 text-sm border rounded-md ${sortBy === 'state' ? 'bg-primary text-white' : 'border-gray-300'}`}
+                  onClick={() => handleSortChange("state")}
+                >
+                  Estado
+                </button>
+              </div>
+            </div>
             <div className="space-y-4">
-              {searchResults.map((company) => (
+              {filteredResults.map((company) => (
                 <CompanyCard
                   key={company.id}
                   company={company}
                   onClick={() => handleCompanyClick(company)}
                 />
               ))}
+              {filteredResults.length === 0 && (
+                <div className="text-center p-6 border border-dashed rounded-lg">
+                  <p className="text-muted-foreground">
+                    Nenhuma empresa encontrada com os filtros atuais.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

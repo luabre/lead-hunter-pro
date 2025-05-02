@@ -31,6 +31,7 @@ export interface CompanyFilters {
   employees?: string;
   type?: string;
   yearsInBusiness?: string;
+  sortBy?: 'name' | 'opportunity' | 'state';
 }
 
 const brazilianStates = [
@@ -41,6 +42,7 @@ const brazilianStates = [
 const CompanySearch = ({ onSearch }: CompanySearchProps) => {
   const [filters, setFilters] = useState<CompanyFilters>({
     segment: "",
+    sortBy: "name", // Default sort by name
   });
   
   const [isAdvancedSearch, setIsAdvancedSearch] = useState(false);
@@ -208,6 +210,23 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
                     <SelectItem value="3-5">3 - 5 anos</SelectItem>
                     <SelectItem value="5-10">5 - 10 anos</SelectItem>
                     <SelectItem value="above-10">Mais de 10 anos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="sortBy">Ordenar por</Label>
+                <Select
+                  onValueChange={(value) => handleInputChange("sortBy", value as 'name' | 'opportunity' | 'state')}
+                  value={filters.sortBy}
+                >
+                  <SelectTrigger id="sortBy">
+                    <SelectValue placeholder="Ordenar por" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">Nome</SelectItem>
+                    <SelectItem value="opportunity">Oportunidade</SelectItem>
+                    <SelectItem value="state">Estado</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
