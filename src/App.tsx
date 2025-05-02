@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,7 @@ import Meetings from "./pages/Meetings";
 import MarketIntel from "./pages/MarketIntel";
 import AiManager from "./pages/AiManager";
 import SocialSelling from "./pages/SocialSelling";
+import LeadImport from "./pages/LeadImport";
 import { useState } from "react";
 
 const App = () => {
@@ -44,6 +44,7 @@ const App = () => {
               <Route path="/market-intel" element={<MarketIntel />} />
               <Route path="/ai-manager" element={<AiManager />} />
               <Route path="/social-selling" element={<SocialSelling />} />
+              <Route path="/lead-import" element={<LeadImport />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -21,8 +21,8 @@ const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps)
   })) || [];
 
   // Format for tooltip display only
-  const formatTooltipValue = (value: number, name: string, item: any) => {
-    const percentage = item?.payload?.percentage;
+  const formatTooltipValue = (value: number, name: string, props: any) => {
+    const percentage = props?.payload?.percentage;
     return [`${value} empresas (${percentage}%)`, name];
   };
 
@@ -58,9 +58,9 @@ const BusinessTypeChart = ({ title, description, data }: BusinessTypeChartProps)
                 verticalAlign="middle" 
                 align="right" 
                 formatter={(value, entry) => {
-                  if (!entry || !entry.payload) return value;
-                  const { name, value: itemValue, percentage } = entry.payload;
-                  return `${name}: ${itemValue} (${percentage}%)`;
+                  const payload = entry.payload;
+                  if (!payload) return value;
+                  return `${payload.name}: ${payload.value} (${payload.percentage}%)`;
                 }}
               />
               <Tooltip 
