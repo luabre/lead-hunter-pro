@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -27,17 +26,16 @@ const SdrPipelineActions = () => {
         navigate("/meetings");
         break;
       case "report":
-        // Navigate to reports page
         navigate("/dashboard");
         break;
       case "message":
-        // Navigate to messages page
         navigate("/ia-sdr");
         break;
       case "call":
-        // Navigate to calls page
         navigate("/contacts");
         break;
+      default:
+        console.log("Action not implemented:", actionType);
     }
   };
 
