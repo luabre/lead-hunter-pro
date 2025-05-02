@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LoginProps {
   onLoginSuccess: () => void;
@@ -39,30 +41,69 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
         return;
       }
 
-      // Este é um login simulado para demonstração
-      // Em produção, isso seria substituído por uma chamada real de autenticação
-      setTimeout(() => {
-        // Simulando login bem-sucedido para qualquer credencial
-        localStorage.setItem('isAuthenticated', 'true');
+      // Attempt to login with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        console.error("Erro ao fazer login:", error);
         
-        toast({
-          title: "Login bem-sucedido",
-          description: "Redirecionando para o dashboard...",
-        });
-        
-        onLoginSuccess();
-        navigate("/");
+        // Specific error handling for common cases
+        if (error.message.includes("Invalid login")) {
+          toast({
+            title: "Credenciais inválidas",
+            description: "Email ou senha incorretos. Por favor, tente novamente.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Erro ao fazer login",
+            description: error.message || "Verifique suas credenciais e tente novamente.",
+            variant: "destructive",
+          });
+        }
         setIsLoading(false);
-      }, 1000);
-    } catch (error) {
+        return;
+      }
+
+      // Successful login
+      localStorage.setItem('isAuthenticated', 'true');
+      
+      toast({
+        title: "Login bem-sucedido",
+        description: "Redirecionando para o dashboard...",
+      });
+      
+      onLoginSuccess();
+      navigate("/", { replace: true });
+    } catch (error: any) {
       console.error("Erro ao fazer login:", error);
       toast({
         title: "Erro ao fazer login",
         description: "Verifique suas credenciais e tente novamente.",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
+  };
+
+  // For demo purposes - allow quick login
+  const handleDemoLogin = () => {
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      localStorage.setItem('isAuthenticated', 'true');
+      toast({
+        title: "Login de demonstração",
+        description: "Você está entrando no modo demonstração.",
+      });
+      onLoginSuccess();
+      navigate("/", { replace: true });
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
@@ -116,6 +157,18 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
+          
+          <div className="mt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full mt-2" 
+              onClick={handleDemoLogin}
+              disabled={isLoading}
+            >
+              Entrar no modo demonstração
+            </Button>
+          </div>
           
           <div className="flex justify-between text-sm mt-4">
             <button 

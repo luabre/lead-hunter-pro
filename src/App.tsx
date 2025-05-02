@@ -22,27 +22,55 @@ import SocialSelling from "./pages/SocialSelling";
 import LeadImport from "./pages/LeadImport";
 import SmartSearch from "./pages/SmartSearch";
 import { useState, useEffect } from "react";
+import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const App = () => {
   // Create a client inside the component
   const [queryClient] = useState(() => new QueryClient());
-  // This is just a placeholder - in a real app you'd use auth state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // This simulates checking if the user is logged in
-  // In a real app, you would use your auth provider here
+  // Improved auth check that uses Supabase's session
   useEffect(() => {
-    const checkAuth = () => {
-      const hasAuth = localStorage.getItem('isAuthenticated') === 'true';
-      setIsAuthenticated(hasAuth);
+    const checkAuth = async () => {
+      setIsLoading(true);
+      
+      try {
+        // Check for an active session in Supabase
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        // Also check localStorage for backward compatibility
+        const hasLocalAuth = localStorage.getItem('isAuthenticated') === 'true';
+        
+        setIsAuthenticated(!!session || hasLocalAuth);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        toast({
+          title: "Erro de autenticação",
+          description: "Houve um problema ao verificar seu login. Por favor, tente novamente.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
     
     checkAuth();
     
-    // Listen for auth changes (simulated)
-    window.addEventListener('storage', checkAuth);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setIsAuthenticated(true);
+        localStorage.setItem('isAuthenticated', 'true');
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+        localStorage.removeItem('isAuthenticated');
+      }
+    });
+    
     return () => {
-      window.removeEventListener('storage', checkAuth);
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -51,6 +79,15 @@ const App = () => {
     localStorage.setItem('isAuthenticated', 'true');
     setIsAuthenticated(true);
   };
+  
+  // Show loading indicator while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
