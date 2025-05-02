@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Companies from "./pages/Companies";
@@ -28,24 +29,26 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/companies" element={<Companies />} />
-            <Route path="/contacts" element={<Contacts />} />
-            <Route path="/pipeline" element={<Pipeline />} />
-            <Route path="/my-pipeline" element={<MyPipeline />} /> {/* Nova rota para pipeline personalizado */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/ia-sdr" element={<IaSdr />} />
-            <Route path="/ia-closer" element={<IaCloser />} />
-            <Route path="/meetings" element={<Meetings />} />
-            <Route path="/market-intel" element={<MarketIntel />} />
-            <Route path="/ai-manager" element={<AiManager />} />
-            <Route path="/social-selling" element={<SocialSelling />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <SidebarProvider defaultOpen={true}>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/companies" element={<Companies />} />
+              <Route path="/contacts" element={<Contacts />} />
+              <Route path="/pipeline" element={<Pipeline />} />
+              <Route path="/my-pipeline" element={<MyPipeline />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/ia-sdr" element={<IaSdr />} />
+              <Route path="/ia-closer" element={<IaCloser />} />
+              <Route path="/meetings" element={<Meetings />} />
+              <Route path="/market-intel" element={<MarketIntel />} />
+              <Route path="/ai-manager" element={<AiManager />} />
+              <Route path="/social-selling" element={<SocialSelling />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </SidebarProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

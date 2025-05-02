@@ -1,3 +1,4 @@
+
 import { useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -14,7 +15,6 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarFooter,
-  SidebarRail,
 } from "@/components/ui/sidebar";
 import {
   Building2,
@@ -110,68 +110,65 @@ const AppSidebar = () => {
   ];
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <SidebarRail />
-      <Sidebar collapsible="offcanvas">
-        <SidebarHeader className="border-b border-border py-4 px-4">
-          <Logo />
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Navegação</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {menuItems.map((item) => (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActivePath(item.path)}
-                      tooltip={item.text}
-                    >
-                      <a href={item.path}>
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.text}</span>
-                        {item.badge && (
-                          <span
-                            className={cn(
-                              "ml-2 rounded px-1.5 py-0.5 text-xs font-medium",
-                              item.badge.variant === "green"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-purple-100 text-purple-800"
-                            )}
-                          >
-                            {item.badge.text}
-                          </span>
-                        )}
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-        <SidebarFooter>
-          <div className="flex flex-col gap-4 p-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9">
-                <AvatarImage src="/placeholder.svg" alt="User Avatar" />
-                <AvatarFallback>LH</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-medium leading-none">
-                  Usuário LeadHunter
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  pessoa@leadhunter.com
-                </p>
-              </div>
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="border-b border-border py-4 px-4">
+        <Logo />
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navegação</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActivePath(item.path)}
+                    tooltip={item.text}
+                  >
+                    <a href={item.path}>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.text}</span>
+                      {item.badge && (
+                        <span
+                          className={cn(
+                            "ml-2 rounded px-1.5 py-0.5 text-xs font-medium",
+                            item.badge.variant === "green"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-purple-100 text-purple-800"
+                          )}
+                        >
+                          {item.badge.text}
+                        </span>
+                      )}
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <div className="flex flex-col gap-4 p-4">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9">
+              <AvatarImage src="/placeholder.svg" alt="User Avatar" />
+              <AvatarFallback>LH</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-sm font-medium leading-none">
+                Usuário LeadHunter
+              </p>
+              <p className="text-xs text-muted-foreground">
+                pessoa@leadhunter.com
+              </p>
             </div>
-            <AppVersion />
           </div>
-        </SidebarFooter>
-      </Sidebar>
-    </SidebarProvider>
+          <AppVersion />
+        </div>
+      </SidebarFooter>
+    </Sidebar>
   );
 };
 
