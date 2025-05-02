@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Brain, Calendar, FileText, MessageSquare, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 const SdrPipelineActions = () => {
   const [aiAssistantActive, setAiAssistantActive] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const toggleAiAssistant = () => {
     setAiAssistantActive(!aiAssistantActive);
@@ -22,28 +24,19 @@ const SdrPipelineActions = () => {
   const handleAction = (actionType: string) => {
     switch (actionType) {
       case "meeting":
-        toast({
-          title: "Agendar reuniões",
-          description: "Abra a ferramenta de agendamento para gerenciar suas reuniões",
-        });
+        navigate("/meetings");
         break;
       case "report":
-        toast({
-          title: "Ver relatórios",
-          description: "Acesse os relatórios detalhados de sua performance",
-        });
+        // Navigate to reports page
+        navigate("/dashboard");
         break;
       case "message":
-        toast({
-          title: "Mensagens",
-          description: "Verifique suas mensagens recentes com leads",
-        });
+        // Navigate to messages page
+        navigate("/ia-sdr");
         break;
       case "call":
-        toast({
-          title: "Ligações",
-          description: "Acesse o sistema de telefonia integrado",
-        });
+        // Navigate to calls page
+        navigate("/contacts");
         break;
     }
   };
