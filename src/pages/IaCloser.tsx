@@ -211,7 +211,7 @@ Todos estes elementos foram pensados especificamente para atender às necessidad
                             </div>
                           ) : (
                             <div className="space-y-6">
-                              <p className="text-muted-foreground">
+                              <p className="text-foreground font-medium">
                                 Use a IA para gerar uma proposta personalizada com base no histórico de conversas
                                 e perfil do lead.
                               </p>
@@ -389,16 +389,16 @@ Todos estes elementos foram pensados especificamente para atender às necessidad
               <div className="flex items-center gap-3">
                 <FileText className="h-7 w-7 text-leadhunter-teal" />
                 <div>
-                  <CardTitle className="text-lg">IA Closer</CardTitle>
-                  <CardDescription className="text-gray-300">
+                  <CardTitle className="text-lg text-white">IA Closer</CardTitle>
+                  <CardDescription className="text-gray-100">
                     Fechamento inteligente e personalizado
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-sm mb-6">
-                <p>
+              <div className="text-white text-sm mb-6">
+                <p className="font-medium">
                   A IA Closer analisa leads qualificados para fechamento eficaz utilizando:
                 </p>
                 <ul className="mt-2 space-y-1 list-disc pl-5">
@@ -409,19 +409,19 @@ Todos estes elementos foram pensados especificamente para atender às necessidad
                 </ul>
               </div>
               
-              <div className="bg-leadhunter-blue-dark/50 p-3 rounded-lg border border-white/10">
-                <p className="text-sm font-medium mb-2">Análise do Lead</p>
+              <div className="bg-leadhunter-blue-dark/80 p-3 rounded-lg border border-white/20">
+                <p className="text-sm font-medium mb-2 text-white">Análise do Lead</p>
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-300">Abertura para proposta</span>
+                    <span className="text-gray-100">Abertura para proposta</span>
                     <span className="text-leadhunter-teal font-medium">84%</span>
                   </div>
-                  <div className="w-full bg-white/10 rounded-full h-1.5">
+                  <div className="w-full bg-white/20 rounded-full h-1.5">
                     <div className="bg-leadhunter-teal h-1.5 rounded-full" style={{ width: "84%" }}></div>
                   </div>
                 </div>
                 
-                <div className="mt-3 text-xs text-gray-300">
+                <div className="mt-3 text-xs text-gray-100">
                   <p>
                     João Silva abriu o último email 3 vezes nas últimas 24 horas. 
                     Demonstra alto interesse e urgência.

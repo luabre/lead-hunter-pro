@@ -25,10 +25,10 @@ const AiAgentCard = ({ type, onClick }: AiAgentCardProps) => {
             <Mail className="h-7 w-7 text-leadhunter-teal" />
           )}
           <div>
-            <CardTitle className="text-lg">
+            <CardTitle className="text-lg text-white">
               {type === "sdr" ? "IA SDR" : "IA Closer"}
             </CardTitle>
-            <CardDescription className="text-gray-300">
+            <CardDescription className="text-gray-100">
               {type === "sdr"
                 ? "Prospecção e Qualificação Humanizada"
                 : "Fechamento Inteligente e Personalizado"}
@@ -37,7 +37,7 @@ const AiAgentCard = ({ type, onClick }: AiAgentCardProps) => {
         </div>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="text-sm mb-4">
+        <div className="text-sm mb-4 text-white">
           {type === "sdr" && (
             <>
               <p className="mb-2">
@@ -68,7 +68,7 @@ const AiAgentCard = ({ type, onClick }: AiAgentCardProps) => {
         <div className="mt-6">
           <Button
             variant="outline"
-            className="w-full border-white/30 text-white hover:bg-white/10"
+            className="w-full border-white text-white hover:bg-white/20 font-medium"
             onClick={onClick}
           >
             {type === "sdr" ? "Iniciar Prospecção" : "Gerar Proposta"}

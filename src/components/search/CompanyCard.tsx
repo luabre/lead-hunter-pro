@@ -194,7 +194,7 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
       <div className="mt-4 flex justify-between gap-2 flex-wrap">
         <Button 
           size="sm" 
-          className="bg-leadhunter-teal hover:bg-leadhunter-teal/90"
+          className="bg-leadhunter-teal hover:bg-leadhunter-teal/90 text-white font-medium"
           onClick={handleIaSdrClick}
         >
           <MessageSquare className="h-4 w-4 mr-1" />
@@ -204,7 +204,7 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
         {company.socialActive && (
           <Button
             size="sm"
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
             onClick={handleSocialSellingClick}
           >
             <MessageSquare className="h-4 w-4 mr-1" />

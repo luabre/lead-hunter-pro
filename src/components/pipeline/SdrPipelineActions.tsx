@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -51,7 +50,7 @@ const SdrPipelineActions = () => {
           <Button 
             variant="outline"
             size="sm"
-            className="h-8 w-auto px-2 flex-shrink-0 whitespace-nowrap"
+            className="h-8 w-auto px-2 flex-shrink-0 whitespace-nowrap font-medium"
             onClick={() => handleAction("meeting")}
           >
             <Calendar className="h-3.5 w-3.5 mr-1" />
@@ -111,12 +110,12 @@ const SdrPipelineActions = () => {
                 Assistente IA SDR
                 <Badge 
                   variant={aiAssistantActive ? "default" : "outline"}
-                  className={aiAssistantActive ? "bg-green-500 hover:bg-green-600" : ""}
+                  className={aiAssistantActive ? "bg-green-500 hover:bg-green-600 text-white font-medium" : ""}
                 >
                   {aiAssistantActive ? "Ativo" : "Desativado"}
                 </Badge>
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-foreground">
                 Seu assistente pessoal para automaizar abordagens e qualificação
               </p>
             </div>
@@ -125,6 +124,7 @@ const SdrPipelineActions = () => {
           <Button 
             onClick={toggleAiAssistant}
             variant={aiAssistantActive ? "destructive" : "default"}
+            className="font-medium"
           >
             {aiAssistantActive ? "Desativar" : "Ativar"} Assistente
           </Button>
@@ -136,15 +136,15 @@ const SdrPipelineActions = () => {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">09:45</Badge>
-                <span>Lead "Tech Solutions" - Enviado email de follow-up</span>
+                <span className="text-foreground">Lead "Tech Solutions" - Enviado email de follow-up</span>
               </li>
               <li className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">11:20</Badge>
-                <span>Lead "ABC Corp" - Qualificado como oportunidade quente</span>
+                <span className="text-foreground">Lead "ABC Corp" - Qualificado como oportunidade quente</span>
               </li>
               <li className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">14:30</Badge>
-                <span>Lead "XYZ Inc" - Agendado alerta para 2ª tentativa</span>
+                <span className="text-foreground">Lead "XYZ Inc" - Agendado alerta para 2ª tentativa</span>
               </li>
             </ul>
           </div>
