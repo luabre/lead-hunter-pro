@@ -28,8 +28,8 @@ interface CompanyCardProps {
     decisionMakerPosition?: string;
     opportunitySignals?: string[];
     recommendedChannels?: string[];
-    website?: string; // Added this property
-    yearFounded?: string; // Added this property
+    website?: string;
+    yearFounded?: string;
     creator?: {
       email: string;
       name: string;
@@ -108,7 +108,7 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
         website: company.website || company.digitalPresence,
         year_founded: company.yearFounded,
         digital_maturity: 50, // Default value
-        created_at: new Date().toISOString() // Fixed: Convert Date to string
+        created_at: new Date().toISOString() // Convert Date to string
       };
 
       // Insert the company into the database
