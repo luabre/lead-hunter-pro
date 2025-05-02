@@ -106,7 +106,7 @@ const LeadImportStepper = ({
         {currentStep === 4 && (
           <AssignmentStep onComplete={handleAssignmentComplete} onBack={goToPreviousStep} />
         )}
-        {currentStep === 5 && processedData && (
+        {currentStep === 5 && processedData && uploadedFile && (
           <CompletionStep 
             file={uploadedFile}
             processedData={processedData}

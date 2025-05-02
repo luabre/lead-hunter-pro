@@ -6,9 +6,11 @@ import { Check, X, Search, FileText, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { exportAsCSV } from "@/utils/exportUtils";
+import { ProcessedData } from "../LeadImportStepper";
+import { useToast } from "@/hooks/use-toast";
 
 interface PreviewStepProps {
-  data: any;
+  data: ProcessedData;
   onApprove: () => void;
   onBack: () => void;
 }
@@ -16,16 +18,30 @@ interface PreviewStepProps {
 const PreviewStep = ({ data, onApprove, onBack }: PreviewStepProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTab, setSelectedTab] = useState("valid");
+  const { toast } = useToast();
   
-  const validLeads = data.leads.filter((lead: any) => lead.status === "OK" || lead.status === "Corrigido" || lead.status === "Enriquecido");
-  const failedLeads = data.leads.filter((lead: any) => lead.status === "Falhou");
+  // Process data for display
+  const validLeads = data.leads.filter((lead: any) => 
+    lead.status === "OK" || lead.status === "Corrigido" || lead.status === "Enriquecido"
+  );
+  
+  const failedLeads = data.leads.filter((lead: any) => lead.status === "Falhou" || lead.status === "Rejeitado");
+  
+  // Stats for display
+  const stats = {
+    total: data.total,
+    valid: data.total - data.failed,
+    enriched: data.enriched,
+    corrected: data.corrected,
+    failed: data.failed
+  };
   
   const displayLeads = selectedTab === "valid" ? validLeads : failedLeads;
   
   const filteredLeads = displayLeads.filter((lead: any) => 
-    lead.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.contactName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.cnpj.toLowerCase().includes(searchTerm.toLowerCase())
+    (lead.companyName && lead.companyName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (lead.contactName && lead.contactName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (lead.cnpj && lead.cnpj.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
   const handleExport = () => {
@@ -43,6 +59,11 @@ const PreviewStep = ({ data, onApprove, onBack }: PreviewStepProps) => {
     };
     
     exportAsCSV(data.leads, headers, "leads_processados");
+    
+    toast({
+      title: "Dados exportados com sucesso",
+      description: "O arquivo CSV foi baixado para o seu computador"
+    });
   };
   
   const getStatusBadge = (status: string) => {
@@ -54,6 +75,7 @@ const PreviewStep = ({ data, onApprove, onBack }: PreviewStepProps) => {
       case "Enriquecido":
         return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">Enriquecido</Badge>;
       case "Falhou":
+      case "Rejeitado":
         return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">Falhou</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
@@ -70,22 +92,26 @@ const PreviewStep = ({ data, onApprove, onBack }: PreviewStepProps) => {
       </div>
       
       <div className="bg-muted p-4 rounded-lg">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="bg-background p-3 rounded border text-center">
             <div className="text-sm text-muted-foreground">Total de Leads</div>
-            <div className="text-xl font-bold">{data.stats.total}</div>
+            <div className="text-xl font-bold">{stats.total}</div>
           </div>
           <div className="bg-background p-3 rounded border text-center">
             <div className="text-sm text-muted-foreground">Válidos</div>
-            <div className="text-xl font-bold text-green-500">{data.stats.valid}</div>
+            <div className="text-xl font-bold text-green-500">{stats.valid}</div>
           </div>
           <div className="bg-background p-3 rounded border text-center">
             <div className="text-sm text-muted-foreground">Enriquecidos</div>
-            <div className="text-xl font-bold text-blue-500">{data.stats.enriched}</div>
+            <div className="text-xl font-bold text-blue-500">{stats.enriched}</div>
           </div>
           <div className="bg-background p-3 rounded border text-center">
             <div className="text-sm text-muted-foreground">Corrigidos</div>
-            <div className="text-xl font-bold text-amber-500">{data.stats.corrected}</div>
+            <div className="text-xl font-bold text-amber-500">{stats.corrected}</div>
+          </div>
+          <div className="bg-background p-3 rounded border text-center">
+            <div className="text-sm text-muted-foreground">Falhas</div>
+            <div className="text-xl font-bold text-red-500">{stats.failed}</div>
           </div>
         </div>
       </div>

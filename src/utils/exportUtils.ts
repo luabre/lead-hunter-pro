@@ -21,12 +21,32 @@ export const convertToCSV = (data: any[], headers: Record<string, string>) => {
   const rows = data.map(item => {
     return headerKeys.map(key => {
       // Handle nested properties using dot notation (e.g. 'creator.name')
-      const value = key.includes('.')
-        ? key.split('.').reduce((obj, i) => (obj && obj[i] !== undefined ? obj[i] : ''), item)
-        : item[key] !== undefined ? item[key] : '';
+      let value = undefined;
+      
+      if (key.includes('.')) {
+        value = key.split('.').reduce((obj, i) => (obj && obj[i] !== undefined ? obj[i] : ''), item);
+      } else {
+        value = item[key];
+      }
+      
+      // Handle different data types
+      let stringValue = '';
+      if (value === null || value === undefined) {
+        stringValue = '';
+      } else if (typeof value === 'object') {
+        try {
+          stringValue = JSON.stringify(value);
+        } catch {
+          stringValue = String(value);
+        }
+      } else if (typeof value === 'boolean') {
+        stringValue = value ? 'Sim' : 'Não';
+      } else {
+        stringValue = String(value);
+      }
       
       // Escape quotes and wrap in quotes
-      return `"${String(value).replace(/"/g, '""')}"`;
+      return `"${stringValue.replace(/"/g, '""')}"`;
     }).join(',');
   });
   
@@ -59,6 +79,27 @@ export const downloadFile = (content: string, fileName: string, mimeType: string
  * @param fileName File name without extension
  */
 export const exportAsCSV = (data: any[], headers: Record<string, string>, fileName: string) => {
+  const timestamp = new Date().toISOString().replace(/[:.T]/g, '-').slice(0, 19);
+  const finalFileName = `${fileName}_${timestamp}`;
   const csv = convertToCSV(data, headers);
-  downloadFile(csv, `${fileName}.csv`, 'text/csv;charset=utf-8;');
+  downloadFile(csv, `${finalFileName}.csv`, 'text/csv;charset=utf-8;');
+};
+
+/**
+ * Creates an Excel-like CSV with multiple sheets (separate CSVs)
+ * @param sheets Object mapping sheet names to data arrays
+ * @param headers Custom headers mapping (key: display name)
+ * @param fileName File name without extension
+ */
+export const exportMultipleCSV = (
+  sheets: Record<string, any[]>,
+  headers: Record<string, Record<string, string>>,
+  fileName: string
+) => {
+  // For each sheet, create and download a separate CSV
+  Object.entries(sheets).forEach(([sheetName, data]) => {
+    const sheetHeaders = headers[sheetName] || {};
+    const sheetFileName = `${fileName}_${sheetName}`;
+    exportAsCSV(data, sheetHeaders, sheetFileName);
+  });
 };
