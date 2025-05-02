@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,7 +31,7 @@ import AdvancedFeaturesToggle from "@/components/ai/AdvancedFeaturesToggle";
 import AiManagerProfile from "@/components/ai/AiManagerProfile";
 import AiActionTimeline from "@/components/ai/AiActionTimeline";
 import ApprovalWorkflow from "@/components/ai/ApprovalWorkflow";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
@@ -66,25 +65,23 @@ const AiManager = () => {
             Coordenador digital autônomo que orquestra e otimiza a plataforma
           </p>
         </div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700"
-                onClick={() => setIsDialogOpen(true)}
-              >
-                <Brain className="h-5 w-5 mr-2" />
-                Ativar Assistente
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-xs">
-                Ligue o Gerente de IA para agir de forma autônoma: ele analisará, alertará e 
-                recomendará ações em tempo real para melhorar sua operação de prospecção.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={() => setIsDialogOpen(true)}
+            >
+              <Brain className="h-5 w-5 mr-2" />
+              Ativar Assistente
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="max-w-xs">
+              Ligue o Gerente de IA para agir de forma autônoma: ele analisará, alertará e 
+              recomendará ações em tempo real para melhorar sua operação de prospecção.
+            </p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
