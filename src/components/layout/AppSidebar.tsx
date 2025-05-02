@@ -1,4 +1,3 @@
-
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {
@@ -159,7 +158,7 @@ const AppSidebar = () => {
                     </Link>
                   </SidebarMenuButton>
                   
-                  {item.subItems && (
+                  {item.subItems && item.subItems.length > 0 && (
                     <SidebarMenuSub>
                       {item.subItems.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.path}>
