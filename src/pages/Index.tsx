@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -6,6 +7,9 @@ import CompanySearch from "@/components/search/CompanySearch";
 import CompanyCard from "@/components/search/CompanyCard";
 import CompanyDetails from "@/components/company/CompanyDetails";
 import AiAgentCard from "@/components/ai/AiAgentCard";
+import BusinessTypeChart from "@/components/dashboard/BusinessTypeChart";
+import MarketChart from "@/components/dashboard/MarketChart";
+import CompanyHeatMap from "@/components/search/CompanyHeatMap";
 import { 
   Database, Search, Users, TrendingUp, Brain, Rocket, Calendar, 
   Flame, Lightbulb, ChevronRight, AlertTriangle, Edit, ArrowRight

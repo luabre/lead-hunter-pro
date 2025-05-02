@@ -47,11 +47,11 @@ const CompanyHeatMap = ({ title, description, states, maxCount }: CompanyHeatMap
               return (
                 <div 
                   key={state.uf}
-                  className={`rounded-lg p-3 flex flex-col justify-between bg-leadhunter-blue ${getHeatIntensity(state.count)}`}
+                  className={`rounded-lg p-3 flex flex-col justify-between bg-blue-500 ${getHeatIntensity(state.count)}`}
                 >
                   <div className="flex justify-between items-start">
                     <span className="text-xl font-semibold text-white">{state.uf}</span>
-                    <Badge variant="outline" className="bg-white text-leadhunter-blue-dark">
+                    <Badge variant="outline" className="bg-white text-blue-700">
                       {state.count} ({statePercentage}%)
                     </Badge>
                   </div>
