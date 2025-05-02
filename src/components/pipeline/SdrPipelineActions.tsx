@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -43,41 +44,45 @@ const SdrPipelineActions = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium mb-3">Ações Rápidas</h3>
-        <div className="flex flex-wrap gap-3">
+        <div className="grid grid-cols-4 gap-2">
           <Button 
             variant="outline"
-            className="flex-1"
+            size="sm"
+            className="h-auto py-2 flex flex-col items-center"
             onClick={() => handleAction("meeting")}
           >
-            <Calendar className="h-4 w-4 mr-2" />
-            Agendar Reuniões
+            <Calendar className="h-4 w-4 mb-1" />
+            <span className="text-xs">Agendar Reuniões</span>
           </Button>
           
           <Button 
             variant="outline"
-            className="flex-1"
+            size="sm"
+            className="h-auto py-2 flex flex-col items-center"
             onClick={() => handleAction("report")}
           >
-            <FileText className="h-4 w-4 mr-2" />
-            Ver Relatórios
+            <FileText className="h-4 w-4 mb-1" />
+            <span className="text-xs">Ver Relatórios</span>
           </Button>
           
           <Button 
             variant="outline"
-            className="flex-1"
+            size="sm"
+            className="h-auto py-2 flex flex-col items-center"
             onClick={() => handleAction("message")}
           >
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Mensagens
+            <MessageSquare className="h-4 w-4 mb-1" />
+            <span className="text-xs">Mensagens</span>
           </Button>
           
           <Button 
             variant="outline"
-            className="flex-1"
+            size="sm"
+            className="h-auto py-2 flex flex-col items-center"
             onClick={() => handleAction("call")}
           >
-            <Phone className="h-4 w-4 mr-2" />
-            Ligações
+            <Phone className="h-4 w-4 mb-1" />
+            <span className="text-xs">Ligações</span>
           </Button>
         </div>
       </div>
