@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
 import { AlertBox } from "@/components/common/AlertBox";
 import { Badge } from "@/components/ui/badge";
