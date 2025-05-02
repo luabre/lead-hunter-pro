@@ -392,6 +392,12 @@ const SmartSearch = () => {
           // Use enriched data for employee count if available, otherwise use random
           const employeeCount = enrichedData?.employees || employeeRanges[Math.floor(Math.random() * employeeRanges.length)];
           
+          // Create matched keywords array from the search keywords if provided
+          let matchedKeywords: string[] = [];
+          if (filters.keywords) {
+            matchedKeywords = filters.keywords.split(",").map(k => k.trim());
+          }
+          
           // Generate company object with enriched data
           generatedCompanies.push({
             id: `gen-${i + 1}`,
@@ -415,7 +421,7 @@ const SmartSearch = () => {
             opportunitySignals: enrichedData?.opportunitySignals,
             recommendedChannels: enrichedData?.recommendedChannels,
             yearFounded: Math.floor(1990 + Math.random() * 30).toString(), // Random year between 1990-2020
-            matchedKeywords: filters.keywords ? filters.keywords.split(",").map(k => k.trim()) : [],
+            matchedKeywords,
             creator: {
               name: "IA LeadHunter",
               email: "ia@leadhunter.ai",
@@ -586,7 +592,7 @@ const SmartSearch = () => {
             />
           </div>
 
-          {/* Companies List with Sorting Controls - Updated to show matched keywords */}
+          {/* Companies List with Sorting Controls */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">
@@ -619,7 +625,6 @@ const SmartSearch = () => {
                   key={company.id}
                   company={company}
                   onClick={() => handleCompanyClick(company)}
-                  keywords={company.matchedKeywords}
                 />
               ))}
               {filteredResults.length === 0 && (

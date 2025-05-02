@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, TrendingUp, Users, MessageSquare, FileText, Calendar, Globe, Briefcase, Database } from "lucide-react";
@@ -31,6 +32,7 @@ interface CompanyCardProps {
     yearFounded?: string;
     sector?: string;       // Primary, Secondary, Tertiary, or Quaternary
     subSector?: string;    // More specific industry category
+    matchedKeywords?: string[]; // Add matchedKeywords property
     creator?: {
       email: string;
       name: string;
@@ -41,9 +43,10 @@ interface CompanyCardProps {
   onClick?: () => void;
   className?: string;
   showSaveButton?: boolean;
+  keywords?: string[]; // Add keywords property
 }
 
-const CompanyCard = ({ company, onClick, className, showSaveButton = false }: CompanyCardProps) => {
+const CompanyCard = ({ company, onClick, className, showSaveButton = false, keywords }: CompanyCardProps) => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -161,6 +164,9 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
     return null;
   };
 
+  // Get matched keywords from either the component prop or the company object
+  const displayKeywords = keywords || company.matchedKeywords;
+
   return (
     <div className={cn("company-card animate-fade-in", className)} onClick={onClick}>
       <div className="flex justify-between items-start">
@@ -210,6 +216,17 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
         <div className="mt-2 text-sm text-muted-foreground">
           <span className="font-medium">Subsetor: </span>
           {company.subSector}
+        </div>
+      )}
+
+      {/* Display matched keywords if available */}
+      {displayKeywords && displayKeywords.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {displayKeywords.map((keyword, index) => (
+            <Badge key={index} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              {keyword}
+            </Badge>
+          ))}
         </div>
       )}
 
