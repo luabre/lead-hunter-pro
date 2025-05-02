@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Building2, CircleUser, FileSearch, Globe, MapPin, MessageSquare, TrendingUp, Users, FileText, Calendar, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Link } from "react-router-dom";
 
 interface CompanyDetailsProps {
   company: {
@@ -46,6 +46,7 @@ interface CompanyDetailsProps {
       origin: string;
       createdAt: string;
     };
+    socialActive?: boolean; // New property for social activity
   };
   onClose?: () => void;
 }
@@ -80,20 +81,27 @@ const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
             <CardTitle className="text-2xl">{company.fantasyName}</CardTitle>
             <CardDescription className="mt-1">{company.name}</CardDescription>
           </div>
-          {company.opportunity && (
-            <Badge 
-              variant="outline"
-              className={
-                company.opportunity === 'hot'
-                  ? 'opportunity-hot'
-                  : company.opportunity === 'warm'
-                  ? 'opportunity-warm'
-                  : 'opportunity-cold'
-              }
-            >
-              Oportunidade {company.opportunity === 'hot' ? 'Quente' : company.opportunity === 'warm' ? 'Morna' : 'Fria'}
-            </Badge>
-          )}
+          <div className="flex gap-2 flex-wrap items-start">
+            {company.socialActive && (
+              <Badge className="bg-green-600 text-white hover:bg-green-700">
+                🟢 Social Ativo
+              </Badge>
+            )}
+            {company.opportunity && (
+              <Badge 
+                variant="outline"
+                className={
+                  company.opportunity === 'hot'
+                    ? 'opportunity-hot'
+                    : company.opportunity === 'warm'
+                    ? 'opportunity-warm'
+                    : 'opportunity-cold'
+                }
+              >
+                Oportunidade {company.opportunity === 'hot' ? 'Quente' : company.opportunity === 'warm' ? 'Morna' : 'Fria'}
+              </Badge>
+            )}
+          </div>
         </div>
         
         <div className="flex flex-wrap gap-3 mt-3">
@@ -138,7 +146,11 @@ const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="analysis">Análise Estratégica</TabsTrigger>
           <TabsTrigger value="decision-maker">Decisor</TabsTrigger>
+          {company.socialActive && (
+            <TabsTrigger value="social">Social Selling</TabsTrigger>
+          )}
         </TabsList>
+        
         <TabsContent value="overview" className="p-0">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -255,7 +267,7 @@ const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
                       {company.opportunity === 'hot' 
                         ? 'Esse lead é Quente. Por quê?' 
                         : company.opportunity === 'warm'
-                        ? 'Esse lead é Morno. Por quê?'
+                        ? 'Esse lead é Morna. Por quê?'
                         : 'Esse lead é Frio. Por quê?'
                       }
                     </h4>
@@ -407,6 +419,68 @@ const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
             </div>
           </CardContent>
         </TabsContent>
+        
+        {company.socialActive && (
+          <TabsContent value="social" className="p-0">
+            <CardContent className="p-6">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Atividade Social do Decisor</h3>
+                    <p className="text-sm text-muted-foreground">
+                      João Silva está socialmente ativo no LinkedIn
+                    </p>
+                  </div>
+                  <Link to="/social-selling">
+                    <Button>
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Ativar Social Selling
+                    </Button>
+                  </Link>
+                </div>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Última atividade</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="border-b pb-3">
+                        <div className="flex justify-between">
+                          <h4 className="font-medium text-sm">Transformação Digital no Setor de Saúde</h4>
+                          <Badge variant="outline" className="text-xs">Artigo</Badge>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Publicado em 28/04/2023
+                        </div>
+                        <div className="text-sm mt-2">
+                          <Badge className="bg-green-600 text-xs text-white">🟢 Oportunidade de engajamento</Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                        <p className="text-sm font-medium flex items-center gap-1 text-blue-800">
+                          <span className="text-xl">🧠</span> Sugestão da IA:
+                        </p>
+                        <p className="text-sm text-blue-700 mt-1">
+                          "Este conteúdo tem alta relevância para seu produto. Comece curtindo e adicione um comentário sobre como sua solução pode apoiar a transformação digital no setor."
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <div className="flex justify-center">
+                  <Link to="/social-selling">
+                    <Button variant="outline">
+                      Ver estratégia completa de Social Selling
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </TabsContent>
+        )}
       </Tabs>
       
       <CardFooter className="border-t p-6 flex justify-between gap-4">
@@ -422,6 +496,14 @@ const CompanyDetails = ({ company, onClose }: CompanyDetailsProps) => {
             <MessageSquare className="h-4 w-4 mr-2" />
             Ativar IA SDR
           </Button>
+          {company.socialActive && (
+            <Link to="/social-selling">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Social Selling
+              </Button>
+            </Link>
+          )}
         </div>
       </CardFooter>
     </Card>

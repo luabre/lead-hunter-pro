@@ -19,6 +19,7 @@ interface CompanyCardProps {
     employees: string;
     opportunity?: 'hot' | 'warm' | 'cold';
     aiDetected?: boolean;
+    socialActive?: boolean; // New property for social activity
     creator?: {
       email: string;
       name: string;
@@ -71,6 +72,12 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
     navigate(`/ia-sdr?company=${company.id}&name=${encodeURIComponent(company.fantasyName)}`);
   };
 
+  // Handle Social Selling activation
+  const handleSocialSellingClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/social-selling`);
+  };
+
   // Format date for display
   const formatDate = (dateString: string) => {
     try {
@@ -97,8 +104,8 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
           <h3 className="text-lg font-semibold">{company.fantasyName}</h3>
           <p className="text-sm text-muted-foreground">{company.name}</p>
         </div>
-        {company.opportunity && (
-          <div>
+        <div className="flex gap-2 flex-wrap">
+          {company.opportunity && (
             <Badge 
               variant="outline"
               className={cn(
@@ -107,8 +114,13 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
             >
               {getOpportunityLabel()}
             </Badge>
-          </div>
-        )}
+          )}
+          {company.socialActive && (
+            <Badge className="bg-green-600 text-white hover:bg-green-700">
+              Social Ativo
+            </Badge>
+          )}
+        </div>
       </div>
       
       <div className="mt-3 flex gap-4">
@@ -142,7 +154,7 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
         </div>
       )}
       
-      <div className="mt-4 flex justify-between">
+      <div className="mt-4 flex justify-between gap-2 flex-wrap">
         <Button 
           size="sm" 
           className="bg-leadhunter-teal hover:bg-leadhunter-teal/90"
@@ -151,6 +163,18 @@ const CompanyCard = ({ company, onClick, className }: CompanyCardProps) => {
           <MessageSquare className="h-4 w-4 mr-1" />
           Ativar IA SDR
         </Button>
+        
+        {company.socialActive && (
+          <Button
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700"
+            onClick={handleSocialSellingClick}
+          >
+            <MessageSquare className="h-4 w-4 mr-1" />
+            Social Selling
+          </Button>
+        )}
+        
         <Button 
           size="sm" 
           variant="outline" 

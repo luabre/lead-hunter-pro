@@ -89,6 +89,14 @@ const AppSidebar = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
+                  <Link to="/social-selling" className="w-full">
+                    <MessageSquare className="h-5 w-5" />
+                    <span>Social Selling</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
                   <Link to="/pipeline" className="w-full">
                     <FileText className="h-5 w-5" />
                     <span>Pipeline</span>

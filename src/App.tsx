@@ -15,6 +15,7 @@ import IaCloser from "./pages/IaCloser";
 import Meetings from "./pages/Meetings";
 import MarketIntel from "./pages/MarketIntel";
 import AiManager from "./pages/AiManager";
+import SocialSelling from "./pages/SocialSelling";
 import { useState } from "react";
 
 const App = () => {
@@ -38,6 +39,7 @@ const App = () => {
             <Route path="/meetings" element={<Meetings />} />
             <Route path="/market-intel" element={<MarketIntel />} />
             <Route path="/ai-manager" element={<AiManager />} />
+            <Route path="/social-selling" element={<SocialSelling />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
