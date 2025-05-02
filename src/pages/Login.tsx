@@ -35,30 +35,9 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Left side with illustration and tagline */}
-      <div className="hidden md:flex w-6/12 flex-col bg-blue-50 p-10 justify-between">
-        <div className="mt-8">
-          <h1 className="font-bold text-2xl text-blue-600">LeadHunter Pro</h1>
-        </div>
-        <div className="flex flex-col items-start">
-          <img 
-            src="/lovable-uploads/17b4a589-6394-459b-b81d-18b299c5042f.png" 
-            alt="Ilustração de prospecção inteligente" 
-            className="max-w-[80%] mx-auto mb-8"
-          />
-          <h2 className="text-xl md:text-2xl font-semibold text-gray-800 max-w-md">
-            Inteligência comercial em ação.
-          </h2>
-          <p className="text-lg md:text-xl text-gray-700 max-w-md mt-2">
-            Acesse sua conta e comece a caçar oportunidades.
-          </p>
-        </div>
-        <div className="opacity-0">Placeholder para espaçamento</div>
-      </div>
-
-      {/* Right side with login form */}
+      {/* Left side with login form */}
       <div className="w-full md:w-6/12 flex flex-col p-6 md:p-10 justify-center">
-        <div className="md:hidden mb-8">
+        <div className="mb-8">
           <h1 className="font-bold text-2xl text-blue-600">LeadHunter Pro</h1>
           <p className="text-gray-700 mt-2">
             Inteligência comercial em ação. Acesse sua conta e comece a caçar oportunidades.
@@ -136,6 +115,27 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Right side with illustration and tagline */}
+      <div className="hidden md:flex w-6/12 flex-col bg-blue-50 p-10 justify-between">
+        <div className="mt-8">
+          <h1 className="font-bold text-2xl text-blue-600">LeadHunter Pro</h1>
+        </div>
+        <div className="flex flex-col items-start">
+          <img 
+            src="/lovable-uploads/17b4a589-6394-459b-b81d-18b299c5042f.png" 
+            alt="Ilustração de prospecção inteligente" 
+            className="max-w-[80%] mx-auto mb-8"
+          />
+          <h2 className="text-xl md:text-2xl font-semibold text-gray-800 max-w-md">
+            Inteligência comercial em ação.
+          </h2>
+          <p className="text-lg md:text-xl text-gray-700 max-w-md mt-2">
+            Acesse sua conta e comece a caçar oportunidades.
+          </p>
+        </div>
+        <div className="opacity-0">Placeholder para espaçamento</div>
       </div>
     </div>
   );
