@@ -44,45 +44,45 @@ const SdrPipelineActions = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium mb-3">Ações Rápidas</h3>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1">
           <Button 
             variant="outline"
             size="sm"
-            className="h-auto py-2 flex flex-col items-center"
+            className="h-auto py-1 px-1 flex flex-col items-center"
             onClick={() => handleAction("meeting")}
           >
-            <Calendar className="h-4 w-4 mb-1" />
-            <span className="text-xs">Agendar Reuniões</span>
+            <Calendar className="h-3 w-3 mb-0.5" />
+            <span className="text-[10px]">Reuniões</span>
           </Button>
           
           <Button 
             variant="outline"
             size="sm"
-            className="h-auto py-2 flex flex-col items-center"
+            className="h-auto py-1 px-1 flex flex-col items-center"
             onClick={() => handleAction("report")}
           >
-            <FileText className="h-4 w-4 mb-1" />
-            <span className="text-xs">Ver Relatórios</span>
+            <FileText className="h-3 w-3 mb-0.5" />
+            <span className="text-[10px]">Relatórios</span>
           </Button>
           
           <Button 
             variant="outline"
             size="sm"
-            className="h-auto py-2 flex flex-col items-center"
+            className="h-auto py-1 px-1 flex flex-col items-center"
             onClick={() => handleAction("message")}
           >
-            <MessageSquare className="h-4 w-4 mb-1" />
-            <span className="text-xs">Mensagens</span>
+            <MessageSquare className="h-3 w-3 mb-0.5" />
+            <span className="text-[10px]">Mensagens</span>
           </Button>
           
           <Button 
             variant="outline"
             size="sm"
-            className="h-auto py-2 flex flex-col items-center"
+            className="h-auto py-1 px-1 flex flex-col items-center"
             onClick={() => handleAction("call")}
           >
-            <Phone className="h-4 w-4 mb-1" />
-            <span className="text-xs">Ligações</span>
+            <Phone className="h-3 w-3 mb-0.5" />
+            <span className="text-[10px]">Ligações</span>
           </Button>
         </div>
       </div>
