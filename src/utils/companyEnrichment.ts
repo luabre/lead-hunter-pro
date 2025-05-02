@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 
@@ -117,8 +118,7 @@ export async function saveCompanyToDatabase(company: any) {
       city: company.city || null,
       state: company.state || null,
       segment: company.segment || null,
-      sector: company.sector || null,
-      subsector: company.subSector || null,
+      // Removed sector and subsector fields as they don't exist in the database
       employees: company.employees || null,
       opportunity: company.opportunity || null,
       ai_detected: company.aiDetected || false,
