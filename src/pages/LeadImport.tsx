@@ -206,7 +206,7 @@ const LeadImport = () => {
                         <ChartTooltip
                           content={<ChartTooltipContent labelClassName="font-medium" />}
                         />
-                        <Bar dataKey="value" nameKey="key">
+                        <Bar dataKey="value">
                           {[
                             <Cell key="0" fill="#8B5CF6" />,
                             <Cell key="1" fill="#D946EF" />,
