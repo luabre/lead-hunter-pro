@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -13,6 +12,7 @@ import CompanyHeatMap from "@/components/search/CompanyHeatMap";
 import { Database, Users, TrendingUp, Search, Sparkles } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import StatsCard from "@/components/dashboard/StatsCard";
+import { enrichCompanyWithGPT } from "@/utils/companyEnrichment";
 
 // Mock Data - using the same data as in Index.tsx
 const mockCompanies = [
@@ -122,6 +122,106 @@ const heatMapStates = [
   { uf: "PB", name: "Paraíba", count: 140 },
 ];
 
+// Sample company names to simulate AI-generated companies based on segment
+const segmentCompanyMap: Record<string, string[]> = {
+  "tecnologia": [
+    "TechSolutions Brasil", 
+    "InnovaTech Sistemas", 
+    "ByteCode Tecnologia", 
+    "DataTech Informática", 
+    "CyberSoft Brasil"
+  ],
+  "saúde": [
+    "MedVida Clínicas", 
+    "SaúdeTech Brasil", 
+    "ViverBem Hospitalar", 
+    "MedCenter Diagnósticos", 
+    "CliniCare Saúde"
+  ],
+  "alimentação": [
+    "NutriFood Alimentos", 
+    "SaborBrasil Indústria", 
+    "AlimentoBem Distribuidora", 
+    "NaturalTaste Orgânicos", 
+    "DeliFood Processados"
+  ],
+  "logística": [
+    "TransporteBrasil Logística", 
+    "ExpressCargo Entregas", 
+    "LogiTech Transportadora", 
+    "MoveCargo Brasil", 
+    "FreteFácil Logística"
+  ],
+  "construção": [
+    "ConstruBrasil Engenharia", 
+    "EdificarTech Construtora", 
+    "ObraPrima Incorporadora", 
+    "EstruturaFirme Construções", 
+    "EngeCivil Projetos"
+  ],
+  "educação": [
+    "EduTech Brasil", 
+    "LearnWay Cursos", 
+    "SaberMais Educação", 
+    "ConhecerJá Instituto", 
+    "AprendizTech Ensino"
+  ],
+  "varejo": [
+    "MegaShop Comércio", 
+    "CompraTudo Varejo", 
+    "LojaBrasil Rede", 
+    "MercadoFácil Comércio", 
+    "VendaMais Distribuição"
+  ],
+  "finanças": [
+    "FinanceTech Brasil", 
+    "InvestBrasil Corretora", 
+    "CapitalSmart Investimentos", 
+    "CreditoBrasil Financeira", 
+    "MoneyWise Consultoria"
+  ]
+};
+
+// Function to get random companies based on segment
+const getSegmentCompanies = (segment: string): string[] => {
+  const lowerSegment = segment.toLowerCase();
+  
+  // Try to find an exact match
+  for (const key in segmentCompanyMap) {
+    if (key === lowerSegment) {
+      return segmentCompanyMap[key];
+    }
+  }
+  
+  // If no exact match, try to find a partial match
+  for (const key in segmentCompanyMap) {
+    if (lowerSegment.includes(key) || key.includes(lowerSegment)) {
+      return segmentCompanyMap[key];
+    }
+  }
+  
+  // If no match at all, return a random set
+  const allCompanies = Object.values(segmentCompanyMap).flat();
+  const randomCompanies = [];
+  
+  for (let i = 0; i < 5; i++) {
+    const randomIndex = Math.floor(Math.random() * allCompanies.length);
+    randomCompanies.push(allCompanies[randomIndex]);
+  }
+  
+  return randomCompanies;
+};
+
+// Generate Brazilian states
+const brazilianStates = [
+  "SP", "RJ", "MG", "PR", "RS", "SC", "BA", "ES", "GO", "PE"
+];
+
+// Generate random employee count
+const employeeRanges = [
+  "1-10", "11-50", "51-100", "101-200", "201-500", "500+"
+];
+
 const SmartSearch = () => {
   const navigate = useNavigate();
   const [searchPerformed, setSearchPerformed] = useState(false);
@@ -131,7 +231,7 @@ const SmartSearch = () => {
   const [filterText, setFilterText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
-  const handleSearch = (filters: CompanyFilters) => {
+  const handleSearch = async (filters: CompanyFilters) => {
     if (!filters.segment) {
       toast({
         title: "Por favor, informe um segmento",
@@ -144,30 +244,91 @@ const SmartSearch = () => {
     // Show loading state
     setIsSearching(true);
 
-    // Simulate API call with delay
-    setTimeout(() => {
-      setIsSearching(false);
+    try {
+      // Get company names based on segment
+      const segmentCompanies = getSegmentCompanies(filters.segment);
+      const generatedCompanies = [];
       
-      // Apply any text filtering from filters
-      let filtered = [...mockCompanies];
-      if (filters.segment) {
-        setFilterText(filters.segment);
-        // Simple filtering - in a real app this would be done server-side with AI
-        filtered = filtered.filter(company => 
-          company.segment.toLowerCase().includes(filters.segment.toLowerCase())
-        );
+      // Generate 5 mock companies based on the segment
+      for (let i = 0; i < segmentCompanies.length; i++) {
+        const companyName = segmentCompanies[i];
+        const randomState = brazilianStates[Math.floor(Math.random() * brazilianStates.length)];
+        const randomCity = randomState === "SP" ? "São Paulo" : 
+                          randomState === "RJ" ? "Rio de Janeiro" : 
+                          randomState === "MG" ? "Belo Horizonte" : "Cidade Principal";
+        const randomEmployees = employeeRanges[Math.floor(Math.random() * employeeRanges.length)];
+        
+        // Generate CNPJ
+        const cnpj = `${Math.floor(10 + Math.random() * 90)}.${Math.floor(100 + Math.random() * 900)}.${Math.floor(100 + Math.random() * 900)}/0001-${Math.floor(10 + Math.random() * 90)}`;
+        
+        // Opportunity level
+        const opportunities = ["hot", "warm", "cold"];
+        const opportunity = opportunities[Math.floor(Math.random() * opportunities.length)] as "hot" | "warm" | "cold";
+        
+        // AI detected for some companies
+        const aiDetected = Math.random() > 0.6;
+        
+        // Enrich company data using GPT
+        let enrichedData = null;
+        try {
+          enrichedData = await enrichCompanyWithGPT(companyName, randomCity, filters.segment);
+          console.log("Enriched data for", companyName, enrichedData);
+        } catch (error) {
+          console.error("Failed to enrich company data:", error);
+        }
+        
+        // Generate company object
+        generatedCompanies.push({
+          id: `gen-${i + 1}`,
+          name: companyName,
+          fantasyName: companyName.split(" ")[0],
+          cnpj,
+          city: randomCity,
+          state: randomState,
+          segment: filters.segment,
+          employees: randomEmployees,
+          opportunity,
+          aiDetected,
+          website: enrichedData?.website,
+          digitalPresence: enrichedData?.digitalPresence,
+          revenue: enrichedData?.revenue,
+          decisionMakerName: enrichedData?.decisionMaker?.name,
+          decisionMakerPosition: enrichedData?.decisionMaker?.position,
+          companyType: enrichedData?.companyType,
+          opportunitySignals: enrichedData?.opportunitySignals,
+          recommendedChannels: enrichedData?.recommendedChannels,
+          creator: {
+            name: "IA LeadHunter",
+            email: "ia@leadhunter.ai",
+            origin: "radar",
+            createdAt: new Date().toISOString(),
+          }
+        });
       }
       
-      // Sort the results based on current sort parameter
-      const sortedResults = sortResults([...filtered], sortBy);
+      // Apply any text filtering from filters
+      setFilterText(filters.segment);
       
+      // Sort the results based on current sort parameter
+      const sortedResults = sortResults([...generatedCompanies], sortBy);
+      
+      // Update state with the generated companies
       setSearchResults(sortedResults);
       setSearchPerformed(true);
       toast({
         title: "Busca IA realizada com sucesso",
         description: `Nossa IA encontrou ${sortedResults.length} empresas no segmento de ${filters.segment}.`,
       });
-    }, 1500);
+    } catch (error) {
+      console.error("Error during AI search:", error);
+      toast({
+        title: "Erro na busca",
+        description: "Ocorreu um erro ao processar sua busca. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const sortResults = (companies: typeof mockCompanies, sortField: string) => {
