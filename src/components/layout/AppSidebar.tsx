@@ -98,7 +98,7 @@ const AppSidebar = () => {
       icon: BarChartHorizontal,
     },
     {
-      text: "Vendas Sociais",
+      text: "Social Selling",
       path: "/social-selling",
       icon: Network,
     },
