@@ -13,6 +13,7 @@ import { Database, Users, TrendingUp, Search, Sparkles } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { enrichCompanyWithGPT } from "@/utils/companyEnrichment";
+import { supabase } from "@/integrations/supabase/client";
 
 // Mock Data - using the same data as in Index.tsx
 const mockCompanies = [
@@ -246,6 +247,16 @@ const SmartSearch = () => {
   const [sortBy, setSortBy] = useState<"name" | "opportunity" | "state">("name");
   const [filterText, setFilterText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const checkAuthStatus = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setAuthError("Você precisa estar autenticado para usar esta funcionalidade.");
+      return false;
+    }
+    return true;
+  };
 
   const handleSearch = async (filters: CompanyFilters) => {
     if (!filters.segment) {
@@ -257,10 +268,24 @@ const SmartSearch = () => {
       return;
     }
 
+    // Check authentication status before proceeding
+    const isAuthenticated = await checkAuthStatus();
+    if (!isAuthenticated) {
+      toast({
+        title: "Autenticação necessária",
+        description: "Você precisa estar logado para realizar buscas.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Show loading state
     setIsSearching(true);
+    setAuthError(null);
 
     try {
+      console.log("Starting search with segment:", filters.segment);
+      
       // Get segment-specific company names
       const segmentCompanies = getSegmentCompanies(filters.segment);
       const generatedCompanies = [];
@@ -286,6 +311,7 @@ const SmartSearch = () => {
         // Enrich company data using GPT with explicit segment parameter
         let enrichedData = null;
         try {
+          console.log(`Enriching company data for: ${companyName} (${filters.segment})`);
           enrichedData = await enrichCompanyWithGPT(companyName, randomCity, filters.segment);
           console.log("Enriched data for", companyName, enrichedData);
 
@@ -414,6 +440,20 @@ const SmartSearch = () => {
           </p>
         </div>
       </div>
+
+      {/* Authentication Error */}
+      {authError && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-700">
+          <p>{authError}</p>
+          <Button 
+            variant="link" 
+            className="p-0 text-red-700 underline" 
+            onClick={() => navigate('/login')}
+          >
+            Fazer login
+          </Button>
+        </div>
+      )}
 
       {/* Search Form */}
       <div className="mb-8">

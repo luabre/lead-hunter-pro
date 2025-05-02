@@ -115,6 +115,7 @@ serve(async (req) => {
 
   try {
     const { prompt, segment } = await req.json();
+    console.log("Request received for segment:", segment);
     
     // Normalize the segment for matching (lowercase, remove accents)
     const normalizedSegment = segment ? segment.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
@@ -164,6 +165,8 @@ Para empresas de saúde, detalhe ainda mais o subsetor específico: Hospitais, C
 Para porte da empresa, use as classificações: MEI (até R$81 mil/ano), Microempresa (até R$360 mil/ano), Pequena Empresa (até R$4,8 milhões/ano), Média Empresa (até R$300 milhões/ano), Grande Empresa (acima de R$300 milhões/ano).
 `;
 
+    console.log("Sending request to OpenAI for segment:", segment);
+
     // Determine the most appropriate system message based on the segment
     const systemMessage = sectorInfo ? 
       `Você é um assistente especializado em dados empresariais brasileiros, com foco no segmento de ${segment}. Sua função é gerar informações estruturadas sobre empresas deste segmento específico: ${segment}. Utilize seu conhecimento detalhado sobre os setores econômicos brasileiros, especialmente sobre ${sectorInfo.sector} e subsetores como ${sectorInfo.subsectors.join(", ")}. Baseie-se nas tendências de mercado e conhecimento geral sobre empresas similares para inferir informações quando necessário. Mantenha suas respostas estritamente no formato solicitado e NUNCA gere empresas de setores diferentes do solicitado (${segment}).` :
@@ -188,10 +191,12 @@ Para porte da empresa, use as classificações: MEI (até R$81 mil/ano), Microem
     const data = await response.json();
     
     if (data.error) {
+      console.error("OpenAI API error:", data.error.message);
       throw new Error(`OpenAI API error: ${data.error.message}`);
     }
     
     const generatedText = data.choices[0].message.content;
+    console.log("Response received from OpenAI, length:", generatedText.length);
 
     return new Response(JSON.stringify({ generatedText }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

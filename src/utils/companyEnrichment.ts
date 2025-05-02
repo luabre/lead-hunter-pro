@@ -103,6 +103,79 @@ Retorne em formato estruturado:
 }
 
 /**
+ * Saves a company to the database
+ * Handles both authentication check and proper data formatting
+ */
+export async function saveCompanyToDatabase(company: any) {
+  try {
+    // First, check if user is authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Autenticação necessária",
+        description: "Você precisa estar logado para salvar empresas",
+        variant: "destructive",
+      });
+      return { success: false, error: "Autenticação necessária" };
+    }
+
+    // Map the company data to the structure expected by the database
+    const companyData = {
+      name: company.name,
+      fantasy_name: company.fantasyName,
+      cnpj: company.cnpj || null,
+      city: company.city || null,
+      state: company.state || null,
+      segment: company.segment || null,
+      sector: company.sector || null,
+      subsector: company.subSector || null,
+      employees: company.employees || null,
+      opportunity: company.opportunity || null,
+      ai_detected: company.aiDetected || false,
+      website: company.website || company.digitalPresence || null,
+      year_founded: company.yearFounded || null,
+      digital_maturity: 50, // Default value
+      created_at: new Date().toISOString(), // Convert Date to string
+      created_by: session.user.id // Add the user ID as creator
+    };
+
+    console.log("Saving company data:", companyData);
+
+    // Insert the company into the database
+    const { data, error } = await supabase
+      .from('companies')
+      .insert(companyData)
+      .select();
+
+    if (error) {
+      console.error("Error saving company to database:", error);
+      toast({
+        title: "Erro ao salvar",
+        description: error.message || "Não foi possível incluir a empresa na base de dados.",
+        variant: "destructive",
+      });
+      return { success: false, error };
+    }
+
+    toast({
+      title: "Empresa salva com sucesso",
+      description: `${company.fantasyName} foi adicionada à base de dados.`,
+    });
+
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Error in save operation:", error);
+    toast({
+      title: "Erro ao salvar",
+      description: "Ocorreu um erro ao processar sua solicitação.",
+      variant: "destructive",
+    });
+    return { success: false, error };
+  }
+}
+
+/**
  * Parses the GPT response text into a structured object
  */
 function parseGPTResponse(text: string): EnrichedCompanyData {

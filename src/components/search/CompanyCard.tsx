@@ -1,14 +1,12 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, TrendingUp, Users, MessageSquare, FileText, Calendar, Globe, Briefcase, Database, Save } from "lucide-react";
+import { MapPin, TrendingUp, Users, MessageSquare, FileText, Calendar, Globe, Briefcase, Database } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { toast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { saveCompanyToDatabase } from "@/utils/companyEnrichment";
 
 interface CompanyCardProps {
   company: {
@@ -116,70 +114,15 @@ const CompanyCard = ({ company, onClick, className, showSaveButton = false }: Co
     setIsSaving(true);
 
     try {
-      // First, check if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
+      const result = await saveCompanyToDatabase(company);
       
-      if (!session) {
-        toast({
-          title: "Erro ao salvar",
-          description: "Você precisa estar autenticado para salvar empresas.",
-          variant: "destructive",
-        });
-        setIsSaving(false);
-        return;
+      if (result.success) {
+        // Redirect to the companies page to view the saved company
+        navigate('/companies');
       }
-
-      // Map the company data to the structure expected by the database
-      const companyData = {
-        name: company.name,
-        fantasy_name: company.fantasyName,
-        cnpj: company.cnpj,
-        city: company.city,
-        state: company.state,
-        segment: company.segment,
-        sector: company.sector || null,
-        subsector: company.subSector || null,
-        employees: company.employees,
-        opportunity: company.opportunity,
-        ai_detected: company.aiDetected || false,
-        website: company.website || company.digitalPresence,
-        year_founded: company.yearFounded,
-        digital_maturity: 50, // Default value
-        created_at: new Date().toISOString(), // Convert Date to string
-        created_by: session.user.id // Add the user ID as creator
-      };
-
-      // Insert the company into the database
-      const { data, error } = await supabase
-        .from('companies')
-        .insert(companyData)
-        .select();
-
-      if (error) {
-        console.error("Error saving company to database:", error);
-        toast({
-          title: "Erro ao salvar",
-          description: "Não foi possível incluir a empresa na base de dados.",
-          variant: "destructive",
-        });
-        setIsSaving(false);
-        return;
-      }
-
-      toast({
-        title: "Empresa salva com sucesso",
-        description: `${company.fantasyName} foi adicionada à base de dados.`,
-      });
-
-      // Redirect to the companies page to view the saved company
-      navigate('/companies');
     } catch (error) {
       console.error("Error in save operation:", error);
-      toast({
-        title: "Erro ao salvar",
-        description: "Ocorreu um erro ao processar sua solicitação.",
-        variant: "destructive",
-      });
+    } finally {
       setIsSaving(false);
     }
   };
