@@ -32,9 +32,27 @@ import AdvancedFeaturesToggle from "@/components/ai/AdvancedFeaturesToggle";
 import AiManagerProfile from "@/components/ai/AiManagerProfile";
 import AiActionTimeline from "@/components/ai/AiActionTimeline";
 import ApprovalWorkflow from "@/components/ai/ApprovalWorkflow";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const AiManager = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [autonomyLevel, setAutonomyLevel] = useState("observer");
+
+  const handleActivate = () => {
+    toast.success("Gerente de IA ativado com sucesso!", {
+      description: `Nível de autonomia: ${
+        autonomyLevel === "observer" 
+          ? "Observador" 
+          : autonomyLevel === "assisted" 
+            ? "Intervenção Assistida" 
+            : "Autonomia Total"
+      }`
+    });
+    setIsDialogOpen(false);
+  };
 
   return (
     <AppLayout>
@@ -48,11 +66,100 @@ const AiManager = () => {
             Coordenador digital autônomo que orquestra e otimiza a plataforma
           </p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <Brain className="h-5 w-5 mr-2" />
-          Ativar Assistente
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                <Brain className="h-5 w-5 mr-2" />
+                Ativar Assistente
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">
+                Ligue o Gerente de IA para agir de forma autônoma: ele analisará, alertará e 
+                recomendará ações em tempo real para melhorar sua operação de prospecção.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Ative o Assistente de IA – Escolha o Nível de Autonomia</DialogTitle>
+            <DialogDescription>
+              O Gerente de IA é um coordenador digital que otimiza sua operação de prospecção. 
+              Você pode escolher até onde ele pode agir automaticamente.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-6">
+            <RadioGroup value={autonomyLevel} onValueChange={setAutonomyLevel}>
+              <div className="space-y-6">
+                <div className="flex items-start space-x-2">
+                  <RadioGroupItem value="observer" id="observer" className="mt-1" />
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="observer" className="text-base font-medium flex items-center gap-2">
+                      1️⃣ Observador (Somente Relatórios)
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      O Gerente de IA coleta dados, emite alertas e envia sugestões — mas não executa nenhuma ação automaticamente.
+                    </p>
+                    <p className="text-xs text-blue-600">
+                      📊 Recomendado para: empresas que preferem controle manual.
+                    </p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-start space-x-2">
+                  <RadioGroupItem value="assisted" id="assisted" className="mt-1" />
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="assisted" className="text-base font-medium flex items-center gap-2">
+                      2️⃣ Intervenção Assistida
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      A IA pode sugerir ações e executar apenas tarefas de baixo risco (como mudar scripts, reordenar leads no funil, sugerir horário de reunião).
+                    </p>
+                    <p className="text-xs text-amber-600">
+                      🛡️ Ações sensíveis requerem aprovação.
+                    </p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-start space-x-2">
+                  <RadioGroupItem value="full" id="full" className="mt-1" />
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="full" className="text-base font-medium flex items-center gap-2">
+                      3️⃣ Autonomia Total
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      O Gerente de IA atua como um gerente de vendas sênior: executa ajustes, dispara nudges, reorganiza leads e otimiza scripts automaticamente.
+                    </p>
+                    <p className="text-xs text-green-600">
+                      🔒 Tudo fica registrado e pode ser auditado no painel.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
+            <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleActivate}>
+              Ativar com este nível
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid grid-cols-4 w-full">
