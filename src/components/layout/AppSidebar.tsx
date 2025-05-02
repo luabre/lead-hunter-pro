@@ -1,3 +1,4 @@
+
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {
@@ -60,13 +61,11 @@ const AppSidebar = () => {
       text: "Empresas",
       path: "/companies",
       icon: Building2,
-      subItems: [
-        {
-          text: "Busca Inteligente",
-          path: "/smart-search",
-          icon: Search,
-        }
-      ]
+    },
+    {
+      text: "Busca Inteligente",
+      path: "/smart-search",
+      icon: Search,
     },
     {
       text: "Contatos",
@@ -157,24 +156,6 @@ const AppSidebar = () => {
                       )}
                     </Link>
                   </SidebarMenuButton>
-                  
-                  {item.subItems && item.subItems.length > 0 && (
-                    <SidebarMenuSub>
-                      {item.subItems.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.path}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={isActivePath(subItem.path)}
-                          >
-                            <Link to={subItem.path}>
-                              <subItem.icon className="h-4 w-4 mr-2" />
-                              <span>{subItem.text}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
