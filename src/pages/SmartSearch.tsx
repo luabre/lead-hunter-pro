@@ -198,36 +198,106 @@ const segmentCompanyMap: Record<string, string[]> = {
   ]
 };
 
-// Enhanced function to get segment-specific company names
-const getSegmentCompanies = (segment: string): string[] => {
+// Enhanced function to get segment-specific company names with more filtering options
+const getSegmentCompanies = (filters: CompanyFilters): string[] => {
+  const { segment, companyName, keywords } = filters;
+  
   // Normalize the segment for matching (lowercase, remove accents)
   const normalizedSegment = segment.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  // Get initial list of companies by segment
+  let companies: string[] = [];
   
   // Try to find an exact match first
   for (const key in segmentCompanyMap) {
     if (key === normalizedSegment) {
-      return segmentCompanyMap[key];
+      companies = [...segmentCompanyMap[key]];
+      break;
     }
   }
   
   // If no exact match, try partial match with keywords
-  for (const key in segmentCompanyMap) {
-    if (normalizedSegment.includes(key) || key.includes(normalizedSegment)) {
-      return segmentCompanyMap[key];
+  if (companies.length === 0) {
+    for (const key in segmentCompanyMap) {
+      if (normalizedSegment.includes(key) || key.includes(normalizedSegment)) {
+        companies = [...segmentCompanyMap[key]];
+        break;
+      }
     }
   }
   
   // If no match at all, generate segment-specific company names
-  const segmentPrefix = segment.split(' ')[0];
-  const suffixes = ["Brasil", "Tech", "Soluções", "Serviços", "Group"];
-  const types = ["Ltda", "S.A.", "Empresarial", "Corporativo", "Nacional"];
+  if (companies.length === 0) {
+    const segmentPrefix = segment.split(' ')[0];
+    const suffixes = ["Brasil", "Tech", "Soluções", "Serviços", "Group"];
+    const types = ["Ltda", "S.A.", "Empresarial", "Corporativo", "Nacional"];
+    
+    // Generate 5 companies with the segment name incorporated
+    companies = Array(5).fill(0).map((_, i) => {
+      const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+      const type = types[Math.floor(Math.random() * types.length)];
+      return `${segmentPrefix} ${suffix} ${type}`;
+    });
+  }
   
-  // Generate 5 companies with the segment name incorporated
-  return Array(5).fill(0).map((_, i) => {
-    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-    const type = types[Math.floor(Math.random() * types.length)];
-    return `${segmentPrefix} ${suffix} ${type}`;
-  });
+  // Filter by company name if provided
+  if (companyName && companyName.trim() !== "") {
+    const normalizedCompanyName = companyName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    companies = companies.filter(company => 
+      company.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(normalizedCompanyName)
+    );
+    
+    // If no matches, generate some companies with the name included
+    if (companies.length === 0) {
+      const types = ["Ltda", "S.A.", "Empresarial", "Corporativo", "Nacional"];
+      companies = Array(3).fill(0).map((_, i) => {
+        const type = types[Math.floor(Math.random() * types.length)];
+        return `${companyName} ${type}`;
+      });
+    }
+  }
+  
+  // Add keywords-influenced companies if keywords provided
+  if (keywords && keywords.trim() !== "") {
+    const keywordsArray = keywords.split(",").map(k => k.trim().toLowerCase());
+    const keywordSuffixes = {
+      "inovação": ["Inovações", "Tech", "Future", "Next"],
+      "sustentável": ["Eco", "Green", "Sustentável", "Natural"],
+      "digital": ["Digital", "Online", "Virtual", "Tech"],
+      "premium": ["Premium", "Gold", "Elite", "Prime"],
+      "tradicional": ["Tradicional", "Classic", "Original", "Heritage"]
+    };
+    
+    // Add some companies based on keywords
+    const keywordCompanies: string[] = [];
+    keywordsArray.forEach(keyword => {
+      const matchedCategory = Object.keys(keywordSuffixes).find(k => 
+        k.includes(keyword) || keyword.includes(k)
+      );
+      
+      if (matchedCategory) {
+        const suffixes = keywordSuffixes[matchedCategory as keyof typeof keywordSuffixes];
+        const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+        
+        // Create a company name incorporating the segment (if provided) and the keyword
+        let baseName = segment ? segment.split(' ')[0] : companyName || "Empresa";
+        keywordCompanies.push(`${baseName} ${suffix} Ltda`);
+      }
+    });
+    
+    // Add keyword-based companies to the list
+    if (keywordCompanies.length > 0) {
+      companies = [...companies, ...keywordCompanies];
+    }
+  }
+  
+  // Ensure we have at least some results
+  if (companies.length === 0) {
+    companies = ["Empresa Genérica Ltda", "Corporação Geral S.A.", "Negócios Unidos Ltda"];
+  }
+  
+  // Return unique companies
+  return Array.from(new Set(companies));
 };
 
 // Generate Brazilian states
@@ -260,10 +330,10 @@ const SmartSearch = () => {
   };
 
   const handleSearch = async (filters: CompanyFilters) => {
-    if (!filters.segment) {
+    if (!filters.segment && !filters.companyName && !filters.keywords) {
       toast({
-        title: "Por favor, informe um segmento",
-        description: "O segmento é obrigatório para a busca.",
+        title: "Critérios insuficientes",
+        description: "Informe pelo menos um segmento, nome de empresa ou palavra-chave para a busca.",
         variant: "destructive",
       });
       return;
@@ -285,13 +355,13 @@ const SmartSearch = () => {
     setAuthError(null);
 
     try {
-      console.log("Starting search with segment:", filters.segment);
+      console.log("Starting search with filters:", filters);
       
-      // Get segment-specific company names
-      const segmentCompanies = getSegmentCompanies(filters.segment);
+      // Get segment-specific company names based on filters
+      const segmentCompanies = getSegmentCompanies(filters);
       const generatedCompanies = [];
       
-      // Generate companies based on the segment with enriched data
+      // Generate companies based on the search criteria with enriched data
       for (let i = 0; i < segmentCompanies.length; i++) {
         const companyName = segmentCompanies[i];
         const randomState = brazilianStates[Math.floor(Math.random() * brazilianStates.length)];
@@ -309,11 +379,14 @@ const SmartSearch = () => {
         // AI detected for some companies
         const aiDetected = Math.random() > 0.6;
         
-        // Enrich company data using GPT with explicit segment parameter
+        // Determine segment for enrichment (use provided segment or extract from company name)
+        const enrichmentSegment = filters.segment || companyName.split(" ")[0];
+        
+        // Enrich company data using GPT
         let enrichedData = null;
         try {
-          console.log(`Enriching company data for: ${companyName} (${filters.segment})`);
-          enrichedData = await enrichCompanyWithGPT(companyName, randomCity, filters.segment);
+          console.log(`Enriching company data for: ${companyName} (${enrichmentSegment})`);
+          enrichedData = await enrichCompanyWithGPT(companyName, randomCity, enrichmentSegment);
           console.log("Enriched data for", companyName, enrichedData);
 
           // Use enriched data for employee count if available, otherwise use random
@@ -327,7 +400,7 @@ const SmartSearch = () => {
             cnpj,
             city: randomCity,
             state: randomState,
-            segment: filters.segment,
+            segment: filters.segment || enrichedData?.sector || "Geral",
             employees: employeeCount,
             opportunity,
             aiDetected,
@@ -342,6 +415,7 @@ const SmartSearch = () => {
             opportunitySignals: enrichedData?.opportunitySignals,
             recommendedChannels: enrichedData?.recommendedChannels,
             yearFounded: Math.floor(1990 + Math.random() * 30).toString(), // Random year between 1990-2020
+            matchedKeywords: filters.keywords ? filters.keywords.split(",").map(k => k.trim()) : [],
             creator: {
               name: "IA LeadHunter",
               email: "ia@leadhunter.ai",
@@ -356,7 +430,7 @@ const SmartSearch = () => {
       }
       
       // Apply any text filtering from filters
-      setFilterText(filters.segment);
+      setFilterText(filters.segment || filters.companyName || filters.keywords || "");
       
       // Sort the results based on current sort parameter
       const sortedResults = sortResults([...generatedCompanies], sortBy);
@@ -364,9 +438,16 @@ const SmartSearch = () => {
       // Update state with the generated companies
       setSearchResults(sortedResults);
       setSearchPerformed(true);
+      
+      const searchCriteria = [
+        filters.segment && `segmento "${filters.segment}"`,
+        filters.companyName && `nome "${filters.companyName}"`,
+        filters.keywords && `palavras-chave "${filters.keywords}"`
+      ].filter(Boolean).join(", ");
+      
       toast({
         title: "Busca IA realizada com sucesso",
-        description: `Nossa IA encontrou ${sortedResults.length} empresas no segmento de ${filters.segment}.`,
+        description: `Nossa IA encontrou ${sortedResults.length} empresas usando ${searchCriteria}.`,
       });
     } catch (error) {
       console.error("Error during AI search:", error);
@@ -437,7 +518,7 @@ const SmartSearch = () => {
             <Sparkles className="h-6 w-6 text-amber-500" />
           </div>
           <p className="text-muted-foreground text-lg">
-            Digite apenas o segmento e nossa IA encontrará empresas do mercado para você
+            Digite o segmento, nome da empresa ou palavras-chave para que nossa IA encontre empresas do mercado
           </p>
         </div>
       </div>
@@ -505,7 +586,7 @@ const SmartSearch = () => {
             />
           </div>
 
-          {/* Companies List with Sorting Controls */}
+          {/* Companies List with Sorting Controls - Updated to show matched keywords */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">
@@ -538,6 +619,7 @@ const SmartSearch = () => {
                   key={company.id}
                   company={company}
                   onClick={() => handleCompanyClick(company)}
+                  keywords={company.matchedKeywords}
                 />
               ))}
               {filteredResults.length === 0 && (

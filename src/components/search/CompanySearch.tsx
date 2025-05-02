@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Search, Sparkles } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CompanySearchProps {
   onSearch: (filters: CompanyFilters) => void;
@@ -25,6 +26,8 @@ interface CompanySearchProps {
 
 export interface CompanyFilters {
   segment: string;
+  companyName?: string;
+  keywords?: string;
   state?: string;
   size?: string;
   revenue?: string;
@@ -66,28 +69,88 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
           <Sparkles className="text-amber-500 h-5 w-5" />
         </div>
         <CardDescription>
-          Digite apenas o segmento e nossa IA encontrará empresas no mercado para você
+          Digite o segmento, nome da empresa ou palavras-chave para que nossa IA encontre empresas no mercado
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6">
-          <div className="grid gap-3">
-            <Label htmlFor="segment">Qual segmento você busca?</Label>
-            <div className="flex gap-2">
-              <Input
-                id="segment"
-                placeholder="Ex: Tecnologia, Logística, Saúde..."
-                className="flex-1"
-                value={filters.segment}
-                onChange={(e) => handleInputChange("segment", e.target.value)}
-              />
-              <Button onClick={handleSearchClick} className="gap-1">
-                <Search className="h-4 w-4 mr-1" />
-                Descobrir Empresas
-              </Button>
+          <div className="grid gap-4">
+            <div className="grid gap-3">
+              <Label htmlFor="segment">Segmento</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="segment"
+                  placeholder="Ex: Tecnologia, Logística, Saúde..."
+                  className="flex-1"
+                  value={filters.segment}
+                  onChange={(e) => handleInputChange("segment", e.target.value)}
+                />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" className="w-8 p-0">?</Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Digite o segmento de mercado que você deseja buscar</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </div>
+            
+            <div className="grid gap-3">
+              <Label htmlFor="companyName">Nome da Empresa</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="companyName"
+                  placeholder="Ex: TechSol, LogEx..."
+                  className="flex-1"
+                  value={filters.companyName || ""}
+                  onChange={(e) => handleInputChange("companyName", e.target.value)}
+                />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" className="w-8 p-0">?</Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Digite o nome ou parte do nome da empresa</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
+            
+            <div className="grid gap-3">
+              <Label htmlFor="keywords">Palavras-chave</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="keywords"
+                  placeholder="Ex: inovação, sustentável, digital..."
+                  className="flex-1"
+                  value={filters.keywords || ""}
+                  onChange={(e) => handleInputChange("keywords", e.target.value)}
+                />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" className="w-8 p-0">?</Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Digite palavras-chave relacionadas ao seu interesse</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
+            
+            <Button onClick={handleSearchClick} className="w-full gap-1">
+              <Search className="h-4 w-4 mr-1" />
+              Descobrir Empresas
+            </Button>
+            
             <p className="text-sm text-muted-foreground mt-1">
-              Nossa IA buscará empresas deste segmento no mercado e trará dados enriquecidos automaticamente.
+              Nossa IA buscará empresas de acordo com os critérios acima e trará dados enriquecidos automaticamente.
             </p>
           </div>
           
