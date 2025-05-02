@@ -3,7 +3,7 @@ import React from 'react';
 
 export const Logo = () => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       <div className="h-10 w-10 rounded-md flex items-center justify-center">
         <img 
           src="/lovable-uploads/f0e9edb7-59e3-486c-b794-16df510819f5.png" 
