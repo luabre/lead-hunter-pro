@@ -198,96 +198,82 @@ const segmentCompanyMap: Record<string, string[]> = {
   ]
 };
 
-// Enhanced function to get segment-specific company names with more filtering options
+// Enhanced function to process unified search term
 const getSegmentCompanies = (filters: CompanyFilters): string[] => {
-  const { segment, companyName, keywords } = filters;
+  const { searchTerm } = filters;
   
-  // Normalize the segment for matching (lowercase, remove accents)
-  const normalizedSegment = segment.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (!searchTerm || searchTerm.trim() === "") {
+    return [];
+  }
   
-  // Get initial list of companies by segment
+  // Normalize the search term for matching (lowercase, remove accents)
+  const normalizedSearchTerm = searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  // Get initial list of companies by attempting to match segment, company name, or keywords
   let companies: string[] = [];
   
-  // Try to find an exact match first
+  // Check if search term matches any segment
   for (const key in segmentCompanyMap) {
-    if (key === normalizedSegment) {
-      companies = [...segmentCompanyMap[key]];
-      break;
+    if (key.includes(normalizedSearchTerm) || normalizedSearchTerm.includes(key)) {
+      companies = [...companies, ...segmentCompanyMap[key]];
     }
   }
   
-  // If no exact match, try partial match with keywords
-  if (companies.length === 0) {
-    for (const key in segmentCompanyMap) {
-      if (normalizedSegment.includes(key) || key.includes(normalizedSegment)) {
-        companies = [...segmentCompanyMap[key]];
-        break;
-      }
-    }
-  }
-  
-  // If no match at all, generate segment-specific company names
-  if (companies.length === 0) {
-    const segmentPrefix = segment.split(' ')[0];
-    const suffixes = ["Brasil", "Tech", "Soluções", "Serviços", "Group"];
-    const types = ["Ltda", "S.A.", "Empresarial", "Corporativo", "Nacional"];
-    
-    // Generate 5 companies with the segment name incorporated
-    companies = Array(5).fill(0).map((_, i) => {
-      const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-      const type = types[Math.floor(Math.random() * types.length)];
-      return `${segmentPrefix} ${suffix} ${type}`;
-    });
-  }
-  
-  // Filter by company name if provided
-  if (companyName && companyName.trim() !== "") {
-    const normalizedCompanyName = companyName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    companies = companies.filter(company => 
-      company.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(normalizedCompanyName)
+  // Also search for specific company names that match the search term
+  for (const segment in segmentCompanyMap) {
+    const matchingCompanies = segmentCompanyMap[segment].filter(company => 
+      company.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(normalizedSearchTerm)
     );
     
-    // If no matches, generate some companies with the name included
-    if (companies.length === 0) {
+    if (matchingCompanies.length > 0) {
+      companies = [...companies, ...matchingCompanies];
+    }
+  }
+  
+  // If still no matches, generate companies based on the search term
+  if (companies.length === 0) {
+    // Check if it looks more like a company name or a segment/keyword
+    const isLikelyCompanyName = normalizedSearchTerm.includes("ltda") || 
+                               normalizedSearchTerm.includes("s.a") || 
+                               normalizedSearchTerm.includes("mei") ||
+                               normalizedSearchTerm.length > 12; // Arbitrary length check
+    
+    if (isLikelyCompanyName) {
+      // Generate companies with the search term as the company name
       const types = ["Ltda", "S.A.", "Empresarial", "Corporativo", "Nacional"];
       companies = Array(3).fill(0).map((_, i) => {
         const type = types[Math.floor(Math.random() * types.length)];
-        return `${companyName} ${type}`;
+        return `${searchTerm} ${type}`;
       });
-    }
-  }
-  
-  // Add keywords-influenced companies if keywords provided
-  if (keywords && keywords.trim() !== "") {
-    const keywordsArray = keywords.split(",").map(k => k.trim().toLowerCase());
-    const keywordSuffixes = {
-      "inovação": ["Inovações", "Tech", "Future", "Next"],
-      "sustentável": ["Eco", "Green", "Sustentável", "Natural"],
-      "digital": ["Digital", "Online", "Virtual", "Tech"],
-      "premium": ["Premium", "Gold", "Elite", "Prime"],
-      "tradicional": ["Tradicional", "Classic", "Original", "Heritage"]
-    };
-    
-    // Add some companies based on keywords
-    const keywordCompanies: string[] = [];
-    keywordsArray.forEach(keyword => {
-      const matchedCategory = Object.keys(keywordSuffixes).find(k => 
-        k.includes(keyword) || keyword.includes(k)
-      );
+    } else {
+      // Treat as segment/keyword
+      const segmentPrefix = searchTerm.split(' ')[0];
+      const suffixes = ["Brasil", "Tech", "Soluções", "Serviços", "Group"];
+      const types = ["Ltda", "S.A.", "Empresarial", "Corporativo", "Nacional"];
       
-      if (matchedCategory) {
-        const suffixes = keywordSuffixes[matchedCategory as keyof typeof keywordSuffixes];
+      // Generate companies with the segment name incorporated
+      companies = Array(5).fill(0).map((_, i) => {
         const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-        
-        // Create a company name incorporating the segment (if provided) and the keyword
-        let baseName = segment ? segment.split(' ')[0] : companyName || "Empresa";
-        keywordCompanies.push(`${baseName} ${suffix} Ltda`);
+        const type = types[Math.floor(Math.random() * types.length)];
+        return `${segmentPrefix} ${suffix} ${type}`;
+      });
+      
+      // Add keyword-influenced companies
+      const keywordSuffixes = {
+        "inovação": ["Inovações", "Tech", "Future", "Next"],
+        "sustentável": ["Eco", "Green", "Sustentável", "Natural"],
+        "digital": ["Digital", "Online", "Virtual", "Tech"],
+        "premium": ["Premium", "Gold", "Elite", "Prime"],
+        "tradicional": ["Tradicional", "Classic", "Original", "Heritage"]
+      };
+      
+      for (const keyword in keywordSuffixes) {
+        if (normalizedSearchTerm.includes(keyword) || keyword.includes(normalizedSearchTerm)) {
+          const suffixes = keywordSuffixes[keyword as keyof typeof keywordSuffixes];
+          const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+          companies.push(`${segmentPrefix} ${suffix} Ltda`);
+        }
       }
-    });
-    
-    // Add keyword-based companies to the list
-    if (keywordCompanies.length > 0) {
-      companies = [...companies, ...keywordCompanies];
     }
   }
   
@@ -296,8 +282,8 @@ const getSegmentCompanies = (filters: CompanyFilters): string[] => {
     companies = ["Empresa Genérica Ltda", "Corporação Geral S.A.", "Negócios Unidos Ltda"];
   }
   
-  // Return unique companies
-  return Array.from(new Set(companies));
+  // Return unique companies, limited to a reasonable number
+  return Array.from(new Set(companies)).slice(0, 10);
 };
 
 // Generate Brazilian states
@@ -309,6 +295,17 @@ const brazilianStates = [
 const employeeRanges = [
   "1-10", "11-50", "51-100", "101-200", "201-500", "500+"
 ];
+
+export interface CompanyFilters {
+  searchTerm: string; // Updated to use a single search term
+  state?: string;
+  size?: string;
+  revenue?: string;
+  employees?: string;
+  type?: string;
+  yearsInBusiness?: string;
+  sortBy?: 'name' | 'opportunity' | 'state';
+}
 
 const SmartSearch = () => {
   const navigate = useNavigate();
@@ -330,10 +327,10 @@ const SmartSearch = () => {
   };
 
   const handleSearch = async (filters: CompanyFilters) => {
-    if (!filters.segment && !filters.companyName && !filters.keywords) {
+    if (!filters.searchTerm || filters.searchTerm.trim() === "") {
       toast({
         title: "Critérios insuficientes",
-        description: "Informe pelo menos um segmento, nome de empresa ou palavra-chave para a busca.",
+        description: "Informe um termo de busca para encontrar empresas.",
         variant: "destructive",
       });
       return;
@@ -355,11 +352,17 @@ const SmartSearch = () => {
     setAuthError(null);
 
     try {
-      console.log("Starting search with filters:", filters);
+      console.log("Starting search with unified term:", filters.searchTerm);
       
-      // Get segment-specific company names based on filters
+      // Get companies based on unified search term
       const segmentCompanies = getSegmentCompanies(filters);
       const generatedCompanies = [];
+      
+      // Determine if the search term is more likely a segment, company name, or keywords
+      const searchTerm = filters.searchTerm.toLowerCase();
+      const isLikelySegment = Object.keys(segmentCompanyMap).some(segment => 
+        segment.includes(searchTerm) || searchTerm.includes(segment)
+      );
       
       // Generate companies based on the search criteria with enriched data
       for (let i = 0; i < segmentCompanies.length; i++) {
@@ -379,8 +382,32 @@ const SmartSearch = () => {
         // AI detected for some companies
         const aiDetected = Math.random() > 0.6;
         
-        // Determine segment for enrichment (use provided segment or extract from company name)
-        const enrichmentSegment = filters.segment || companyName.split(" ")[0];
+        // Determine segment for enrichment
+        // If search looks like a segment, use it directly
+        // Otherwise try to extract a likely segment from company name
+        let enrichmentSegment = "";
+        if (isLikelySegment) {
+          enrichmentSegment = filters.searchTerm;
+        } else {
+          // Try to extract segment from company name
+          for (const segment in segmentCompanyMap) {
+            if (companyName.toLowerCase().includes(segment)) {
+              enrichmentSegment = segment;
+              break;
+            }
+          }
+          // If no segment found, use first word of company name
+          if (!enrichmentSegment) {
+            enrichmentSegment = companyName.split(" ")[0];
+          }
+        }
+        
+        // Create matched keywords from the search term
+        // If the term is not a segment or company name, it's likely keywords
+        let matchedKeywords: string[] = [];
+        if (!isLikelySegment && !companyName.toLowerCase().includes(searchTerm)) {
+          matchedKeywords = [filters.searchTerm];
+        }
         
         // Enrich company data using GPT
         let enrichedData = null;
@@ -392,12 +419,6 @@ const SmartSearch = () => {
           // Use enriched data for employee count if available, otherwise use random
           const employeeCount = enrichedData?.employees || employeeRanges[Math.floor(Math.random() * employeeRanges.length)];
           
-          // Create matched keywords array from the search keywords if provided
-          let matchedKeywords: string[] = [];
-          if (filters.keywords) {
-            matchedKeywords = filters.keywords.split(",").map(k => k.trim());
-          }
-          
           // Generate company object with enriched data
           generatedCompanies.push({
             id: `gen-${i + 1}`,
@@ -406,7 +427,7 @@ const SmartSearch = () => {
             cnpj,
             city: randomCity,
             state: randomState,
-            segment: filters.segment || enrichedData?.sector || "Geral",
+            segment: isLikelySegment ? filters.searchTerm : (enrichedData?.sector || "Geral"),
             employees: employeeCount,
             opportunity,
             aiDetected,
@@ -421,7 +442,7 @@ const SmartSearch = () => {
             opportunitySignals: enrichedData?.opportunitySignals,
             recommendedChannels: enrichedData?.recommendedChannels,
             yearFounded: Math.floor(1990 + Math.random() * 30).toString(), // Random year between 1990-2020
-            matchedKeywords,
+            matchedKeywords: matchedKeywords.length > 0 ? matchedKeywords : undefined,
             creator: {
               name: "IA LeadHunter",
               email: "ia@leadhunter.ai",
@@ -435,8 +456,8 @@ const SmartSearch = () => {
         }
       }
       
-      // Apply any text filtering from filters
-      setFilterText(filters.segment || filters.companyName || filters.keywords || "");
+      // Apply filtering from search term
+      setFilterText(filters.searchTerm || "");
       
       // Sort the results based on current sort parameter
       const sortedResults = sortResults([...generatedCompanies], sortBy);
@@ -445,15 +466,9 @@ const SmartSearch = () => {
       setSearchResults(sortedResults);
       setSearchPerformed(true);
       
-      const searchCriteria = [
-        filters.segment && `segmento "${filters.segment}"`,
-        filters.companyName && `nome "${filters.companyName}"`,
-        filters.keywords && `palavras-chave "${filters.keywords}"`
-      ].filter(Boolean).join(", ");
-      
       toast({
         title: "Busca IA realizada com sucesso",
-        description: `Nossa IA encontrou ${sortedResults.length} empresas usando ${searchCriteria}.`,
+        description: `Nossa IA encontrou ${sortedResults.length} empresas usando o termo "${filters.searchTerm}".`,
       });
     } catch (error) {
       console.error("Error during AI search:", error);

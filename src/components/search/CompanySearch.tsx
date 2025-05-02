@@ -25,9 +25,7 @@ interface CompanySearchProps {
 }
 
 export interface CompanyFilters {
-  segment: string;
-  companyName?: string;
-  keywords?: string;
+  searchTerm: string; // Unified search term for segment, company name, and keywords
   state?: string;
   size?: string;
   revenue?: string;
@@ -44,7 +42,7 @@ const brazilianStates = [
 
 const CompanySearch = ({ onSearch }: CompanySearchProps) => {
   const [filters, setFilters] = useState<CompanyFilters>({
-    segment: "",
+    searchTerm: "",
     sortBy: "name", // Default sort by name
   });
   
@@ -69,75 +67,29 @@ const CompanySearch = ({ onSearch }: CompanySearchProps) => {
           <Sparkles className="text-amber-500 h-5 w-5" />
         </div>
         <CardDescription>
-          Digite o segmento, nome da empresa ou palavras-chave para que nossa IA encontre empresas no mercado
+          Digite segmento, nome da empresa ou palavras-chave para que nossa IA encontre empresas no mercado
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6">
           <div className="grid gap-4">
             <div className="grid gap-3">
-              <Label htmlFor="segment">Segmento</Label>
+              <Label htmlFor="searchTerm">Busca</Label>
               <div className="flex gap-2">
                 <Input
-                  id="segment"
-                  placeholder="Ex: Tecnologia, Logística, Saúde..."
+                  id="searchTerm"
+                  placeholder="Ex: Tecnologia, TechSol, inovação..."
                   className="flex-1"
-                  value={filters.segment}
-                  onChange={(e) => handleInputChange("segment", e.target.value)}
+                  value={filters.searchTerm}
+                  onChange={(e) => handleInputChange("searchTerm", e.target.value)}
                 />
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button variant="outline" className="w-8 p-0">?</Button>
                     </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Digite o segmento de mercado que você deseja buscar</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </div>
-            
-            <div className="grid gap-3">
-              <Label htmlFor="companyName">Nome da Empresa</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="companyName"
-                  placeholder="Ex: TechSol, LogEx..."
-                  className="flex-1"
-                  value={filters.companyName || ""}
-                  onChange={(e) => handleInputChange("companyName", e.target.value)}
-                />
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" className="w-8 p-0">?</Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Digite o nome ou parte do nome da empresa</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </div>
-            
-            <div className="grid gap-3">
-              <Label htmlFor="keywords">Palavras-chave</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="keywords"
-                  placeholder="Ex: inovação, sustentável, digital..."
-                  className="flex-1"
-                  value={filters.keywords || ""}
-                  onChange={(e) => handleInputChange("keywords", e.target.value)}
-                />
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" className="w-8 p-0">?</Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Digite palavras-chave relacionadas ao seu interesse</p>
+                    <TooltipContent className="max-w-xs">
+                      <p>Digite segmento (ex: Tecnologia), nome da empresa (ex: TechSol), ou palavras-chave (ex: inovação, sustentável) para sua busca</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
