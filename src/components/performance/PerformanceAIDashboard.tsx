@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -23,11 +22,14 @@ import {
 } from 'recharts';
 import { Calendar as CalendarIcon, Users as UsersIcon, TrendingUp, AlertTriangle, CheckCircle, Lightbulb, ArrowRight } from 'lucide-react';
 
+// Define the strict status type to match what StatusIndicator expects
+type StatusType = "onTrack" | "atRisk" | "critical";
+
 // Mock data for charts
 const statusData = {
   value: 71,
   target: 100,
-  status: "onTrack", // "onTrack", "atRisk", "critical"
+  status: "onTrack" as StatusType, // Explicitly type this as StatusType
 };
 
 const monthlyProgress = [
@@ -114,7 +116,7 @@ const simulatorData = {
 };
 
 // Status indicator component
-const StatusIndicator = ({ status }: { status: "onTrack" | "atRisk" | "critical" }) => {
+const StatusIndicator = ({ status }: { status: StatusType }) => {
   const getStatusInfo = () => {
     switch (status) {
       case "onTrack":
