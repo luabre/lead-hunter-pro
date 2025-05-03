@@ -21,6 +21,7 @@ import AiManager from "./pages/AiManager";
 import SocialSelling from "./pages/SocialSelling";
 import LeadImport from "./pages/LeadImport";
 import SmartSearch from "./pages/SmartSearch";
+import Campaigns from "./pages/Campaigns"; // Import the new Campaigns page
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -132,6 +133,17 @@ const App = () => {
                 isAuthenticated ? (
                   <SidebarProvider defaultOpen={true}>
                     <Contacts />
+                  </SidebarProvider>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } />
+              
+              {/* Add the new Campaigns route here */}
+              <Route path="/campaigns" element={
+                isAuthenticated ? (
+                  <SidebarProvider defaultOpen={true}>
+                    <Campaigns />
                   </SidebarProvider>
                 ) : (
                   <Navigate to="/login" replace />

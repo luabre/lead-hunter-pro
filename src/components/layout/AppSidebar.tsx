@@ -32,6 +32,7 @@ import {
   Camera,
   Pencil,
   UserPlus,
+  Megaphone, // Added for Campaigns icon
 } from "lucide-react";
 import { Logo } from "./Logo";
 import AppVersion from "./AppVersion";
@@ -181,6 +182,12 @@ const AppSidebar = () => {
       text: "Contatos",
       path: "/contacts",
       icon: Users,
+    },
+    {
+      text: "Campanhas",
+      path: "/campaigns",
+      icon: Megaphone,
+      badge: { text: "Novo", variant: "green" as const },
     },
     {
       text: "Pipeline Geral",
