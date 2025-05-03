@@ -1,512 +1,582 @@
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Progress } from "@/components/ui/progress"; 
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, LineChart, PieChart } from "recharts";
 import { 
-  AlertCircle, 
-  AlertTriangle, 
-  ArrowDown, 
-  ArrowRight, 
-  ArrowUp, 
-  Check, 
-  CheckCircle2, 
-  Clock, 
-  FileText, 
-  Lightbulb, 
-  Rocket, 
-  Target, 
-  TrendingDown, 
-  TrendingUp, 
-  XCircle 
-} from "lucide-react";
-import { useEffect, useState } from "react";
+  BarChart, 
+  Bar, 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer,
+  RadialBarChart,
+  RadialBar,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
+import { Calendar as CalendarIcon, Users as UsersIcon, TrendingUp, AlertTriangle, CheckCircle, Lightbulb, ArrowRight } from 'lucide-react';
 
-const PerformanceAIDashboard = () => {
-  const [currentGoalProgress, setCurrentGoalProgress] = useState(65);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  useEffect(() => {
-    // Simulate data loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, []);
+// Mock data for charts
+const statusData = {
+  value: 71,
+  target: 100,
+  status: "onTrack", // "onTrack", "atRisk", "critical"
+};
 
-  // Helper function to determine goal status color
-  const getGoalStatusColor = (progress: number) => {
-    if (progress >= 80) return "text-green-500";
-    if (progress >= 50) return "text-yellow-500";
-    return "text-red-500";
-  };
+const monthlyProgress = [
+  { name: 'Jan', value: 65 },
+  { name: 'Fev', value: 72 },
+  { name: 'Mar', value: 68 },
+  { name: 'Abr', value: 71 },
+  { name: 'Mai', value: 0 }, // Future month
+  { name: 'Jun', value: 0 }, // Future month
+];
 
-  // Helper function to determine status icon
-  const getStatusIcon = (progress: number) => {
-    if (progress >= 80) return <CheckCircle2 className="h-6 w-6 text-green-500" />;
-    if (progress >= 50) return <AlertTriangle className="h-6 w-6 text-yellow-500" />;
-    return <AlertCircle className="h-6 w-6 text-red-500" />;
-  };
+const performanceData = [
+  { name: 'Leads Gerados', value: 428, target: 400 },
+  { name: 'Reuniões', value: 74, target: 100 },
+  { name: 'Propostas', value: 32, target: 40 },
+  { name: 'Fechamentos', value: 12, target: 15 },
+];
 
-  // Sample data for the action plan
-  const actionPlan = [
-    { 
-      id: 1, 
-      title: "Mover 12 leads para etapa de Proposta", 
-      progress: 75, 
-      status: "in-progress" 
+const radialData = [
+  {
+    name: 'Meta Mensal',
+    value: 71,
+    fill: '#10b981',
+  }
+];
+
+const actionItems = [
+  {
+    id: 1,
+    title: "Enviar follow-up para 12 leads em aberto",
+    priority: "high",
+    completed: false
+  },
+  {
+    id: 2,
+    title: "Ativar campanha para segmento Tecnologia",
+    priority: "medium",
+    completed: true
+  },
+  {
+    id: 3,
+    title: "Revisar objeções de preço nos leads recentes",
+    priority: "high",
+    completed: false
+  },
+];
+
+const insightData = [
+  {
+    title: "Taxa de conversão acima da média",
+    description: "Seu time está 18% acima da média do setor em conversão de reuniões para propostas.",
+    type: "positive"
+  },
+  {
+    title: "Gargalo identificado",
+    description: "Leads do segmento Saúde estão demorando 3x mais para avançar após a primeira reunião.",
+    type: "warning"
+  },
+  {
+    title: "Oportunidade detectada",
+    description: "Aumento de 27% nas buscas por seu produto no segmento Educação.",
+    type: "insight"
+  },
+];
+
+const simulatorData = {
+  currentMetrics: {
+    ticketAvg: 10000,
+    conversionRate: {
+      leadToMeeting: 20,
+      meetingToProposal: 60,
+      proposalToClose: 40,
+      leadToClose: 4.8
     },
-    { 
-      id: 2, 
-      title: "Ativar campanha para leads do segmento Enterprise", 
-      progress: 100, 
-      status: "completed" 
-    },
-    { 
-      id: 3, 
-      title: "Agendar 8 novas reuniões", 
-      progress: 25, 
-      status: "delayed" 
-    },
-  ];
-
-  // Sample data for the simulator section
-  const simulationParams = {
-    targetRevenue: "R$1.000.000",
-    avgTicket: "R$10.000",
-    conversionRates: {
-      meetingToProposal: "60%",
-      proposalToClose: "40%",
-      leadToClose: "10%"
-    },
-    avgConversionTime: "21 dias"
-  };
-
-  // Sample projections
-  const projections = {
-    closures: 100,
+    cycleTime: 21,
+    target: 1000000
+  },
+  projections: {
+    closings: 100,
     proposals: 250,
     meetings: 416,
     leadsNeeded: 1000
+  }
+};
+
+// Status indicator component
+const StatusIndicator = ({ status }: { status: "onTrack" | "atRisk" | "critical" }) => {
+  const getStatusInfo = () => {
+    switch (status) {
+      case "onTrack":
+        return {
+          icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+          text: "Você está no caminho certo",
+          color: "text-green-500",
+          bgColor: "bg-green-100"
+        };
+      case "atRisk":
+        return {
+          icon: <AlertTriangle className="h-5 w-5 text-amber-500" />,
+          text: "Atenção: risco de não atingir a meta",
+          color: "text-amber-500",
+          bgColor: "bg-amber-100"
+        };
+      case "critical":
+        return {
+          icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
+          text: "Meta comprometida: aja agora!",
+          color: "text-red-500",
+          bgColor: "bg-red-100"
+        };
+      default:
+        return {
+          icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+          text: "Status desconhecido",
+          color: "text-gray-500",
+          bgColor: "bg-gray-100"
+        };
+    }
   };
 
-  // Sample what-if scenarios
-  const scenarios = [
-    {
-      name: "Aumentar ticket médio em 20%",
-      impact: "+15% na meta",
-      recommendation: "Alta prioridade"
-    },
-    {
-      name: "Ativar IA Closer para aumentar conversão",
-      impact: "+8% na meta",
-      recommendation: "Média prioridade"
-    },
-    {
-      name: "Campanha para leads inativos",
-      impact: "+5% na meta",
-      recommendation: "Baixa prioridade"
-    }
-  ];
+  const { icon, text, color, bgColor } = getStatusInfo();
 
   return (
+    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${bgColor}`}>
+      {icon}
+      <span className={`text-sm font-medium ${color}`}>{text}</span>
+    </div>
+  );
+};
+
+// Action item component
+const ActionItem = ({ action }: { action: typeof actionItems[0] }) => {
+  const priorityClass = action.priority === "high" ? "border-red-400" : "border-amber-400";
+  
+  return (
+    <div className={`border-l-4 ${priorityClass} bg-white p-3 rounded-md shadow-sm`}>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <input 
+            type="checkbox" 
+            checked={action.completed} 
+            className="rounded text-blue-600" 
+            readOnly
+          />
+          <span className={action.completed ? "line-through text-gray-500" : ""}>{action.title}</span>
+        </div>
+        <Button variant="ghost" size="sm">
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Insight card component
+const InsightCard = ({ insight }: { insight: typeof insightData[0] }) => {
+  const getInsightIcon = () => {
+    switch (insight.type) {
+      case "positive":
+        return <TrendingUp className="h-5 w-5 text-green-500" />;
+      case "warning":
+        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+      case "insight":
+        return <Lightbulb className="h-5 w-5 text-blue-500" />;
+      default:
+        return <Lightbulb className="h-5 w-5 text-blue-500" />;
+    }
+  };
+
+  const getInsightClass = () => {
+    switch (insight.type) {
+      case "positive":
+        return "bg-green-50 border-green-200";
+      case "warning":
+        return "bg-amber-50 border-amber-200";
+      case "insight":
+        return "bg-blue-50 border-blue-200";
+      default:
+        return "bg-gray-50 border-gray-200";
+    }
+  };
+
+  return (
+    <div className={`border rounded-md p-3 ${getInsightClass()}`}>
+      <div className="flex items-center gap-2 mb-1">
+        {getInsightIcon()}
+        <h4 className="font-medium">{insight.title}</h4>
+      </div>
+      <p className="text-sm text-gray-600 ml-7">{insight.description}</p>
+    </div>
+  );
+};
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+const PerformanceAIDashboard = () => {
+  const [selectedTab, setSelectedTab] = useState("overview");
+  
+  return (
     <div className="space-y-6">
-      {/* Goal Status Card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
-            <CardTitle>Status da Meta</CardTitle>
-            <Badge variant={currentGoalProgress >= 80 ? "default" : currentGoalProgress >= 50 ? "secondary" : "destructive"}>
-              {currentGoalProgress >= 80 ? "No caminho certo" : currentGoalProgress >= 50 ? "Atenção" : "Meta comprometida"}
-            </Badge>
-          </div>
-          <CardDescription>
-            Meta mensal de R$40.000 - Faltam 15 dias
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4 mb-4">
-            {getStatusIcon(currentGoalProgress)}
-            <div className="flex-1">
-              <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium">Progresso</span>
-                <span className={`text-sm font-medium ${getGoalStatusColor(currentGoalProgress)}`}>
-                  {currentGoalProgress}%
-                </span>
-              </div>
-              <Progress 
-                value={currentGoalProgress} 
-                className={`h-2 ${
-                  currentGoalProgress >= 80 
-                    ? "bg-muted text-green-500" 
-                    : currentGoalProgress >= 50 
-                    ? "bg-muted text-yellow-500" 
-                    : "bg-muted text-red-500"
-                }`}
-              />
-            </div>
-          </div>
+      {/* Main Tabs */}
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+        <TabsList className="grid grid-cols-4 mb-4">
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="actions">Plano de Ação</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
+          <TabsTrigger value="simulator">Simulador</TabsTrigger>
+        </TabsList>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="bg-muted/50 p-3 rounded-lg">
-              <div className="text-sm text-muted-foreground mb-1">Realizado</div>
-              <div className="text-2xl font-bold">R$26.000</div>
-            </div>
-            
-            <div className="bg-muted/50 p-3 rounded-lg">
-              <div className="text-sm text-muted-foreground mb-1">Meta</div>
-              <div className="text-2xl font-bold">R$40.000</div>
-            </div>
-            
-            <div className="bg-muted/50 p-3 rounded-lg">
-              <div className="text-sm text-muted-foreground mb-1">Projeção</div>
-              <div className="text-2xl font-bold text-yellow-500">R$36.400</div>
-            </div>
-          </div>
-
-          <Alert className="mt-6 border-yellow-500/50 bg-yellow-500/10">
-            <AlertTriangle className="h-4 w-4 text-yellow-500" />
-            <AlertTitle className="text-yellow-500">Atenção</AlertTitle>
-            <AlertDescription className="text-sm">
-              Com o ritmo atual, você alcançará 91% da meta. Recomendamos seguir o plano de ação da IA para atingir 100%.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-      
-      {/* Action Plan Card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
-            <CardTitle>Plano de Ação Inteligente</CardTitle>
-            <Button variant="outline" size="sm">
-              <FileText className="h-4 w-4 mr-2" />
-              Exportar Plano
-            </Button>
-          </div>
-          <CardDescription>
-            Ações recomendadas pela IA para atingir sua meta
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {actionPlan.map(action => (
-            <div key={action.id} className="border rounded-lg p-4">
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center">
-                  {action.status === "completed" ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
-                  ) : action.status === "delayed" ? (
-                    <Clock className="h-5 w-5 text-red-500 mr-2" />
-                  ) : (
-                    <Target className="h-5 w-5 text-blue-500 mr-2" />
-                  )}
-                  <span className="font-medium">{action.title}</span>
-                </div>
-                <Badge variant={
-                  action.status === "completed" ? "outline" : 
-                  action.status === "delayed" ? "destructive" : "secondary"
-                }>
-                  {action.status === "completed" ? "Concluído" : 
-                   action.status === "delayed" ? "Atrasado" : "Em andamento"}
-                </Badge>
+        {/* Overview Tab Content */}
+        <TabsContent value="overview" className="space-y-6">
+          {/* Main Goal Card */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-xl">Meta Mensal: R$100.000</CardTitle>
+                <StatusIndicator status={statusData.status} />
               </div>
-              
-              <div className="flex items-center gap-2">
-                <div className="flex-1">
-                  <Progress 
-                    value={action.progress} 
-                    className="h-2"
-                  />
-                </div>
-                <span className="text-sm font-medium">{action.progress}%</span>
-              </div>
-              
-              {action.status !== "completed" && (
-                <div className="flex justify-end mt-3">
-                  <Button variant="outline" size="sm" className="h-8">
-                    {action.status === "delayed" ? "Reprogramar" : "Executar agora"}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          ))}
-          
-          <Button className="w-full mt-2">
-            <Lightbulb className="h-4 w-4 mr-2" />
-            Gerar novas recomendações
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Simulation Card */}
-      <Tabs defaultValue="projection" className="w-full">
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex justify-between items-center">
-              <CardTitle>Simulador Estratégico</CardTitle>
-              <TabsList>
-                <TabsTrigger value="projection">Projeção</TabsTrigger>
-                <TabsTrigger value="what-if">What-If</TabsTrigger>
-              </TabsList>
-            </div>
-            <CardDescription>
-              Análise de cenários para atingimento da meta
-            </CardDescription>
-          </CardHeader>
-          
-          <TabsContent value="projection" className="mt-0">
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="border rounded-lg p-4">
-                  <h3 className="text-sm font-medium mb-3">Parâmetros atuais</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Meta de faturamento:</span>
-                      <span className="font-medium">{simulationParams.targetRevenue}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Ticket médio:</span>
-                      <span className="font-medium">{simulationParams.avgTicket}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Reunião → Proposta:</span>
-                      <span className="font-medium">{simulationParams.conversionRates.meetingToProposal}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Proposta → Fechamento:</span>
-                      <span className="font-medium">{simulationParams.conversionRates.proposalToClose}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Lead → Fechamento:</span>
-                      <span className="font-medium">{simulationParams.conversionRates.leadToClose}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Tempo médio de conversão:</span>
-                      <span className="font-medium">{simulationParams.avgConversionTime}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="border rounded-lg p-4">
-                  <h3 className="text-sm font-medium mb-3">Projeção para 90 dias</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-500/20 rounded-full p-2">
-                        <Check className="h-4 w-4 text-blue-500" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Fechamentos necessários</div>
-                        <div className="font-bold">{projections.closures}</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <div className="bg-indigo-500/20 rounded-full p-2">
-                        <FileText className="h-4 w-4 text-indigo-500" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Propostas a enviar</div>
-                        <div className="font-bold">{projections.proposals}</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <div className="bg-green-500/20 rounded-full p-2">
-                        <Calendar className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Reuniões a agendar</div>
-                        <div className="font-bold">{projections.meetings}</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <div className="bg-orange-500/20 rounded-full p-2">
-                        <Users className="h-4 w-4 text-orange-500" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Leads necessários</div>
-                        <div className="font-bold">{projections.leadsNeeded}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <Alert className="bg-blue-500/10 border-blue-500/50">
-                <Lightbulb className="h-4 w-4 text-blue-500" />
-                <AlertTitle className="text-blue-500">Insight da IA</AlertTitle>
-                <AlertDescription className="text-sm">
-                  Com sua taxa de conversão atual, você precisará de um pipeline 10x maior que sua meta. 
-                  Recomendamos focar em melhorar a conversão de proposta → fechamento para reduzir o 
-                  volume de leads necessários.
-                </AlertDescription>
-              </Alert>
-            </CardContent>
-          </TabsContent>
-
-          <TabsContent value="what-if" className="mt-0">
+            </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <h3 className="text-sm font-medium">Cenários alternativos</h3>
-                
-                {scenarios.map((scenario, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <div className="font-medium">{scenario.name}</div>
-                      <Badge 
-                        variant={
-                          scenario.recommendation === "Alta prioridade" ? "default" :
-                          scenario.recommendation === "Média prioridade" ? "secondary" : "outline"
-                        }
-                      >
-                        {scenario.recommendation}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                      <span className="text-sm text-green-500 font-medium">{scenario.impact}</span>
-                    </div>
-                    
-                    <Button variant="outline" size="sm" className="mt-3 w-full">
-                      Simular este cenário
-                    </Button>
+                {/* Progress bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Progresso atual: {statusData.value}%</span>
+                    <span className="text-muted-foreground">Meta: 100%</span>
                   </div>
-                ))}
-                
-                <Button variant="secondary" className="w-full">
-                  <Rocket className="h-4 w-4 mr-2" />
-                  Criar cenário personalizado
-                </Button>
+                  <Progress value={statusData.value} className="h-2" />
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>R$ {(statusData.value / 100 * 100000).toLocaleString()}</span>
+                    <span>R$ 100.000</span>
+                  </div>
+                </div>
+
+                {/* Radial chart */}
+                <div className="flex justify-center mt-4">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <RadialBarChart 
+                      cx="50%" 
+                      cy="50%" 
+                      innerRadius="60%" 
+                      outerRadius="100%" 
+                      data={radialData} 
+                      startAngle={180} 
+                      endAngle={0}
+                    >
+                      <RadialBar
+                        background
+                        dataKey="value"
+                        cornerRadius={10}
+                      />
+                      <text
+                        x="50%"
+                        y="50%"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="radial-chart-text"
+                        fill="#333"
+                        fontSize={24}
+                        fontWeight={600}
+                      >
+                        {statusData.value}%
+                      </text>
+                    </RadialBarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Monthly trend */}
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Evolução mensal</h4>
+                  <ResponsiveContainer width="100%" height={120}>
+                    <LineChart data={monthlyProgress}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis hide />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#3b82f6"
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </CardContent>
-          </TabsContent>
+          </Card>
           
-          <CardFooter className="pt-0">
-            <Button variant="outline" className="w-full">
-              Exportar simulação como relatório
-            </Button>
-          </CardFooter>
-        </Card>
-      </Tabs>
+          {/* Performance Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Métricas de Performance</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart
+                    data={performanceData}
+                    margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="value" fill="#3b82f6" name="Atual" />
+                    <Bar dataKey="target" fill="#e5e7eb" name="Meta" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-      {/* Monthly Learning Card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle>Ciclo Mensal de Aprendizado</CardTitle>
-          <CardDescription>
-            Retrospectiva e recomendações para o próximo ciclo
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="border rounded-lg p-4">
-            <h3 className="flex items-center text-sm font-medium mb-3">
-              <CheckCircle2 className="h-4 w-4 text-green-500 mr-2" />
-              O que funcionou bem
-            </h3>
-            <ul className="text-sm space-y-2">
-              <li className="flex gap-2">
-                <span className="text-green-500">•</span>
-                <span>Aumento de 12% na taxa de conversão de reuniões para propostas</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-green-500">•</span>
-                <span>Campanhas para segmento Enterprise tiveram ROI 3x maior</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-green-500">•</span>
-                <span>Follow-ups automáticos reduziram tempo de ciclo em 15%</span>
-              </li>
-            </ul>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Distribuição de Conversão</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={performanceData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      innerRadius={40}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {performanceData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
           </div>
-          
-          <div className="border rounded-lg p-4">
-            <h3 className="flex items-center text-sm font-medium mb-3">
-              <XCircle className="h-4 w-4 text-red-500 mr-2" />
-              O que bloqueou o atingimento
-            </h3>
-            <ul className="text-sm space-y-2">
-              <li className="flex gap-2">
-                <span className="text-red-500">•</span>
-                <span>Queda de 8% na taxa de retorno de cold emails</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-red-500">•</span>
-                <span>20% de no-shows em reuniões agendadas</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-red-500">•</span>
-                <span>Atraso médio de 7 dias para envio de propostas</span>
-              </li>
-            </ul>
-          </div>
-          
-          <div className="border rounded-lg p-4">
-            <h3 className="flex items-center text-sm font-medium mb-3">
-              <ArrowRight className="h-4 w-4 text-blue-500 mr-2" />
-              Recomendações para o próximo ciclo
-            </h3>
-            <ul className="text-sm space-y-2">
-              <li className="flex gap-2">
-                <span className="text-blue-500">1.</span>
-                <span>Implementar confirmação automatizada de reuniões</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-blue-500">2.</span>
-                <span>Revisar scripts de email com IA Writer</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-blue-500">3.</span>
-                <span>Definir SLA de 48h para envio de propostas</span>
-              </li>
-            </ul>
-          </div>
-          
-          <div className="border rounded-lg p-4">
-            <h3 className="flex items-center text-sm font-medium mb-3">
-              <Target className="h-4 w-4 text-indigo-500 mr-2" />
-              Sugestão de meta para o próximo mês
-            </h3>
-            <div className="flex items-center gap-4">
+        </TabsContent>
+
+        {/* Actions Tab Content */}
+        <TabsContent value="actions">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Plano de Ação Inteligente</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
               <div>
-                <div className="text-sm text-muted-foreground">Meta atual</div>
-                <div className="font-medium">R$40.000</div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Para alcançar sua meta de R$100K faltando 18 dias, a IA sugere as seguintes ações:
+                </p>
+
+                <div className="space-y-3">
+                  {actionItems.map(action => (
+                    <ActionItem key={action.id} action={action} />
+                  ))}
+                </div>
+
+                <div className="mt-4">
+                  <Button className="w-full">
+                    Gerar mais ações recomendadas
+                  </Button>
+                </div>
               </div>
-              
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
-              
-              <div>
-                <div className="text-sm text-muted-foreground">Meta sugerida</div>
-                <div className="font-medium">R$44.000</div>
+
+              <div className="bg-blue-50 p-4 rounded-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <CalendarIcon className="h-5 w-5 text-blue-500" />
+                  <h3 className="font-medium">Acompanhamento de Execução</h3>
+                </div>
+                <div className="pl-7">
+                  <div className="space-y-2">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Ações completadas</span>
+                        <span>1/3</span>
+                      </div>
+                      <Progress value={33} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Progresso no plano</span>
+                        <span>45%</span>
+                      </div>
+                      <Progress value={45} className="h-2" />
+                    </div>
+                  </div>
+
+                  <div className="mt-3 text-sm text-blue-600">
+                    <p>Próxima atualização em: <strong>6 horas</strong></p>
+                  </div>
+                </div>
               </div>
-              
-              <Badge className="ml-auto" variant="outline">
-                <ArrowUp className="h-3 w-3 mr-1" />
-                +10%
-              </Badge>
-            </div>
-            <div className="text-xs text-muted-foreground mt-2">
-              Baseado em tendência de crescimento e melhorias de processo
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <div className="flex w-full gap-3">
-            <Button variant="outline" className="flex-1">
-              Ajustar recomendações
-            </Button>
-            <Button className="flex-1">
-              Aplicar para próximo ciclo
-            </Button>
-          </div>
-        </CardFooter>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Insights Tab Content */}
+        <TabsContent value="insights">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Insights de Performance</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                {insightData.map((insight, index) => (
+                  <InsightCard key={index} insight={insight} />
+                ))}
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <UsersIcon className="h-5 w-5 text-gray-700" />
+                  <h3 className="font-medium">Comparativo de Time</h3>
+                </div>
+                <div className="pl-7">
+                  <p className="text-sm text-gray-600 mb-3">
+                    Seu desempenho comparado com outros vendedores:
+                  </p>
+
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Taxa de conversão</span>
+                        <span className="text-green-600">+15% acima</span>
+                      </div>
+                      <Progress value={65} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Volume de propostas</span>
+                        <span className="text-amber-600">-5% abaixo</span>
+                      </div>
+                      <Progress value={45} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Ticket médio</span>
+                        <span className="text-green-600">+22% acima</span>
+                      </div>
+                      <Progress value={72} className="h-2" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Simulator Tab Content */}
+        <TabsContent value="simulator">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Simulador de Cenários</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-gray-50 p-4 rounded-md">
+                <h3 className="font-medium mb-3">Meta de Faturamento: R$ {simulatorData.currentMetrics.target.toLocaleString()}</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Parâmetros atuais</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Ticket médio:</span>
+                        <span className="font-medium">R$ {simulatorData.currentMetrics.ticketAvg.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Conversão Lead → Fechamento:</span>
+                        <span className="font-medium">{simulatorData.currentMetrics.conversionRate.leadToClose}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Tempo médio de conversão:</span>
+                        <span className="font-medium">{simulatorData.currentMetrics.cycleTime} dias</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">O que você precisa</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Fechamentos:</span>
+                        <span className="font-medium">{simulatorData.projections.closings}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Propostas:</span>
+                        <span className="font-medium">{simulatorData.projections.proposals}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Reuniões:</span>
+                        <span className="font-medium">{simulatorData.projections.meetings}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Leads ativos:</span>
+                        <span className="font-medium">{simulatorData.projections.leadsNeeded}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="font-medium">Experimente diferentes cenários</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="border p-3 rounded-md">
+                    <h4 className="text-sm font-medium mb-2">E se o ticket médio subir 20%?</h4>
+                    <div className="text-sm space-y-1">
+                      <p>Ticket: <span className="font-medium">R$ 12.000</span></p>
+                      <p>Fechamentos necessários: <span className="font-medium">84</span></p>
+                      <p><span className="text-green-600 font-medium">-16% de esforço</span></p>
+                    </div>
+                    <Button variant="outline" className="w-full mt-2 text-xs">
+                      Aplicar cenário
+                    </Button>
+                  </div>
+                  
+                  <div className="border p-3 rounded-md">
+                    <h4 className="text-sm font-medium mb-2">E se a conversão aumentar 30%?</h4>
+                    <div className="text-sm space-y-1">
+                      <p>Taxa: <span className="font-medium">6.24%</span></p>
+                      <p>Leads necessários: <span className="font-medium">700</span></p>
+                      <p><span className="text-green-600 font-medium">-30% de prospecção</span></p>
+                    </div>
+                    <Button variant="outline" className="w-full mt-2 text-xs">
+                      Aplicar cenário
+                    </Button>
+                  </div>
+                  
+                  <div className="border p-3 rounded-md bg-blue-50">
+                    <h4 className="text-sm font-medium mb-2">Personalize seu cenário</h4>
+                    <div className="text-sm">
+                      <p>Configure parâmetros personalizados para simular diferentes situações de mercado.</p>
+                    </div>
+                    <Button className="w-full mt-2 text-xs">
+                      Personalizar
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
