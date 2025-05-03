@@ -23,7 +23,7 @@ import { Logo } from "@/components/layout/Logo";
 const AppSidebar = () => {
   return (
     <aside className="hidden md:block w-64 shrink-0 border-r border-white/10">
-      <div className="bg-[#0A2540] h-full fixed top-0 left-0 w-64 flex flex-col p-3">
+      <div className="bg-black h-full fixed top-0 left-0 w-64 flex flex-col p-3">
         <Logo />
         <nav className="space-y-1">
           <SidebarItem icon={Home} text="Home" to="/" />
