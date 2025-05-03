@@ -1,3 +1,4 @@
+
 import {
   Home,
   LayoutDashboard,
@@ -13,8 +14,8 @@ import {
   MessageSquare,
   MessageCircle,
   Brain,
-  PersonalPipeline,
   BarChart2,
+  PieChart // Using PieChart instead of PersonalPipeline
 } from "lucide-react";
 import { SidebarItem } from "@/components/layout/SidebarItem";
 import { Logo } from "@/components/layout/Logo";
@@ -35,7 +36,7 @@ const AppSidebar = () => {
           {/* Add the new Performance Dashboard item */}
           <SidebarItem icon={BarChart2} text="Performance IA" to="/performance" />
           
-          <SidebarItem icon={PersonalPipeline} text="Meu Pipeline" to="/my-pipeline" />
+          <SidebarItem icon={PieChart} text="Meu Pipeline" to="/my-pipeline" />
           <SidebarItem icon={Search} text="Busca Inteligente" to="/smart-search" />
           <SidebarItem icon={Linkedin} text="Social Selling" to="/social-selling" />
           <SidebarItem icon={TrendingUp} text="Inteligência" to="/market-intel" />

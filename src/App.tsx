@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -20,14 +21,21 @@ import { Toaster } from "@/components/ui/toaster";
 
 // Add the import for our new page
 import PerformanceDashboard from "./pages/PerformanceDashboard";
+import { useState } from "react";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  };
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Toaster />
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/companies" element={<Companies />} />
         <Route path="/contacts" element={<Contacts />} />
