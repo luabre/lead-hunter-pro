@@ -156,7 +156,8 @@ const MarketIntel = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="growth" className="w-full mb-12">
+      {/* Increased bottom margin to mb-16 to add more space */}
+      <Tabs defaultValue="growth" className="w-full mb-16">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="growth">Crescimento do Segmento</TabsTrigger>
           <TabsTrigger value="distribution">Distribuição</TabsTrigger>
@@ -169,7 +170,8 @@ const MarketIntel = () => {
               <CardDescription>Quantidade de empresas por segmento ao longo do tempo</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[350px]">
+              {/* Reduced height to prevent overflow */}
+              <div className="h-[320px]">
                 <ChartContainer
                   config={{
                     tech: { label: "Tecnologia", color: "#1E88E5" },
@@ -179,7 +181,7 @@ const MarketIntel = () => {
                     manufacturing: { label: "Manufatura", color: "#9C27B0" }
                   }}
                 >
-                  <LineChart data={marketTrendsData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+                  <LineChart data={marketTrendsData} margin={{ top: 20, right: 30, left: 0, bottom: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="year" />
                     <YAxis />
@@ -216,9 +218,10 @@ const MarketIntel = () => {
               <CardDescription>Percentual e quantidade de empresas por segmento</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[350px]">
+              {/* Reduced height to prevent overflow */}
+              <div className="h-[320px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={segmentDistribution} margin={{ top: 20, right: 30, left: 20, bottom: 20 }} layout="vertical">
+                  <BarChart data={segmentDistribution} margin={{ top: 20, right: 30, left: 20, bottom: 30 }} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                     <XAxis type="number" />
                     <YAxis type="category" dataKey="segment" width={100} />
@@ -265,7 +268,8 @@ const MarketIntel = () => {
         </TabsContent>
       </Tabs>
 
-      <Card className="mt-6">
+      {/* Added more top margin to mt-10 to increase separation */}
+      <Card className="mt-10">
         <CardHeader>
           <CardTitle>Insights de Mercado</CardTitle>
           <CardDescription>Oportunidades e tendências detectadas por IA</CardDescription>
