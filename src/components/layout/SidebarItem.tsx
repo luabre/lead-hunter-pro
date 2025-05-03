@@ -28,7 +28,7 @@ export const SidebarItem = ({ icon: Icon, text, to, badgeText }: SidebarItemProp
     </>
   );
 
-  const className = "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-primary/10 hover:text-primary w-full";
+  const className = "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-black/10 hover:text-black w-full";
   
   if (!to) {
     return (
@@ -43,7 +43,7 @@ export const SidebarItem = ({ icon: Icon, text, to, badgeText }: SidebarItemProp
       to={to} 
       className={cn(
         className,
-        "text-foreground hover:text-primary"
+        "text-black hover:text-black"
       )}
     >
       {content}
