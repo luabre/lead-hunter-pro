@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -39,12 +39,17 @@ export const LeadSourceSelector = ({ sourceType, onLeadsSelected }: LeadSourceSe
   const [isLoading, setIsLoading] = useState(false);
 
   // Simulate loading data
-  useState(() => {
+  useEffect(() => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
-  });
+  }, []);
+
+  // Update parent component with selected leads
+  useEffect(() => {
+    onLeadsSelected(selectedLeads);
+  }, [selectedLeads, onLeadsSelected]);
 
   const filteredLeads = mockLeads.filter(lead => 
     lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -71,11 +76,6 @@ export const LeadSourceSelector = ({ sourceType, onLeadsSelected }: LeadSourceSe
       setSelectedLeads(filteredLeads.map(lead => lead.id));
     }
   };
-
-  // Update parent component with selected leads
-  useState(() => {
-    onLeadsSelected(selectedLeads);
-  }, [selectedLeads]);
 
   const getSourceTitle = () => {
     switch (sourceType) {
