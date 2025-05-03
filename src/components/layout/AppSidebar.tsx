@@ -39,9 +39,9 @@ const AppSidebar = () => {
           <SidebarItem icon={TrendingUp} text="Inteligência" to="/market-intel" />
           <SidebarItem icon={Upload} text="Importar Leads" to="/lead-import" />
           <SidebarItem icon={Rocket} text="Campanhas" to="/campaigns" />
-          <SidebarItem icon={MessageSquare} text="IA SDR" badgeText="Novo" />
-          <SidebarItem icon={MessageCircle} text="IA Closer" />
-          <SidebarItem icon={Brain} text="IA Manager" badgeText="Novo" />
+          <SidebarItem icon={MessageSquare} text="IA SDR" to="/ia-sdr" badgeText="Novo" />
+          <SidebarItem icon={MessageCircle} text="IA Closer" to="/ia-closer" />
+          <SidebarItem icon={Brain} text="IA Manager" to="/ai-manager" badgeText="Novo" />
         </nav>
       </div>
     </aside>
