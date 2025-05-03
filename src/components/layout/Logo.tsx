@@ -11,7 +11,7 @@ export const Logo = () => {
           className="h-10 w-auto"
         />
       </div>
-      <div className="font-semibold">
+      <div className="font-semibold text-white">
         LeadHunter Pro
       </div>
     </div>
