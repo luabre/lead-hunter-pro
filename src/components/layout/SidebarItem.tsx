@@ -15,8 +15,8 @@ interface SidebarItemProps {
 export const SidebarItem = ({ icon: Icon, text, to, badgeText }: SidebarItemProps) => {
   const content = (
     <>
-      <Icon className="w-5 h-5 shrink-0" />
-      <span className="ml-3">{text}</span>
+      <Icon className="w-5 h-5 shrink-0 text-white" />
+      <span className="ml-3 text-white">{text}</span>
       {badgeText && (
         <Badge 
           className="ml-auto bg-primary hover:bg-primary/80 text-[10px] px-1.5 py-0.5" 
@@ -28,7 +28,7 @@ export const SidebarItem = ({ icon: Icon, text, to, badgeText }: SidebarItemProp
     </>
   );
 
-  const className = "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-black/10 hover:text-black w-full";
+  const className = "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 hover:text-white w-full";
   
   if (!to) {
     return (
@@ -43,7 +43,7 @@ export const SidebarItem = ({ icon: Icon, text, to, badgeText }: SidebarItemProp
       to={to} 
       className={cn(
         className,
-        "text-black hover:text-black"
+        "text-white hover:text-white"
       )}
     >
       {content}

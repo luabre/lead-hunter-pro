@@ -15,15 +15,15 @@ import {
   MessageCircle,
   Brain,
   BarChart2,
-  PieChart // Using PieChart instead of PersonalPipeline
+  PieChart 
 } from "lucide-react";
 import { SidebarItem } from "@/components/layout/SidebarItem";
 import { Logo } from "@/components/layout/Logo";
 
 const AppSidebar = () => {
   return (
-    <aside className="hidden md:block w-64 shrink-0 border-r">
-      <div className="bg-secondary h-full fixed top-0 left-0 w-64 flex flex-col p-3">
+    <aside className="hidden md:block w-64 shrink-0 border-r border-white/10">
+      <div className="bg-[#0A2540] h-full fixed top-0 left-0 w-64 flex flex-col p-3">
         <Logo />
         <nav className="space-y-1">
           <SidebarItem icon={Home} text="Home" to="/" />
@@ -32,10 +32,7 @@ const AppSidebar = () => {
           <SidebarItem icon={Users} text="Contatos" to="/contacts" />
           <SidebarItem icon={Calendar} text="Reuniões" to="/meetings" />
           <SidebarItem icon={LineChart} text="Pipeline" to="/pipeline" />
-          
-          {/* Add the new Performance Dashboard item */}
           <SidebarItem icon={BarChart2} text="Performance IA" to="/performance" />
-          
           <SidebarItem icon={PieChart} text="Meu Pipeline" to="/my-pipeline" />
           <SidebarItem icon={Search} text="Busca Inteligente" to="/smart-search" />
           <SidebarItem icon={Linkedin} text="Social Selling" to="/social-selling" />
