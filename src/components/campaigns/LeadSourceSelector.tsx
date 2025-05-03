@@ -41,9 +41,11 @@ export const LeadSourceSelector = ({ sourceType, onLeadsSelected }: LeadSourceSe
   // Simulate loading data
   useEffect(() => {
     setIsLoading(true);
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   // Update parent component with selected leads
