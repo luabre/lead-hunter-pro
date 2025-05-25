@@ -28,8 +28,8 @@ const AppSidebar = () => {
         <nav className="space-y-1">
           <SidebarItem icon={Home} text="Home" to="/" />
           <SidebarItem icon={Search} text="Busca Inteligente" to="/smart-search" />
-          <SidebarItem icon={LayoutDashboard} text="Dashboard" to="/dashboard" />
           <SidebarItem icon={Building2} text="Empresas" to="/companies" />
+          <SidebarItem icon={LayoutDashboard} text="Dashboard" to="/dashboard" />
           <SidebarItem icon={Users} text="Contatos" to="/contacts" />
           <SidebarItem icon={Calendar} text="Reuniões" to="/meetings" />
           <SidebarItem icon={Rocket} text="Campanhas" to="/campaigns" />
