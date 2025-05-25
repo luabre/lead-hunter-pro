@@ -37,7 +37,7 @@ const AppSidebar = () => {
           <SidebarItem icon={BarChart2} text="Performance IA" to="/performance" />
           <SidebarItem icon={LineChart} text="Pipeline Gerencial" to="/pipeline" />
           <SidebarItem icon={Linkedin} text="Social Selling" to="/social-selling" />
-          <SidebarItem icon={TrendingUp} text="Inteligência" to="/market-intel" />
+          <SidebarItem icon={TrendingUp} text="Inteligência de Mercado" to="/market-intel" />
           <SidebarItem icon={Upload} text="Importar Leads" to="/lead-import" />
           <SidebarItem icon={MessageSquare} text="IA SDR" to="/ia-sdr" badgeText="Novo" />
           <SidebarItem icon={MessageCircle} text="IA Closer" to="/ia-closer" />

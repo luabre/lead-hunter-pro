@@ -1,8 +1,12 @@
+
 import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, TrendingUp } from "lucide-react";
+import { FileText, TrendingUp, BarChart3 } from "lucide-react";
 import CompanyHeatMap from "@/components/search/CompanyHeatMap";
+import BenchmarkModal from "@/components/market-intel/BenchmarkModal";
+import OpportunityRadar from "@/components/market-intel/OpportunityRadar";
+import PotentialScorecard from "@/components/market-intel/PotentialScorecard";
 import {
   Select,
   SelectContent,
@@ -13,6 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { useState } from "react";
 
 // Mock Data
 const heatMapStates = [
@@ -34,11 +39,11 @@ const heatMapStates = [
 ];
 
 const marketTrendsData = [
-  { year: "2020", tech: 850, health: 650, finance: 730, retail: 590, manufacturing: 480 },
-  { year: "2021", tech: 920, health: 710, finance: 690, retail: 540, manufacturing: 510 },
-  { year: "2022", tech: 1050, health: 780, finance: 750, retail: 610, manufacturing: 530 },
-  { year: "2023", tech: 1190, health: 840, finance: 820, retail: 670, manufacturing: 580 },
-  { year: "2024", tech: 1320, health: 910, finance: 870, retail: 720, manufacturing: 640 },
+  { year: "2020", tech: 850, health: 650, finance: 730, retail: 590, manufacturing: 480, education: 420 },
+  { year: "2021", tech: 920, health: 710, finance: 690, retail: 540, manufacturing: 510, education: 445 },
+  { year: "2022", tech: 1050, health: 780, finance: 750, retail: 610, manufacturing: 530, education: 438 },
+  { year: "2023", tech: 1190, health: 840, finance: 820, retail: 670, manufacturing: 580, education: 421 },
+  { year: "2024", tech: 1320, health: 910, finance: 870, retail: 720, manufacturing: 640, education: 415 },
 ];
 
 const growthData = [
@@ -56,10 +61,17 @@ const segmentDistribution = [
   { segment: "Finanças", count: 870, percentage: "17.0" },
   { segment: "Varejo", count: 720, percentage: "14.1" },
   { segment: "Manufatura", count: 640, percentage: "12.5" },
-  { segment: "Outros", count: 660, percentage: "12.9" },
+  { segment: "Educação", count: 415, percentage: "8.1" },
+  { segment: "Outros", count: 245, percentage: "4.8" },
 ];
 
 const MarketIntel = () => {
+  const [selectedSegment, setSelectedSegment] = useState("education"); // Default para o segmento do usuário
+  const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false);
+  
+  // Simular segmento do usuário logado
+  const userSegment = "Educação";
+
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-8">
@@ -70,12 +82,21 @@ const MarketIntel = () => {
           </p>
         </div>
         <div className="flex gap-3">
-          <Select defaultValue="all">
+          <Button 
+            variant="outline"
+            onClick={() => setIsBenchmarkOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <BarChart3 className="h-4 w-4" />
+            📊 Comparar Segmentos
+          </Button>
+          <Select value={selectedSegment} onValueChange={setSelectedSegment}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Segmento de mercado" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os segmentos</SelectItem>
+              <SelectItem value="education">Educação (Seu segmento)</SelectItem>
               <SelectItem value="tech">Tecnologia</SelectItem>
               <SelectItem value="health">Saúde</SelectItem>
               <SelectItem value="finance">Finanças</SelectItem>
@@ -156,7 +177,16 @@ const MarketIntel = () => {
         </Card>
       </div>
 
-      {/* Increased bottom margin to mb-16 to add more space */}
+      {/* Novo bloco: Oportunidades para sua empresa */}
+      <div className="mb-6">
+        <OpportunityRadar userSegment={userSegment} />
+      </div>
+
+      {/* Novo bloco: Seu Potencial neste Cenário */}
+      <div className="mb-6">
+        <PotentialScorecard userSegment={userSegment} />
+      </div>
+
       <Tabs defaultValue="growth" className="w-full mb-16">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="growth">Crescimento do Segmento</TabsTrigger>
@@ -170,7 +200,6 @@ const MarketIntel = () => {
               <CardDescription>Quantidade de empresas por segmento ao longo do tempo</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Reduced height to prevent overflow */}
               <div className="h-[320px]">
                 <ChartContainer
                   config={{
@@ -178,7 +207,8 @@ const MarketIntel = () => {
                     health: { label: "Saúde", color: "#00BFA5" },
                     finance: { label: "Finanças", color: "#FFC107" },
                     retail: { label: "Varejo", color: "#FF5252" },
-                    manufacturing: { label: "Manufatura", color: "#9C27B0" }
+                    manufacturing: { label: "Manufatura", color: "#9C27B0" },
+                    education: { label: "Educação", color: "#FF9800" }
                   }}
                 >
                   <LineChart data={marketTrendsData} margin={{ top: 20, right: 30, left: 0, bottom: 30 }}>
@@ -204,6 +234,7 @@ const MarketIntel = () => {
                     <Line type="monotone" dataKey="finance" stroke="#FFC107" strokeWidth={2} />
                     <Line type="monotone" dataKey="retail" stroke="#FF5252" strokeWidth={2} />
                     <Line type="monotone" dataKey="manufacturing" stroke="#9C27B0" strokeWidth={2} />
+                    <Line type="monotone" dataKey="education" stroke="#FF9800" strokeWidth={2} />
                   </LineChart>
                 </ChartContainer>
               </div>
@@ -218,7 +249,6 @@ const MarketIntel = () => {
               <CardDescription>Percentual e quantidade de empresas por segmento</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Reduced height to prevent overflow */}
               <div className="h-[320px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={segmentDistribution} margin={{ top: 20, right: 30, left: 20, bottom: 30 }} layout="vertical">
@@ -268,7 +298,6 @@ const MarketIntel = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Added more top margin to mt-10 to increase separation */}
       <Card className="mt-10">
         <CardHeader>
           <CardTitle>Insights de Mercado</CardTitle>
@@ -329,6 +358,11 @@ const MarketIntel = () => {
           </div>
         </CardContent>
       </Card>
+
+      <BenchmarkModal 
+        isOpen={isBenchmarkOpen}
+        onClose={() => setIsBenchmarkOpen(false)}
+      />
     </AppLayout>
   );
 };
