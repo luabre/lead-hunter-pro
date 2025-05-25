@@ -1,6 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useRouter } from "next/router";
+import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -34,9 +34,6 @@ import {
 const AppNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
-  const supabase = useSupabaseClient();
-  const session = useSession();
-  const router = useRouter();
 
   useEffect(() => {
     const getUserProfile = async () => {
@@ -73,7 +70,8 @@ const AppNavbar = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push("/login");
+    // In a real app, you would handle navigation here
+    window.location.href = "/login";
   };
 
   return (
