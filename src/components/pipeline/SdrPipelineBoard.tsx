@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Lead, LeadStatus } from "@/hooks/useLeads";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare, Phone, Mail, Calendar, Check, X } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
+import CampaignBadge from "./CampaignBadge";
+import LeadTooltip from "./LeadTooltip";
 
 interface SdrPipelineBoardProps {
   leads: Lead[];
@@ -145,6 +146,10 @@ interface LeadCardProps {
 const LeadCard = ({ lead, onDragStart }: LeadCardProps) => {
   const { toast } = useToast();
 
+  // Determinar tipo de campanha baseado no campo campaign
+  const campaignType = lead.campaign?.toLowerCase().includes("ia") || 
+                      lead.campaign?.toLowerCase().includes("ai") ? "ai" : "manual";
+
   const handleActionClick = (action: string, e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -189,7 +194,7 @@ const LeadCard = ({ lead, onDragStart }: LeadCardProps) => {
   };
 
   return (
-    <TooltipProvider>
+    <LeadTooltip lead={lead}>
       <Card
         className="cursor-grab active:cursor-grabbing hover:shadow-md transition-all border-l-4 animate-fade-in"
         style={{
@@ -206,23 +211,26 @@ const LeadCard = ({ lead, onDragStart }: LeadCardProps) => {
         <CardHeader className="p-3 pb-1">
           <div className="flex justify-between items-start">
             <CardTitle className="text-sm">{lead.companyName}</CardTitle>
-            {lead.opportunity && (
-              <Badge
-                className={
-                  lead.opportunity === "hot"
-                    ? "bg-leadhunter-red text-white text-xs"
+            <div className="flex items-center gap-1">
+              <CampaignBadge campaignType={campaignType} />
+              {lead.opportunity && (
+                <Badge
+                  className={
+                    lead.opportunity === "hot"
+                      ? "bg-leadhunter-red text-white text-xs"
+                      : lead.opportunity === "warm"
+                      ? "bg-leadhunter-gold text-white text-xs"
+                      : "bg-leadhunter-blue text-white text-xs"
+                  }
+                >
+                  {lead.opportunity === "hot"
+                    ? "Quente"
                     : lead.opportunity === "warm"
-                    ? "bg-leadhunter-gold text-white text-xs"
-                    : "bg-leadhunter-blue text-white text-xs"
-                }
-              >
-                {lead.opportunity === "hot"
-                  ? "Quente"
-                  : lead.opportunity === "warm"
-                  ? "Morno"
-                  : "Frio"}
-              </Badge>
-            )}
+                    ? "Morno"
+                    : "Frio"}
+                </Badge>
+              )}
+            </div>
           </div>
           <p className="text-xs text-muted-foreground mt-1">{lead.contactName}</p>
         </CardHeader>
@@ -328,7 +336,7 @@ const LeadCard = ({ lead, onDragStart }: LeadCardProps) => {
           )}
         </CardContent>
       </Card>
-    </TooltipProvider>
+    </LeadTooltip>
   );
 };
 

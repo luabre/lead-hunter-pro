@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { useLeads, Lead, LeadStatus } from "@/hooks/useLeads";
@@ -11,6 +10,7 @@ import { Filter, Plus, RefreshCcw } from "lucide-react";
 import SdrPipelineBoard from "@/components/pipeline/SdrPipelineBoard";
 import SdrPipelineStats from "@/components/pipeline/SdrPipelineStats";
 import SdrPipelineActions from "@/components/pipeline/SdrPipelineActions";
+import ActiveCampaignsPanel from "@/components/pipeline/ActiveCampaignsPanel";
 
 const MyPipeline = () => {
   const { leads, loading, error, fetchLeads, updateLeadStatus } = useLeads({ onlyAssignedToMe: true });
@@ -67,10 +67,14 @@ const MyPipeline = () => {
         <div>
           <h1 className="text-3xl font-bold">Meu Pipeline</h1>
           <p className="text-muted-foreground">
-            Gerenciamento dos seus leads e oportunidades
+            Você está vendo seus próprios leads, organizados por etapa
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => window.open('/performance', '_blank')}>
+            <RefreshCcw className="h-4 w-4 mr-2" />
+            Acompanhar minha performance
+          </Button>
           <Button variant="outline" onClick={handleRefresh}>
             <RefreshCcw className="h-4 w-4 mr-2" />
             Atualizar
@@ -86,6 +90,7 @@ const MyPipeline = () => {
         </div>
       </div>
 
+      {/* Perfil do usuário */}
       {userProfile && (
         <div className="bg-muted rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
@@ -98,6 +103,9 @@ const MyPipeline = () => {
           </div>
         </div>
       )}
+
+      {/* Mini painel de campanhas ativas */}
+      <ActiveCampaignsPanel campaigns={[]} />
 
       <Tabs defaultValue="board" className="mb-6">
         <TabsList>

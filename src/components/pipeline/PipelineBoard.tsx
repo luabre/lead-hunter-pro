@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Phone, Mail, Calendar, Check, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import CampaignBadge from "./CampaignBadge";
+import LeadTooltip from "./LeadTooltip";
 
 interface Lead {
   id: string;
@@ -15,6 +16,9 @@ interface Lead {
   status: "new" | "contacted" | "qualifying" | "meeting" | "negotiation" | "won" | "lost";
   opportunity?: "hot" | "warm" | "cold";
   aiRecommendation?: string;
+  campaign?: string;
+  assignedTo?: string;
+  campaignType?: "ai" | "manual";
 }
 
 interface PipelineBoardProps {
@@ -145,6 +149,11 @@ interface LeadCardProps {
 const LeadCard = ({ lead, onClick, onDragStart }: LeadCardProps) => {
   const { toast } = useToast();
 
+  // Determinar tipo de campanha
+  const campaignType = lead.campaignType || 
+                      (lead.campaign?.toLowerCase().includes("ia") || 
+                       lead.campaign?.toLowerCase().includes("ai") ? "ai" : "manual");
+
   const handleActionClick = (action: string, e: React.MouseEvent) => {
     e.stopPropagation();
     
@@ -189,121 +198,129 @@ const LeadCard = ({ lead, onClick, onDragStart }: LeadCardProps) => {
   };
 
   return (
-    <Card 
-      className="cursor-grab active:cursor-grabbing hover:shadow-md transition-all border-l-4 animate-fade-in"
-      style={{ 
-        borderLeftColor: lead.opportunity === 'hot' 
-          ? 'var(--leadhunter-red)' 
-          : lead.opportunity === 'warm' 
-          ? 'var(--leadhunter-gold)' 
-          : 'var(--leadhunter-blue)' 
-      }}
-      onClick={onClick}
-      draggable
-      onDragStart={onDragStart}
-    >
-      <CardHeader className="p-3 pb-1">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-sm">{lead.companyName}</CardTitle>
-          {lead.opportunity && (
-            <Badge 
-              className={
-                lead.opportunity === 'hot'
-                  ? 'bg-leadhunter-red text-white text-xs'
-                  : lead.opportunity === 'warm'
-                  ? 'bg-leadhunter-gold text-white text-xs'
-                  : 'bg-leadhunter-blue text-white text-xs'
-              }
-            >
-              {lead.opportunity === 'hot' ? 'Quente' : lead.opportunity === 'warm' ? 'Morno' : 'Frio'}
-            </Badge>
+    <LeadTooltip lead={lead}>
+      <Card 
+        className="cursor-grab active:cursor-grabbing hover:shadow-md transition-all border-l-4 animate-fade-in"
+        style={{ 
+          borderLeftColor: lead.opportunity === 'hot' 
+            ? 'var(--leadhunter-red)' 
+            : lead.opportunity === 'warm' 
+            ? 'var(--leadhunter-gold)' 
+            : 'var(--leadhunter-blue)' 
+        }}
+        onClick={onClick}
+        draggable
+        onDragStart={onDragStart}
+      >
+        <CardHeader className="p-3 pb-1">
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-sm">{lead.companyName}</CardTitle>
+            <div className="flex items-center gap-1">
+              <CampaignBadge campaignType={campaignType} />
+              {lead.opportunity && (
+                <Badge 
+                  className={
+                    lead.opportunity === 'hot'
+                      ? 'bg-leadhunter-red text-white text-xs'
+                      : lead.opportunity === 'warm'
+                      ? 'bg-leadhunter-gold text-white text-xs'
+                      : 'bg-leadhunter-blue text-white text-xs'
+                  }
+                >
+                  {lead.opportunity === 'hot' ? 'Quente' : lead.opportunity === 'warm' ? 'Morno' : 'Frio'}
+                </Badge>
+              )}
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">{lead.contactName}</p>
+          {lead.assignedTo && (
+            <p className="text-xs text-muted-foreground">Responsável: {lead.assignedTo}</p>
           )}
-        </div>
-        <p className="text-xs text-muted-foreground mt-1">{lead.contactName}</p>
-      </CardHeader>
-      <CardContent className="p-3 pt-1">
-        {lead.lastAction && lead.lastActionDate && (
-          <div className="text-xs text-muted-foreground mb-2">
-            <p>Última ação: {lead.lastAction}</p>
-            <p>{lead.lastActionDate}</p>
+        </CardHeader>
+        <CardContent className="p-3 pt-1">
+          {lead.lastAction && lead.lastActionDate && (
+            <div className="text-xs text-muted-foreground mb-2">
+              <p>Última ação: {lead.lastAction}</p>
+              <p>{lead.lastActionDate}</p>
+            </div>
+          )}
+          
+          {/* Action buttons - top row */}
+          <div className="flex justify-between items-center mt-2">
+            <div className="flex space-x-1">
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="h-7 w-7 p-0" 
+                onClick={(e) => handleActionClick('message', e)}
+                title="Enviar mensagem"
+              >
+                <MessageSquare className="h-3.5 w-3.5" />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="h-7 w-7 p-0" 
+                onClick={(e) => handleActionClick('call', e)}
+                title="Ligar"
+              >
+                <Phone className="h-3.5 w-3.5" />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="h-7 w-7 p-0" 
+                onClick={(e) => handleActionClick('email', e)}
+                title="Enviar e-mail"
+              >
+                <Mail className="h-3.5 w-3.5" />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="h-7 w-7 p-0" 
+                onClick={(e) => handleActionClick('meeting', e)}
+                title="Agendar reunião"
+              >
+                <Calendar className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
-        )}
-        
-        {/* Action buttons - top row */}
-        <div className="flex justify-between items-center mt-2">
-          <div className="flex space-x-1">
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="h-7 w-7 p-0" 
-              onClick={(e) => handleActionClick('message', e)}
-              title="Enviar mensagem"
-            >
-              <MessageSquare className="h-3.5 w-3.5" />
-            </Button>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="h-7 w-7 p-0" 
-              onClick={(e) => handleActionClick('call', e)}
-              title="Ligar"
-            >
-              <Phone className="h-3.5 w-3.5" />
-            </Button>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="h-7 w-7 p-0" 
-              onClick={(e) => handleActionClick('email', e)}
-              title="Enviar e-mail"
-            >
-              <Mail className="h-3.5 w-3.5" />
-            </Button>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="h-7 w-7 p-0" 
-              onClick={(e) => handleActionClick('meeting', e)}
-              title="Agendar reunião"
-            >
-              <Calendar className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </div>
-        
-        {/* Conditional buttons for Won/Lost stages */}
-        {(lead.status === 'negotiation') && (
-          <div className="flex justify-end mt-2 gap-2">
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="h-7 border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700" 
-              onClick={(e) => handleActionClick('accept', e)}
-            >
-              <Check className="h-3.5 w-3.5 mr-1" />
-              <span className="text-xs">Ganhou</span>
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="h-7 border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700" 
-              onClick={(e) => handleActionClick('reject', e)}
-            >
-              <X className="h-3.5 w-3.5 mr-1" />
-              <span className="text-xs">Perdeu</span>
-            </Button>
-          </div>
-        )}
-        
-        {lead.aiRecommendation && (
-          <div className="mt-2">
-            <Badge variant="secondary" className="text-xs w-full justify-start">
-              <span className="text-leadhunter-teal mr-1">IA:</span> {lead.aiRecommendation}
-            </Badge>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          
+          {/* Conditional buttons for Won/Lost stages */}
+          {(lead.status === 'negotiation') && (
+            <div className="flex justify-end mt-2 gap-2">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="h-7 border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700" 
+                onClick={(e) => handleActionClick('accept', e)}
+              >
+                <Check className="h-3.5 w-3.5 mr-1" />
+                <span className="text-xs">Ganhou</span>
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="h-7 border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700" 
+                onClick={(e) => handleActionClick('reject', e)}
+              >
+                <X className="h-3.5 w-3.5 mr-1" />
+                <span className="text-xs">Perdeu</span>
+              </Button>
+            </div>
+          )}
+          
+          {lead.aiRecommendation && (
+            <div className="mt-2">
+              <Badge variant="secondary" className="text-xs w-full justify-start">
+                <span className="text-leadhunter-teal mr-1">IA:</span> {lead.aiRecommendation}
+              </Badge>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </LeadTooltip>
   );
 };
 

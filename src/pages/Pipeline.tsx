@@ -1,7 +1,7 @@
-
 import { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import PipelineBoard from "@/components/pipeline/PipelineBoard";
+import PipelineFilters from "@/components/pipeline/PipelineFilters";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,9 +19,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Plus, FileText } from "lucide-react";
+import { Plus, FileText, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-// Mock Data
+// Mock Data expandido com informações de campanha
 const mockLeads = [
   {
     id: "1",
@@ -32,6 +33,9 @@ const mockLeads = [
     status: "contacted" as const,
     opportunity: "hot" as const,
     aiRecommendation: "Seguir com reunião",
+    campaign: "IA Prospecção Tech",
+    assignedTo: "Maria Santos",
+    campaignType: "ai" as const
   },
   {
     id: "2",
@@ -41,6 +45,9 @@ const mockLeads = [
     lastActionDate: "Ontem, 16:45",
     status: "qualifying" as const,
     opportunity: "warm" as const,
+    campaign: "Manual Enterprise",
+    assignedTo: "João Silva",
+    campaignType: "manual" as const
   },
   {
     id: "3",
@@ -95,26 +102,66 @@ const mockLeads = [
   },
 ];
 
+const mockUsers = [
+  { id: "1", name: "Maria Santos" },
+  { id: "2", name: "João Silva" },
+  { id: "3", name: "Pedro Costa" },
+  { id: "4", name: "Ana Oliveira" }
+];
+
 const Pipeline = () => {
   const [selectedLead, setSelectedLead] = useState<(typeof mockLeads)[0] | null>(null);
   const [isAddLeadDialogOpen, setIsAddLeadDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState("todos");
+  const [selectedCampaignType, setSelectedCampaignType] = useState("todos");
+  const navigate = useNavigate();
+
+  // Filtrar leads baseado nos filtros selecionados
+  const filteredLeads = mockLeads.filter(lead => {
+    const userMatch = selectedUser === "todos" || 
+                     (selectedUser === "meus" && lead.assignedTo === "Usuário Atual") ||
+                     lead.assignedTo === mockUsers.find(u => u.id === selectedUser)?.name;
+    
+    const campaignMatch = selectedCampaignType === "todos" ||
+                         (selectedCampaignType === "ia" && lead.campaignType === "ai") ||
+                         (selectedCampaignType === "manual" && lead.campaignType === "manual");
+    
+    return userMatch && campaignMatch;
+  });
+
+  // Calcular estatísticas dinâmicas baseadas nos filtros
+  const totalLeads = filteredLeads.length;
+  const negotiationLeads = filteredLeads.filter(lead => lead.status === "negotiation").length;
+  const conversionRate = totalLeads > 0 ? ((filteredLeads.filter(lead => lead.status === "won").length / totalLeads) * 100).toFixed(1) : "0";
+  const projectedValue = "R$ " + (filteredLeads.length * 10250).toLocaleString();
 
   const handleLeadClick = (lead: (typeof mockLeads)[0]) => {
     setSelectedLead(lead);
-    // In a real application, you would open a lead details view
     console.log("Lead clicked:", lead);
+  };
+
+  const handleViewPerformance = (userName?: string) => {
+    if (userName) {
+      navigate(`/performance?user=${encodeURIComponent(userName)}`);
+    } else {
+      navigate('/performance');
+    }
   };
 
   return (
     <AppLayout>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Pipeline de Vendas</h1>
           <p className="text-muted-foreground">
-            Gerenciamento de oportunidades e workflow de vendas
+            Gestão e controle da operação de vendas
           </p>
         </div>
         <div className="flex gap-3">
+          <Button variant="outline" onClick={() => handleViewPerformance()}>
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Ver Performance
+          </Button>
           <Button variant="outline">
             <FileText className="h-4 w-4 mr-2" />
             Relatórios
@@ -126,31 +173,45 @@ const Pipeline = () => {
         </div>
       </div>
 
-      {/* Pipeline KPIs */}
+      {/* Filtros Gerenciais */}
+      <div className="mb-6">
+        <PipelineFilters
+          selectedUser={selectedUser}
+          selectedCampaignType={selectedCampaignType}
+          onUserChange={setSelectedUser}
+          onCampaignTypeChange={setSelectedCampaignType}
+          users={mockUsers}
+        />
+      </div>
+
+      {/* Pipeline KPIs - Dinâmicos baseados nos filtros */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-card p-4 rounded-lg border">
           <div className="text-muted-foreground text-sm">Total de Leads</div>
-          <div className="text-2xl font-bold mt-1">{mockLeads.length}</div>
+          <div className="text-2xl font-bold mt-1">{totalLeads}</div>
+          {selectedUser !== "todos" && (
+            <div className="text-xs text-muted-foreground mt-1">
+              Filtrado por: {selectedUser === "meus" ? "Meus leads" : mockUsers.find(u => u.id === selectedUser)?.name}
+            </div>
+          )}
         </div>
         <div className="bg-card p-4 rounded-lg border">
           <div className="text-muted-foreground text-sm">Em Negociação</div>
-          <div className="text-2xl font-bold mt-1">
-            {mockLeads.filter((lead) => lead.status === "negotiation").length}
-          </div>
+          <div className="text-2xl font-bold mt-1">{negotiationLeads}</div>
         </div>
         <div className="bg-card p-4 rounded-lg border">
           <div className="text-muted-foreground text-sm">Taxa de Conversão</div>
-          <div className="text-2xl font-bold mt-1">23.5%</div>
+          <div className="text-2xl font-bold mt-1">{conversionRate}%</div>
         </div>
         <div className="bg-card p-4 rounded-lg border">
           <div className="text-muted-foreground text-sm">Valor Previsto</div>
-          <div className="text-2xl font-bold mt-1">R$ 458.750</div>
+          <div className="text-2xl font-bold mt-1">{projectedValue}</div>
         </div>
       </div>
 
       {/* Pipeline Board */}
       <div className="bg-card p-4 rounded-lg border">
-        <PipelineBoard leads={mockLeads} onLeadClick={handleLeadClick} />
+        <PipelineBoard leads={filteredLeads} onLeadClick={handleLeadClick} />
       </div>
 
       {/* Add Lead Dialog */}
