@@ -21,6 +21,7 @@ import {
   Cell
 } from 'recharts';
 import { Calendar as CalendarIcon, Users as UsersIcon, TrendingUp, AlertTriangle, CheckCircle, Lightbulb, ArrowRight } from 'lucide-react';
+import ScenarioSimulatorModal from './ScenarioSimulatorModal';
 
 // Define the strict status type to match what StatusIndicator expects
 type StatusType = "onTrack" | "atRisk" | "critical";
@@ -565,13 +566,11 @@ const PerformanceAIDashboard = () => {
                   </div>
                   
                   <div className="border p-3 rounded-md bg-blue-50">
-                    <h4 className="text-sm font-medium mb-2">Personalize seu cenário</h4>
-                    <div className="text-sm">
+                    <h4 className="text-sm font-medium mb-2">Simule seu cenário ideal</h4>
+                    <div className="text-sm mb-3">
                       <p>Configure parâmetros personalizados para simular diferentes situações de mercado.</p>
                     </div>
-                    <Button className="w-full mt-2 text-xs">
-                      Personalizar
-                    </Button>
+                    <ScenarioSimulatorModal />
                   </div>
                 </div>
               </div>
