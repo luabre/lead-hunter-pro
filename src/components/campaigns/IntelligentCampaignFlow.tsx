@@ -26,28 +26,35 @@ interface CampaignTouch {
 }
 
 interface IntelligentCampaignFlowProps {
-  onCancel: () => void;
-  onCreationComplete: (campaignName: string) => void;
+  onCancel?: () => void;
+  onCreationComplete?: (campaignName: string) => void;
+  preset?: any;
+  fromInsight?: boolean;
 }
 
-const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCampaignFlowProps) => {
+const IntelligentCampaignFlow = ({ 
+  onCancel = () => {}, 
+  onCreationComplete = () => {}, 
+  preset,
+  fromInsight = false
+}: IntelligentCampaignFlowProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAIGenerating, setIsAIGenerating] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const { toast } = useToast();
   
   const [campaignData, setCampaignData] = useState({
-    name: "",
-    description: "",
-    segment: "",
-    objective: "",
-    preferredChannels: [] as string[],
-    touches: [] as CampaignTouch[]
+    name: preset?.nome || "",
+    description: preset?.description || "",
+    segment: preset?.segmento || "",
+    objective: preset?.objetivo || "",
+    preferredChannels: preset?.canaisSugeridos || [] as string[],
+    touches: preset?.toquesInteligentes || [] as CampaignTouch[]
   });
 
   const [aiFormData, setAiFormData] = useState({
     objective: "",
-    targetAudience: "",
+    targetAudience: preset?.publicoAlvo?.toString() || "",
     mainPain: "",
     solution: "",
     useWhatsApp: false,
@@ -88,7 +95,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
     
     // Simulate AI generation
     setTimeout(() => {
-      const generatedTouches: CampaignTouch[] = [
+      const generatedTouches: CampaignTouch[] = preset?.toquesInteligentes || [
         {
           id: "1",
           order: 1,
@@ -143,8 +150,8 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
 
       setCampaignData({
         ...campaignData,
-        name: `Campanha ${aiFormData.objective} - ${aiFormData.targetAudience}`,
-        description: `Campanha inteligente para ${aiFormData.objective.toLowerCase()} focada em ${aiFormData.targetAudience}`,
+        name: campaignData.name || `Campanha ${aiFormData.objective} - ${aiFormData.targetAudience}`,
+        description: campaignData.description || `Campanha inteligente para ${aiFormData.objective.toLowerCase()} focada em ${aiFormData.targetAudience}`,
         touches: generatedTouches
       });
 
@@ -229,6 +236,11 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
     autoSave();
     onCreationComplete(campaignData.name);
   };
+
+  // If preset is provided, start at step 3 (touches configuration)
+  if (fromInsight && preset && currentStep === 1) {
+    setCurrentStep(3);
+  }
 
   const renderBasicInfoStep = () => (
     <div className="space-y-6">

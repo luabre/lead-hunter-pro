@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import CampaignDashboard from "@/components/campaigns/CampaignDashboard";
 import CampaignsList from "@/components/campaigns/CampaignsList";
@@ -9,9 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Brain, Rocket, TrendingUp } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
 
 const Campaigns = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [isFromIntel, setIsFromIntel] = useState(false);
   const [campaignPreset, setCampaignPreset] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("overview");
@@ -24,6 +28,22 @@ const Campaigns = () => {
       setActiveTab("create");
     }
   }, [location.state]);
+
+  const handleCampaignCancel = () => {
+    setActiveTab("overview");
+    setIsFromIntel(false);
+    setCampaignPreset(null);
+  };
+
+  const handleCampaignCreationComplete = (campaignName: string) => {
+    toast({
+      title: "Campanha criada com sucesso!",
+      description: `A campanha "${campaignName}" foi criada e está pronta para ser iniciada.`,
+    });
+    setActiveTab("campaigns");
+    setIsFromIntel(false);
+    setCampaignPreset(null);
+  };
 
   return (
     <AppLayout>
@@ -104,11 +124,16 @@ const Campaigns = () => {
                 <IntelligentCampaignFlow 
                   preset={campaignPreset}
                   fromInsight={true}
+                  onCancel={handleCampaignCancel}
+                  onCreationComplete={handleCampaignCreationComplete}
                 />
               </CardContent>
             </Card>
           ) : (
-            <IntelligentCampaignFlow />
+            <IntelligentCampaignFlow 
+              onCancel={handleCampaignCancel}
+              onCreationComplete={handleCampaignCreationComplete}
+            />
           )}
         </TabsContent>
       </Tabs>

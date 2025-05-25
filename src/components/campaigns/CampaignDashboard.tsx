@@ -28,12 +28,25 @@ interface CampaignMetrics {
 }
 
 interface CampaignDashboardProps {
-  campaignId: string;
-  campaignName: string;
-  metrics: CampaignMetrics;
+  campaignId?: string;
+  campaignName?: string;
+  metrics?: CampaignMetrics;
 }
 
-const CampaignDashboard = ({ campaignId, campaignName, metrics }: CampaignDashboardProps) => {
+const CampaignDashboard = ({ 
+  campaignId = "demo-campaign", 
+  campaignName = "Visão Geral das Campanhas", 
+  metrics = {
+    leadsReached: 150,
+    openRate: 24,
+    clickRate: 8,
+    responseRate: 12,
+    meetingsScheduled: 18,
+    sales: 5,
+    optOuts: 3,
+    reengaged: 8
+  }
+}: CampaignDashboardProps) => {
   const aiSuggestions = [
     {
       type: "warning",

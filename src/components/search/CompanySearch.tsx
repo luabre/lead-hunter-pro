@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -21,7 +21,15 @@ import { Search, Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CompanySearchProps {
-  onSearch: (filters: CompanyFilters) => void;
+  onSearch?: (filters: CompanyFilters) => void;
+  initialFilters?: {
+    segment?: string;
+    locations?: string[];
+    aiDetected?: boolean;
+    recentGrowth?: boolean;
+    fromInsight?: boolean;
+    insightId?: string;
+  };
 }
 
 export interface CompanyFilters {
@@ -40,13 +48,24 @@ const brazilianStates = [
   "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
 ];
 
-const CompanySearch = ({ onSearch }: CompanySearchProps) => {
+const CompanySearch = ({ onSearch = () => {}, initialFilters }: CompanySearchProps) => {
   const [filters, setFilters] = useState<CompanyFilters>({
     searchTerm: "",
     sortBy: "name", // Default sort by name
   });
   
   const [isAdvancedSearch, setIsAdvancedSearch] = useState(false);
+
+  // Apply initial filters when component mounts
+  useEffect(() => {
+    if (initialFilters) {
+      setFilters(prev => ({
+        ...prev,
+        searchTerm: initialFilters.segment || "",
+        state: initialFilters.locations?.[0] || "",
+      }));
+    }
+  }, [initialFilters]);
   
   const handleInputChange = (field: keyof CompanyFilters, value: string) => {
     setFilters((prev) => ({

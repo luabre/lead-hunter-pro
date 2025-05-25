@@ -28,12 +28,16 @@ import {
 import { Campaign } from "@/types/campaign";
 
 interface CampaignsListProps {
-  campaigns: Campaign[];
-  isLoading: boolean;
+  campaigns?: Campaign[];
+  isLoading?: boolean;
   searchTerm?: string;
 }
 
-const CampaignsList = ({ campaigns, isLoading, searchTerm = "" }: CampaignsListProps) => {
+const CampaignsList = ({ 
+  campaigns = [], 
+  isLoading = false, 
+  searchTerm = "" 
+}: CampaignsListProps) => {
   const [expandedCampaign, setExpandedCampaign] = useState<string | null>(null);
   
   const filteredCampaigns = campaigns.filter(campaign => 
