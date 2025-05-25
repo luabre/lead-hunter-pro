@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   BarChart, 
   Bar, 
@@ -20,17 +22,40 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import { Calendar as CalendarIcon, Users as UsersIcon, TrendingUp, AlertTriangle, CheckCircle, Lightbulb, ArrowRight } from 'lucide-react';
+import { Calendar as CalendarIcon, Users as UsersIcon, TrendingUp, AlertTriangle, CheckCircle, Lightbulb, ArrowRight, RotateCcw, Beaker } from 'lucide-react';
 import ScenarioSimulatorModal from './ScenarioSimulatorModal';
 
 // Define the strict status type to match what StatusIndicator expects
 type StatusType = "onTrack" | "atRisk" | "critical";
 
+// Simulation scenario type
+interface AppliedScenario {
+  id: string;
+  name: string;
+  revenueGoal: number;
+  averageTicket: number;
+  conversionRate: number;
+  cycleTime: number;
+  closingsNeeded: number;
+  proposalsNeeded: number;
+  meetingsNeeded: number;
+  leadsNeeded: number;
+  effortReduction: number;
+}
+
 // Mock data for charts
-const statusData = {
+const originalData = {
+  revenueGoal: 100000,
+  averageTicket: 10000,
+  conversionRate: 4.8,
+  cycleTime: 21,
+  closingsNeeded: 10,
+  proposalsNeeded: 25,
+  meetingsNeeded: 42,
+  leadsNeeded: 208,
   value: 71,
   target: 100,
-  status: "onTrack" as StatusType, // Explicitly type this as StatusType
+  status: "onTrack" as StatusType,
 };
 
 const monthlyProgress = [
@@ -95,26 +120,6 @@ const insightData = [
     type: "insight"
   },
 ];
-
-const simulatorData = {
-  currentMetrics: {
-    ticketAvg: 10000,
-    conversionRate: {
-      leadToMeeting: 20,
-      meetingToProposal: 60,
-      proposalToClose: 40,
-      leadToClose: 4.8
-    },
-    cycleTime: 21,
-    target: 1000000
-  },
-  projections: {
-    closings: 100,
-    proposals: 250,
-    meetings: 416,
-    leadsNeeded: 1000
-  }
-};
 
 // Status indicator component
 const StatusIndicator = ({ status }: { status: StatusType }) => {
@@ -228,9 +233,114 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const PerformanceAIDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("overview");
+  const [appliedScenario, setAppliedScenario] = useState<AppliedScenario | null>(null);
+
+  // Calculate current data based on applied scenario or original data
+  const currentData = appliedScenario || originalData;
+
+  // Calculate performance data based on current scenario
+  const performanceData = [
+    { name: 'Leads Gerados', value: 428, target: currentData.leadsNeeded },
+    { name: 'Reuniões', value: 74, target: currentData.meetingsNeeded },
+    { name: 'Propostas', value: 32, target: currentData.proposalsNeeded },
+    { name: 'Fechamentos', value: 12, target: currentData.closingsNeeded },
+  ];
+
+  const radialData = [
+    {
+      name: 'Meta Mensal',
+      value: currentData.value,
+      fill: '#10b981',
+    }
+  ];
+
+  // Function to apply a scenario
+  const applyScenario = (scenarioType: 'ticketIncrease' | 'conversionIncrease') => {
+    let newScenario: AppliedScenario;
+
+    if (scenarioType === 'ticketIncrease') {
+      const newTicket = originalData.averageTicket * 1.2; // +20%
+      const newClosingsNeeded = Math.ceil(originalData.revenueGoal / newTicket);
+      const newProposalsNeeded = Math.ceil(newClosingsNeeded / 0.4);
+      const newMeetingsNeeded = Math.ceil(newProposalsNeeded / 0.6);
+      const newLeadsNeeded = Math.ceil(newClosingsNeeded / (originalData.conversionRate / 100));
+      const effortReduction = Math.round(((originalData.leadsNeeded - newLeadsNeeded) / originalData.leadsNeeded) * 100);
+
+      newScenario = {
+        id: 'ticket-20',
+        name: 'Ticket Médio +20%',
+        revenueGoal: originalData.revenueGoal,
+        averageTicket: newTicket,
+        conversionRate: originalData.conversionRate,
+        cycleTime: originalData.cycleTime,
+        closingsNeeded: newClosingsNeeded,
+        proposalsNeeded: newProposalsNeeded,
+        meetingsNeeded: newMeetingsNeeded,
+        leadsNeeded: newLeadsNeeded,
+        effortReduction,
+        value: originalData.value,
+        target: originalData.target,
+        status: originalData.status
+      };
+    } else {
+      const newConversionRate = originalData.conversionRate * 1.3; // +30%
+      const newLeadsNeeded = Math.ceil(originalData.closingsNeeded / (newConversionRate / 100));
+      const newProposalsNeeded = Math.ceil(originalData.closingsNeeded / 0.4);
+      const newMeetingsNeeded = Math.ceil(newProposalsNeeded / 0.6);
+      const effortReduction = Math.round(((originalData.leadsNeeded - newLeadsNeeded) / originalData.leadsNeeded) * 100);
+
+      newScenario = {
+        id: 'conversion-30',
+        name: 'Conversão +30%',
+        revenueGoal: originalData.revenueGoal,
+        averageTicket: originalData.averageTicket,
+        conversionRate: newConversionRate,
+        cycleTime: originalData.cycleTime,
+        closingsNeeded: originalData.closingsNeeded,
+        proposalsNeeded: newProposalsNeeded,
+        meetingsNeeded: newMeetingsNeeded,
+        leadsNeeded: newLeadsNeeded,
+        effortReduction,
+        value: originalData.value,
+        target: originalData.target,
+        status: originalData.status
+      };
+    }
+
+    setAppliedScenario(newScenario);
+  };
+
+  // Function to reset to original scenario
+  const resetToOriginal = () => {
+    setAppliedScenario(null);
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
   
   return (
     <div className="space-y-6">
+      {/* Simulation Alert */}
+      {appliedScenario && (
+        <Alert className="border-blue-200 bg-blue-50">
+          <Beaker className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="flex items-center justify-between">
+            <span className="text-blue-800">
+              🧪 <strong>Simulação ativa:</strong> {appliedScenario.name} - 
+              {appliedScenario.effortReduction > 0 && ` ${appliedScenario.effortReduction}% menos prospecção`}
+            </span>
+            <Button variant="outline" size="sm" onClick={resetToOriginal} className="text-blue-700 border-blue-300">
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Voltar ao original
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Main Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
         <TabsList className="grid grid-cols-4 mb-4">
@@ -246,8 +356,8 @@ const PerformanceAIDashboard = () => {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">
-                <CardTitle className="text-xl">Meta Mensal: R$100.000</CardTitle>
-                <StatusIndicator status={statusData.status} />
+                <CardTitle className="text-xl">Meta Mensal: {formatCurrency(currentData.revenueGoal)}</CardTitle>
+                <StatusIndicator status={currentData.status} />
               </div>
             </CardHeader>
             <CardContent>
@@ -255,13 +365,33 @@ const PerformanceAIDashboard = () => {
                 {/* Progress bar */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Progresso atual: {statusData.value}%</span>
+                    <span>Progresso atual: {currentData.value}%</span>
                     <span className="text-muted-foreground">Meta: 100%</span>
                   </div>
-                  <Progress value={statusData.value} className="h-2" />
+                  <Progress value={currentData.value} className="h-2" />
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>R$ {(statusData.value / 100 * 100000).toLocaleString()}</span>
-                    <span>R$ 100.000</span>
+                    <span>{formatCurrency((currentData.value / 100) * currentData.revenueGoal)}</span>
+                    <span>{formatCurrency(currentData.revenueGoal)}</span>
+                  </div>
+                </div>
+
+                {/* Key metrics summary */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                  <div className="text-center p-3 bg-gray-50 rounded-md">
+                    <div className="text-2xl font-bold text-blue-600">{currentData.closingsNeeded}</div>
+                    <div className="text-xs text-gray-600">Fechamentos necessários</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-md">
+                    <div className="text-2xl font-bold text-green-600">{currentData.leadsNeeded}</div>
+                    <div className="text-xs text-gray-600">Leads necessários</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-md">
+                    <div className="text-2xl font-bold text-purple-600">{formatCurrency(currentData.averageTicket)}</div>
+                    <div className="text-xs text-gray-600">Ticket médio</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-md">
+                    <div className="text-2xl font-bold text-orange-600">{currentData.conversionRate.toFixed(1)}%</div>
+                    <div className="text-xs text-gray-600">Taxa de conversão</div>
                   </div>
                 </div>
 
@@ -292,7 +422,7 @@ const PerformanceAIDashboard = () => {
                         fontSize={24}
                         fontWeight={600}
                       >
-                        {statusData.value}%
+                        {currentData.value}%
                       </text>
                     </RadialBarChart>
                   </ResponsiveContainer>
@@ -384,7 +514,7 @@ const PerformanceAIDashboard = () => {
             <CardContent className="space-y-6">
               <div>
                 <p className="text-sm text-gray-600 mb-4">
-                  Para alcançar sua meta de R$100K faltando 18 dias, a IA sugere as seguintes ações:
+                  Para alcançar sua meta de {formatCurrency(currentData.revenueGoal)} faltando 18 dias, a IA sugere as seguintes ações:
                 </p>
 
                 <div className="space-y-3">
@@ -492,7 +622,7 @@ const PerformanceAIDashboard = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-gray-50 p-4 rounded-md">
-                <h3 className="font-medium mb-3">Meta de Faturamento: R$ {simulatorData.currentMetrics.target.toLocaleString()}</h3>
+                <h3 className="font-medium mb-3">Meta de Faturamento: {formatCurrency(currentData.revenueGoal)}</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -500,15 +630,15 @@ const PerformanceAIDashboard = () => {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Ticket médio:</span>
-                        <span className="font-medium">R$ {simulatorData.currentMetrics.ticketAvg.toLocaleString()}</span>
+                        <span className="font-medium">{formatCurrency(currentData.averageTicket)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Conversão Lead → Fechamento:</span>
-                        <span className="font-medium">{simulatorData.currentMetrics.conversionRate.leadToClose}%</span>
+                        <span className="font-medium">{currentData.conversionRate.toFixed(1)}%</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Tempo médio de conversão:</span>
-                        <span className="font-medium">{simulatorData.currentMetrics.cycleTime} dias</span>
+                        <span className="font-medium">{currentData.cycleTime} dias</span>
                       </div>
                     </div>
                   </div>
@@ -518,19 +648,19 @@ const PerformanceAIDashboard = () => {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Fechamentos:</span>
-                        <span className="font-medium">{simulatorData.projections.closings}</span>
+                        <span className="font-medium">{currentData.closingsNeeded}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Propostas:</span>
-                        <span className="font-medium">{simulatorData.projections.proposals}</span>
+                        <span className="font-medium">{currentData.proposalsNeeded}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Reuniões:</span>
-                        <span className="font-medium">{simulatorData.projections.meetings}</span>
+                        <span className="font-medium">{currentData.meetingsNeeded}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Leads ativos:</span>
-                        <span className="font-medium">{simulatorData.projections.leadsNeeded}</span>
+                        <span className="font-medium">{currentData.leadsNeeded}</span>
                       </div>
                     </div>
                   </div>
@@ -544,24 +674,34 @@ const PerformanceAIDashboard = () => {
                   <div className="border p-3 rounded-md">
                     <h4 className="text-sm font-medium mb-2">E se o ticket médio subir 20%?</h4>
                     <div className="text-sm space-y-1">
-                      <p>Ticket: <span className="font-medium">R$ 12.000</span></p>
-                      <p>Fechamentos necessários: <span className="font-medium">84</span></p>
+                      <p>Ticket: <span className="font-medium">{formatCurrency(originalData.averageTicket * 1.2)}</span></p>
+                      <p>Fechamentos necessários: <span className="font-medium">{Math.ceil(originalData.revenueGoal / (originalData.averageTicket * 1.2))}</span></p>
                       <p><span className="text-green-600 font-medium">-16% de esforço</span></p>
                     </div>
-                    <Button variant="outline" className="w-full mt-2 text-xs">
-                      Aplicar cenário
+                    <Button 
+                      variant="outline" 
+                      className="w-full mt-2 text-xs"
+                      onClick={() => applyScenario('ticketIncrease')}
+                      disabled={appliedScenario?.id === 'ticket-20'}
+                    >
+                      📊 Ver impacto na meta
                     </Button>
                   </div>
                   
                   <div className="border p-3 rounded-md">
                     <h4 className="text-sm font-medium mb-2">E se a conversão aumentar 30%?</h4>
                     <div className="text-sm space-y-1">
-                      <p>Taxa: <span className="font-medium">6.24%</span></p>
-                      <p>Leads necessários: <span className="font-medium">700</span></p>
+                      <p>Taxa: <span className="font-medium">{(originalData.conversionRate * 1.3).toFixed(1)}%</span></p>
+                      <p>Leads necessários: <span className="font-medium">{Math.ceil(originalData.closingsNeeded / ((originalData.conversionRate * 1.3) / 100))}</span></p>
                       <p><span className="text-green-600 font-medium">-30% de prospecção</span></p>
                     </div>
-                    <Button variant="outline" className="w-full mt-2 text-xs">
-                      Aplicar cenário
+                    <Button 
+                      variant="outline" 
+                      className="w-full mt-2 text-xs"
+                      onClick={() => applyScenario('conversionIncrease')}
+                      disabled={appliedScenario?.id === 'conversion-30'}
+                    >
+                      🧪 Testar esse cenário
                     </Button>
                   </div>
                   
