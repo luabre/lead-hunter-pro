@@ -1,192 +1,259 @@
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, CheckSquare } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Search, 
+  Archive, 
+  Database, 
+  Radar, 
+  Building2, 
+  MapPin, 
+  Users,
+  User,
+  Phone,
+  Mail
+} from "lucide-react";
 
-// Mock data for demonstration
-const mockLeads = [
-  { id: "1", name: "TechSol Ltda", segment: "Tecnologia", temperature: "hot", city: "São Paulo", state: "SP" },
-  { id: "2", name: "Financeira Capital", segment: "Financeiro", temperature: "warm", city: "Rio de Janeiro", state: "RJ" },
-  { id: "3", name: "Manufatura Express", segment: "Manufatura", temperature: "cold", city: "Belo Horizonte", state: "MG" },
-  { id: "4", name: "Saúde Total", segment: "Saúde", temperature: "hot", city: "Brasília", state: "DF" },
-  { id: "5", name: "Varejista Moderna", segment: "Varejo", temperature: "warm", city: "Curitiba", state: "PR" },
-  { id: "6", name: "Construções Rápidas", segment: "Construção", temperature: "cold", city: "Salvador", state: "BA" },
-  { id: "7", name: "Agro Sustentável", segment: "Agronegócio", temperature: "hot", city: "Goiânia", state: "GO" },
-  { id: "8", name: "Educação Avançada", segment: "Educação", temperature: "warm", city: "Recife", state: "PE" },
-];
-
-interface Lead {
-  id: string;
-  name: string;
-  segment: string;
-  temperature: string;
-  city: string;
-  state: string;
-}
+type SourceType = "search" | "import" | "radar" | "existing" | "import-cpf" | "existing-cpf";
+type CampaignType = "cnpj" | "cpf";
 
 interface LeadSourceSelectorProps {
-  sourceType: 'search' | 'import' | 'radar' | 'existing';
-  onLeadsSelected: (leads: string[]) => void;
+  sourceType: SourceType;
+  campaignType?: CampaignType;
+  onLeadsSelected: (leads: any[]) => void;
 }
 
-export const LeadSourceSelector = ({ sourceType, onLeadsSelected }: LeadSourceSelectorProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
+const LeadSourceSelector = ({ sourceType, campaignType = "cnpj", onLeadsSelected }: LeadSourceSelectorProps) => {
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Simulate loading data
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Update parent component with selected leads
-  useEffect(() => {
-    onLeadsSelected(selectedLeads);
-  }, [selectedLeads, onLeadsSelected]);
-
-  const filteredLeads = mockLeads.filter(lead => 
-    lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.segment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    `${lead.city}, ${lead.state}`.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleToggleSelect = (leadId: string) => {
-    setSelectedLeads(prevSelected => {
-      const isSelected = prevSelected.includes(leadId);
-      
-      if (isSelected) {
-        return prevSelected.filter(id => id !== leadId);
-      } else {
-        return [...prevSelected, leadId];
-      }
-    });
-  };
-
-  const handleSelectAll = () => {
-    if (selectedLeads.length === filteredLeads.length) {
-      setSelectedLeads([]);
+  const handleLeadSelection = (leadId: string, isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedLeads([...selectedLeads, leadId]);
     } else {
-      setSelectedLeads(filteredLeads.map(lead => lead.id));
+      setSelectedLeads(selectedLeads.filter(id => id !== leadId));
     }
   };
 
-  const getSourceTitle = () => {
-    switch (sourceType) {
-      case 'search': return 'Busca Inteligente';
-      case 'import': return 'Base Importada';
-      case 'radar': return 'Leads Recentes do Radar IA';
-      case 'existing': return 'Base Existente';
-      default: return 'Selecione Leads';
-    }
+  const handleSelectAll = (leads: any[]) => {
+    const allIds = leads.map(lead => lead.id);
+    setSelectedLeads(allIds);
+    onLeadsSelected(leads);
   };
 
-  const renderTemperatureBadge = (temperature: string) => {
-    switch (temperature) {
-      case 'hot':
-        return <Badge className="bg-red-500">Quente</Badge>;
-      case 'warm':
-        return <Badge className="bg-orange-500">Morno</Badge>;
-      case 'cold':
-        return <Badge className="bg-blue-500">Frio</Badge>;
-      default:
-        return null;
+  // Dados mock para pessoas físicas
+  const mockCPFLeads = [
+    {
+      id: "pf1",
+      name: "Maria Silva Santos",
+      email: "maria.santos@gmail.com",
+      phone: "(11) 98765-4321",
+      city: "São Paulo",
+      interest: "Investimentos",
+      source: "Landing Page"
+    },
+    {
+      id: "pf2", 
+      name: "João Carlos Lima",
+      email: "joao.lima@hotmail.com",
+      phone: "(21) 97654-3210",
+      city: "Rio de Janeiro",
+      interest: "Educação Financeira",
+      source: "Facebook Ads"
+    },
+    {
+      id: "pf3",
+      name: "Ana Paula Costa",
+      email: "ana.costa@yahoo.com",
+      phone: "(31) 96543-2109",
+      city: "Belo Horizonte", 
+      interest: "Renda Extra",
+      source: "Indicação"
     }
+  ];
+
+  // Dados mock para empresas (mantendo os existentes)
+  const mockCNPJLeads = [
+    {
+      id: "1",
+      company: "TechStart Soluções",
+      cnpj: "12.345.678/0001-90",
+      segment: "Tecnologia",
+      employees: "50-100",
+      city: "São Paulo",
+      contact: "Carlos Silva",
+      email: "carlos@techstart.com.br"
+    },
+    {
+      id: "2",
+      company: "InnovateBR",
+      cnpj: "98.765.432/0001-10",
+      segment: "Consultoria",
+      employees: "10-50",
+      city: "Rio de Janeiro", 
+      contact: "Ana Santos",
+      email: "ana@innovatebr.com"
+    }
+  ];
+
+  const getSourceConfig = () => {
+    const configs = {
+      "search": {
+        title: "🔍 Busca Inteligente",
+        description: "Encontre empresas usando IA com critérios avançados",
+        icon: Search,
+        data: mockCNPJLeads
+      },
+      "import": {
+        title: "📂 Base Importada",
+        description: "Leads empresariais importados de planilhas",
+        icon: Archive,
+        data: mockCNPJLeads
+      },
+      "radar": {
+        title: "🎯 Radar IA",
+        description: "Empresas identificadas automaticamente pela IA",
+        icon: Radar,
+        data: mockCNPJLeads
+      },
+      "existing": {
+        title: "🗄️ Base Existente",
+        description: "Empresas já cadastradas no sistema",
+        icon: Database,
+        data: mockCNPJLeads
+      },
+      "import-cpf": {
+        title: "📂 Importar Base PF",
+        description: "Importe sua base de contatos de pessoas físicas",
+        icon: Archive,
+        data: mockCPFLeads
+      },
+      "existing-cpf": {
+        title: "🗄️ Base Existente PF", 
+        description: "Contatos PF já cadastrados no sistema",
+        icon: Database,
+        data: mockCPFLeads
+      }
+    };
+
+    return configs[sourceType];
   };
 
-  return (
-    <div>
-      <div className="mb-4">
-        <h3 className="text-lg font-medium mb-2">{getSourceTitle()}</h3>
-        <p className="text-muted-foreground text-sm mb-4">
-          Selecione os leads que deseja incluir na campanha
-        </p>
-        
-        <div className="flex space-x-4 mb-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Buscar leads por nome, segmento ou localização..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+  const config = getSourceConfig();
+
+  const renderCNPJLead = (lead: any) => (
+    <Card key={lead.id} className="p-4">
+      <div className="flex items-start space-x-3">
+        <Checkbox
+          checked={selectedLeads.includes(lead.id)}
+          onCheckedChange={(checked) => handleLeadSelection(lead.id, checked as boolean)}
+        />
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              {lead.company}
+            </h4>
+            <Badge variant="outline">{lead.segment}</Badge>
           </div>
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
-          </Button>
-        </div>
-        
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-xs"
-              onClick={handleSelectAll}
-            >
-              <CheckSquare className="h-3 w-3 mr-1" />
-              {selectedLeads.length === filteredLeads.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
-            </Button>
-          </div>
-          <div className="text-sm">
-            <span className="font-medium">{selectedLeads.length}</span> de <span>{filteredLeads.length}</span> leads selecionados
+          <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              {lead.employees} funcionários
+            </div>
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {lead.city}
+            </div>
+            <div className="col-span-2">
+              <strong>Contato:</strong> {lead.contact} - {lead.email}
+            </div>
           </div>
         </div>
       </div>
-      
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Skeleton key={index} className="h-32" />
-          ))}
+    </Card>
+  );
+
+  const renderCPFLead = (lead: any) => (
+    <Card key={lead.id} className="p-4">
+      <div className="flex items-start space-x-3">
+        <Checkbox
+          checked={selectedLeads.includes(lead.id)}
+          onCheckedChange={(checked) => handleLeadSelection(lead.id, checked as boolean)}
+        />
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium flex items-center gap-2">
+              <User className="h-4 w-4" />
+              {lead.name}
+            </h4>
+            <Badge variant="outline">{lead.interest}</Badge>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Mail className="h-3 w-3" />
+              {lead.email}
+            </div>
+            <div className="flex items-center gap-1">
+              <Phone className="h-3 w-3" />
+              {lead.phone}
+            </div>
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {lead.city}
+            </div>
+            <div>
+              <strong>Origem:</strong> {lead.source}
+            </div>
+          </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredLeads.map((lead) => (
-            <Card 
-              key={lead.id}
-              className={`cursor-pointer transition-all ${
-                selectedLeads.includes(lead.id) 
-                  ? 'ring-2 ring-primary ring-inset' 
-                  : 'hover:shadow-md'
-              }`}
-              onClick={() => handleToggleSelect(lead.id)}
+      </div>
+    </Card>
+  );
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <config.icon className="h-5 w-5" />
+            {config.title}
+          </CardTitle>
+          <CardDescription>{config.description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-sm text-muted-foreground">
+              {config.data.length} {campaignType === "cpf" ? "contatos" : "leads"} disponíveis
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleSelectAll(config.data)}
             >
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-base">{lead.name}</h3>
-                    <div className="text-muted-foreground text-sm">{lead.segment}</div>
-                    <div className="text-muted-foreground text-xs mt-1">{lead.city}, {lead.state}</div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    {renderTemperatureBadge(lead.temperature)}
-                    <div className={`w-4 h-4 border rounded ${
-                      selectedLeads.includes(lead.id) 
-                        ? 'bg-primary border-primary' 
-                        : 'border-gray-300'
-                    } flex items-center justify-center`}>
-                      {selectedLeads.includes(lead.id) && (
-                        <CheckSquare className="h-3 w-3 text-white" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+              Selecionar Todos
+            </Button>
+          </div>
+          
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {config.data.map((lead) => 
+              campaignType === "cpf" ? renderCPFLead(lead) : renderCNPJLead(lead)
+            )}
+          </div>
+          
+          {selectedLeads.length > 0 && (
+            <div className="mt-4 p-3 bg-primary/10 rounded-md">
+              <p className="text-sm font-medium">
+                ✅ {selectedLeads.length} {campaignType === "cpf" ? "contatos" : "leads"} selecionados
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
+
+export { LeadSourceSelector };

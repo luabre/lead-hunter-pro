@@ -1,204 +1,254 @@
 
-import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Wand2, Save } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-
-// Mock data for templates
-const mockTemplates = [
-  {
-    id: "1",
-    name: "Abordagem Inicial B2B",
-    content: "Olá {{nome}}, tudo bem?\n\nEstou acompanhando o crescimento da {{empresa}} e percebi que vocês têm expandido a atuação no setor de {{segmento}}.\n\nNossa solução tem ajudado empresas similares a aumentarem em 35% a eficiência operacional.\n\nTeria interesse em uma demonstração rápida de 15 minutos na próxima semana?",
-    type: "whatsapp",
-    category: "prospecting"
-  },
-  {
-    id: "2",
-    name: "Follow-up após Demonstração",
-    content: "Olá {{nome}}, como vai?\n\nEspero que esteja bem desde nossa última conversa sobre como podemos ajudar a {{empresa}} a otimizar seus processos.\n\nGostaria de saber se você teve a oportunidade de discutir internamente a solução que apresentamos e se surgiram novas dúvidas.\n\nEstou à disposição para um novo bate-papo.",
-    type: "whatsapp",
-    category: "follow-up"
-  },
-  {
-    id: "3",
-    name: "Nutrição - Novo Conteúdo",
-    content: "Olá {{nome}},\n\nEspero que esteja tudo bem com você e com a equipe da {{empresa}}.\n\nAcabamos de lançar um estudo de caso sobre como uma empresa do setor de {{segmento}} conseguiu aumentar em 40% sua produtividade usando nossa solução.\n\nAcredito que possa trazer insights valiosos para vocês: [link]\n\nQualquer dúvida, estou à disposição.",
-    type: "email",
-    category: "nurture"
-  },
-  {
-    id: "4",
-    name: "Upsell para Cliente Atual",
-    content: "Olá {{nome}},\n\nTenho observado o excelente uso que a {{empresa}} tem feito da nossa ferramenta nos últimos meses.\n\nNotei que vocês poderiam se beneficiar ainda mais com o módulo avançado de {{módulo}} que acabamos de lançar, especialmente desenvolvido para empresas do setor de {{segmento}}.\n\nPodemos conversar sobre como isso poderia trazer ainda mais resultados para vocês?",
-    type: "email",
-    category: "upsell"
-  },
-];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MessageSquare, Edit, Sparkles, Eye } from "lucide-react";
 
 interface CampaignScriptSelectorProps {
   campaignType: string;
   approachType: string;
+  targetType?: "cnpj" | "cpf";
   onScriptSelected: (script: string) => void;
 }
 
-export const CampaignScriptSelector = ({ campaignType, approachType, onScriptSelected }: CampaignScriptSelectorProps) => {
-  const [currentScript, setCurrentScript] = useState<string>("");
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+const CampaignScriptSelector = ({ 
+  campaignType, 
+  approachType, 
+  targetType = "cnpj",
+  onScriptSelected 
+}: CampaignScriptSelectorProps) => {
+  const [selectedScript, setSelectedScript] = useState("");
+  const [customScript, setCustomScript] = useState("");
 
-  // Filter templates based on campaign type and approach type
-  const filteredTemplates = mockTemplates.filter(template => 
-    (template.category === campaignType || template.category === "general") &&
-    (template.type === approachType || template.type === "any")
-  );
-
-  // Simulate loading data
-  useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  }, []);
-
-  // Update parent component with the script
-  useEffect(() => {
-    onScriptSelected(currentScript);
-  }, [currentScript, onScriptSelected]);
-
-  const handleTemplateSelect = (templateId: string) => {
-    const template = mockTemplates.find(t => t.id === templateId);
-    if (template) {
-      setCurrentScript(template.content);
-      setSelectedTemplate(templateId);
+  const getCNPJTemplates = () => {
+    if (approachType === "whatsapp") {
+      return [
+        {
+          id: "corp-intro",
+          name: "Apresentação Corporativa",
+          preview: "Olá {nome}, sou {vendedor} da {empresa}. Vi que vocês trabalham com {segmento} e gostaria de apresentar uma solução que pode otimizar seus resultados em até 40%...",
+          tags: ["Formal", "B2B", "Resultados"]
+        },
+        {
+          id: "problem-solution",
+          name: "Problema → Solução",
+          preview: "Oi {nome}! Muitas empresas do setor {segmento} enfrentam desafios com {problema_comum}. Temos uma solução específica que já ajudou +200 empresas similares...",
+          tags: ["Consultivo", "Específico", "Social Proof"]
+        }
+      ];
     }
+    
+    if (approachType === "email") {
+      return [
+        {
+          id: "email-formal",
+          name: "Email Corporativo Formal",
+          preview: "Prezado(a) {nome},\n\nEspero que esta mensagem o(a) encontre bem. Sou {vendedor} da {empresa}, especializada em soluções para o setor {segmento}...",
+          tags: ["Formal", "Estruturado", "Profissional"]
+        }
+      ];
+    }
+    
+    return [];
   };
 
-  const handleGenerateWithAI = () => {
-    setIsGenerating(true);
-    // Simulate AI generating script
-    setTimeout(() => {
-      setIsGenerating(false);
-      // Example AI-generated script based on campaign type
-      let aiScript = "";
-      
-      if (approachType === "whatsapp") {
-        if (campaignType === "prospecting") {
-          aiScript = "Olá {{nome}}, tudo bem? 👋\n\nSou da equipe de inovação e estou estudando o setor de {{segmento}} onde a {{empresa}} se destaca.\n\nIdentificamos algumas oportunidades que estão gerando 30% de otimização em operações para empresas como a sua.\n\nFaz sentido uma conversa rápida para compartilhar essas descobertas com você? Temos disponibilidade na próxima semana.";
-        } else if (campaignType === "nurture") {
-          aiScript = "Olá {{nome}}, como vai? 👋\n\nEspero que esteja tudo bem por aí na {{empresa}}!\n\nCompartilho um conteúdo exclusivo que preparamos sobre tendências de inovação em {{segmento}} para 2023:\n\n[link do material]\n\nAcredito que pode ser valioso para os próximos passos que conversamos. O que achou?";
-        } else if (campaignType === "follow-up") {
-          aiScript = "Olá {{nome}}, tudo bem? 👋\n\nEstou retomando contato sobre as soluções que conversamos para a {{empresa}}.\n\nGostaria de saber se conseguiu avaliar a proposta e se surgiram novas questões que eu possa ajudar a esclarecer.\n\nFicamos à disposição para avançarmos quando for conveniente para vocês.";
-        } else {
-          aiScript = "Olá {{nome}}, como vai? 👋\n\nTemos observado o excelente uso que a {{empresa}} tem feito da nossa plataforma e queria compartilhar que lançamos um novo recurso que tem tudo a ver com os objetivos que você mencionou na nossa última conversa.\n\nPodemos agendar uma demonstração rápida para mostrar como isso pode potencializar ainda mais seus resultados?";
+  const getCPFTemplates = () => {
+    if (approachType === "whatsapp") {
+      return [
+        {
+          id: "pf-friendly",
+          name: "Abordagem Amigável",
+          preview: "Oi {nome}! Tudo bem? Vi que você se interessou por {interesse}. Queria te contar sobre uma oportunidade que pode te ajudar a {beneficio}...",
+          tags: ["Casual", "Amigável", "Personal"]
+        },
+        {
+          id: "pf-opportunity", 
+          name: "Oportunidade Exclusiva",
+          preview: "Olá {nome}! 😊 Tenho uma oportunidade especial relacionada a {interesse} que pode ser perfeita para você. Tem 2 minutinhos para eu te explicar?",
+          tags: ["Exclusivo", "Emoji", "Direto"]
         }
-      } else {
-        if (campaignType === "prospecting") {
-          aiScript = "Assunto: Oportunidade de otimização para {{empresa}}\n\nOlá {{nome}},\n\nEspero que esteja tudo bem com você.\n\nEstou acompanhando o crescimento da {{empresa}} no setor de {{segmento}} e acredito que posso contribuir com algumas soluções que têm gerado excelentes resultados para empresas similares.\n\nNossos clientes deste segmento têm alcançado:\n\n• Redução de 25% nos custos operacionais\n• Aumento de 30% na produtividade da equipe\n• ROI positivo em menos de 6 meses\n\nGostaria de agendar uma breve conversa para entender melhor seus desafios e mostrar como podemos ajudar?\n\nAtenciosamente,\n[Seu nome]";
-        } else if (campaignType === "nurture") {
-          aiScript = "Assunto: Conteúdo exclusivo para {{empresa}} - Tendências em {{segmento}}\n\nOlá {{nome}},\n\nEspero que este email o encontre bem.\n\nPreparei um material exclusivo sobre as principais tendências e inovações no setor de {{segmento}} que acredito ser extremamente relevante para os desafios que a {{empresa}} enfrenta atualmente.\n\nVocê pode acessá-lo através deste link: [link do material]\n\nFicarei feliz em discutir qualquer insight que desperte seu interesse ou responder qualquer dúvida que possa surgir.\n\nAtenciosamente,\n[Seu nome]";
-        } else if (campaignType === "follow-up") {
-          aiScript = "Assunto: Continuidade da nossa conversa - {{empresa}}\n\nOlá {{nome}},\n\nEstou retomando contato referente à nossa conversa sobre as soluções que apresentamos para a {{empresa}}.\n\nGostaria de saber se você teve a oportunidade de analisar a proposta e se surgiram novas questões que eu possa ajudar a esclarecer.\n\nContinuo à disposição para agendar um novo momento para conversarmos ou para fornecer qualquer informação adicional que facilite sua tomada de decisão.\n\nAtenciosamente,\n[Seu nome]";
-        } else {
-          aiScript = "Assunto: Novos recursos exclusivos para a {{empresa}}\n\nOlá {{nome}},\n\nEspero que esteja tudo bem com você e com toda a equipe da {{empresa}}.\n\nGostaria de compartilhar que acabamos de lançar um novo módulo em nossa plataforma que pode potencializar significativamente os resultados que vocês já estão obtendo, especialmente na área de [área específica].\n\nAlguns de nossos clientes já estão utilizando este recurso e relataram:\n\n• Aumento de 40% na eficiência dos processos\n• Redução de 20% no tempo de implementação\n• Melhor visibilidade sobre métricas-chave de desempenho\n\nGostaria de agendar uma breve demonstração para mostrar como isso pode ser valioso para vocês?\n\nAtenciosamente,\n[Seu nome]";
+      ];
+    }
+    
+    if (approachType === "email") {
+      return [
+        {
+          id: "pf-newsletter",
+          name: "Email Marketing PF",
+          preview: "Oi {nome}!\n\nEspero que esteja tudo bem com você! Queria compartilhar uma informação valiosa sobre {interesse} que pode fazer a diferença na sua vida...",
+          tags: ["Newsletter", "Pessoal", "Educativo"]
         }
-      }
-      
-      setCurrentScript(aiScript);
-      setSelectedTemplate(null);
-    }, 2000);
+      ];
+    }
+    
+    if (approachType === "sms") {
+      return [
+        {
+          id: "pf-sms-short",
+          name: "SMS Direto",
+          preview: "Oi {nome}! Nova oportunidade de {interesse} disponível. Link: {link} Para sair da lista: SAIR",
+          tags: ["Curto", "Direto", "CTA"]
+        }
+      ];
+    }
+    
+    return [];
+  };
+
+  const templates = targetType === "cpf" ? getCPFTemplates() : getCNPJTemplates();
+
+  const handleTemplateSelect = (template: any) => {
+    setSelectedScript(template.preview);
+    onScriptSelected(template.preview);
+  };
+
+  const handleCustomScript = () => {
+    setSelectedScript(customScript);
+    onScriptSelected(customScript);
   };
 
   return (
-    <div>
-      <div className="mb-6">
-        <h3 className="text-lg font-medium mb-2">Script da Campanha</h3>
-        <p className="text-muted-foreground text-sm">
-          Selecione um modelo existente ou gere um novo com IA
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold mb-2">
+          {targetType === "cpf" ? "📱 Scripts para Pessoa Física" : "💼 Scripts Corporativos"}
+        </h3>
+        <p className="text-muted-foreground">
+          {targetType === "cpf" 
+            ? "Escolha um template otimizado para comunicação com consumidores finais"
+            : "Selecione um template profissional para abordagem B2B"
+          }
         </p>
       </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <h4 className="text-sm font-medium mb-3">Templates Disponíveis</h4>
-          {isLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <Skeleton key={index} className="h-24" />
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredTemplates.map((template) => (
-                <Card
-                  key={template.id}
-                  className={`cursor-pointer transition-all ${
-                    selectedTemplate === template.id
-                      ? 'ring-2 ring-primary'
-                      : 'hover:border-primary/50'
+
+      <Tabs defaultValue="templates" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="templates" className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            Templates IA
+          </TabsTrigger>
+          <TabsTrigger value="custom" className="flex items-center gap-2">
+            <Edit className="h-4 w-4" />
+            Script Personalizado
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="templates" className="space-y-4">
+          {templates.length > 0 ? (
+            <div className="grid gap-4">
+              {templates.map((template) => (
+                <Card 
+                  key={template.id} 
+                  className={`cursor-pointer transition-colors hover:bg-muted/50 ${
+                    selectedScript === template.preview ? "ring-2 ring-primary" : ""
                   }`}
-                  onClick={() => handleTemplateSelect(template.id)}
+                  onClick={() => handleTemplateSelect(template)}
                 >
-                  <CardContent className="p-3">
-                    <div className="flex justify-between items-start mb-1">
-                      <h5 className="font-medium text-sm">{template.name}</h5>
-                      <Badge variant="outline" className="text-xs">
-                        {template.type === 'whatsapp' ? 'WhatsApp' : 'Email'}
-                      </Badge>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4" />
+                        {template.name}
+                      </CardTitle>
+                      <div className="flex gap-1">
+                        {template.tags.map((tag) => (
+                          <Badge key={tag} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {template.content}
-                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/30 p-3 rounded-md">
+                      <p className="text-sm whitespace-pre-line">
+                        {template.preview}
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
-              
-              <Button
-                className="w-full"
-                variant="outline"
-                size="sm"
-                onClick={handleGenerateWithAI}
-                disabled={isGenerating}
-              >
-                <Wand2 className="h-3 w-3 mr-1" />
-                {isGenerating ? 'Gerando script...' : 'Gerar com IA'}
-              </Button>
             </div>
+          ) : (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h4 className="font-medium mb-2">Templates em desenvolvimento</h4>
+                <p className="text-sm text-muted-foreground">
+                  Templates para {approachType} {targetType === "cpf" ? "pessoa física" : "corporativo"} 
+                  estarão disponíveis em breve.
+                </p>
+              </CardContent>
+            </Card>
           )}
-        </div>
+        </TabsContent>
         
-        <div className="lg:col-span-2">
-          <div className="flex justify-between items-center mb-3">
-            <h4 className="text-sm font-medium">Editor de Script</h4>
-            <Button variant="ghost" size="sm" disabled={!currentScript}>
-              <Save className="h-3 w-3 mr-1" />
-              Salvar template
-            </Button>
-          </div>
-          <Textarea
-            value={currentScript}
-            onChange={(e) => setCurrentScript(e.target.value)}
-            placeholder={`Escreva ou selecione um script para sua campanha de ${
-              campaignType === 'prospecting' ? 'prospecção' :
-              campaignType === 'nurture' ? 'nutrição' :
-              campaignType === 'follow-up' ? 'follow-up' : 'upsell'
-            }...`}
-            className="min-h-[300px] font-mono text-sm"
-          />
-          <div className="mt-2 text-xs text-muted-foreground">
-            <p>
-              Use <code className="bg-muted px-1 rounded">{'{{nome}}'}</code> para o nome do contato, 
-              <code className="bg-muted px-1 rounded">{'{{empresa}}'}</code> para o nome da empresa e 
-              <code className="bg-muted px-1 rounded">{'{{segmento}}'}</code> para o segmento.
-            </p>
-          </div>
-        </div>
-      </div>
+        <TabsContent value="custom" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Edit className="h-4 w-4" />
+                Criar Script Personalizado
+              </CardTitle>
+              <CardDescription>
+                Escreva seu próprio script. Use variáveis como {targetType === "cpf" ? "{nome}, {interesse}, {cidade}" : "{nome}, {empresa}, {segmento}"} para personalização.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                placeholder={
+                  targetType === "cpf" 
+                    ? "Oi {nome}! Tudo bem? Vi que você tem interesse em {interesse}..."
+                    : "Olá {nome}, sou da {empresa} e gostaria de apresentar uma solução para {segmento}..."
+                }
+                value={customScript}
+                onChange={(e) => setCustomScript(e.target.value)}
+                rows={6}
+                className="resize-none"
+              />
+              
+              <div className="flex items-center gap-2">
+                <Button 
+                  onClick={handleCustomScript}
+                  disabled={!customScript.trim()}
+                  className="gap-2"
+                >
+                  <Eye className="h-4 w-4" />
+                  Usar Este Script
+                </Button>
+                
+                {customScript && (
+                  <Badge variant="outline" className="text-xs">
+                    {customScript.length} caracteres
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {selectedScript && (
+        <Card className="border-green-200 bg-green-50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base text-green-800">
+              ✅ Script Selecionado
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-white p-3 rounded-md border">
+              <p className="text-sm whitespace-pre-line">
+                {selectedScript}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
+
+export { CampaignScriptSelector };
