@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -13,6 +12,7 @@ interface LeadImportStepperProps {
   currentStep: number;
   onStepChange: (step: number) => void;
   onComplete: () => void;
+  campaignType?: "cnpj" | "cpf";
 }
 
 const steps = [
@@ -45,11 +45,13 @@ export interface ProcessedData {
 const LeadImportStepper = ({ 
   currentStep, 
   onStepChange,
-  onComplete 
+  onComplete,
+  campaignType = "cnpj"
 }: LeadImportStepperProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [processedData, setProcessedData] = useState<ProcessedData | null>(null);
   const [assignmentType, setAssignmentType] = useState<string>("auto");
+  const [lgpdConsent, setLgpdConsent] = useState<boolean>(false);
 
   const goToNextStep = () => {
     if (currentStep < steps.length) {
@@ -63,8 +65,11 @@ const LeadImportStepper = ({
     }
   };
 
-  const handleUploadComplete = (file: File) => {
+  const handleUploadComplete = (file: File, consent?: boolean) => {
     setUploadedFile(file);
+    if (consent !== undefined) {
+      setLgpdConsent(consent);
+    }
     goToNextStep();
   };
 
@@ -121,7 +126,10 @@ const LeadImportStepper = ({
       {/* Step content */}
       <div className="mt-6">
         {currentStep === 1 && (
-          <UploadStep onComplete={handleUploadComplete} />
+          <UploadStep 
+            onComplete={handleUploadComplete} 
+            campaignType={campaignType}
+          />
         )}
         {currentStep === 2 && uploadedFile && (
           <CleanseStep file={uploadedFile} onComplete={handleCleanseComplete} />

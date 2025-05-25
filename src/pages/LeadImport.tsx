@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import LeadImportStepper from "@/components/import/LeadImportStepper";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,7 +11,13 @@ import StatsCard from "@/components/dashboard/StatsCard";
 const LeadImport = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
+  const location = useLocation();
   const [showCleanseResults, setShowCleanseResults] = useState(true);
+  
+  // Detect campaign type from URL params or state
+  const campaignType = (location.state?.campaignType || 
+                       new URLSearchParams(location.search).get('type') || 
+                       'cnpj') as 'cnpj' | 'cpf';
 
   // Dados simulados para a demonstração dos outputs de limpeza
   const cleanseData = {
@@ -48,10 +53,12 @@ const LeadImport = () => {
         <div>
           <div className="flex items-center gap-2">
             <Download className="size-6 text-primary" />
-            <h1 className="text-3xl font-bold">Importação Inteligente de Leads</h1>
+            <h1 className="text-3xl font-bold">
+              Importação Inteligente de {campaignType === 'cpf' ? 'Contatos PF' : 'Leads'}
+            </h1>
           </div>
           <p className="text-muted-foreground mt-1">
-            Importe, limpe e enriqueça sua base de leads automaticamente
+            Importe, limpe e enriqueça sua base de {campaignType === 'cpf' ? 'contatos' : 'leads'} automaticamente
           </p>
         </div>
 
@@ -69,7 +76,9 @@ const LeadImport = () => {
             <Timer className="size-5 text-amber-500" />
             <div className="text-sm">
               <p className="font-medium">Processamento</p>
-              <p className="text-muted-foreground">Menos de 3 minutos para 1000 leads</p>
+              <p className="text-muted-foreground">
+                Menos de 3 minutos para 1000 {campaignType === 'cpf' ? 'contatos' : 'leads'}
+              </p>
             </div>
           </Card>
           
@@ -77,7 +86,12 @@ const LeadImport = () => {
             <Shield className="size-5 text-green-500" />
             <div className="text-sm">
               <p className="font-medium">Proteção LGPD</p>
-              <p className="text-muted-foreground">Conformidade com normas de proteção</p>
+              <p className="text-muted-foreground">
+                {campaignType === 'cpf' 
+                  ? 'Declaração de consentimento obrigatória' 
+                  : 'Conformidade com normas de proteção'
+                }
+              </p>
             </div>
           </Card>
         </div>
@@ -88,6 +102,7 @@ const LeadImport = () => {
             currentStep={currentStep} 
             onStepChange={setCurrentStep}
             onComplete={handleComplete}
+            campaignType={campaignType}
           />
         </Card>
 
@@ -96,27 +111,53 @@ const LeadImport = () => {
           <div className="mt-4">
             <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
               <Sparkles className="size-4 text-amber-500" />
-              <span>Benefícios da importação inteligente</span>
+              <span>
+                Benefícios da importação {campaignType === 'cpf' ? 'de contatos PF' : 'inteligente'}
+              </span>
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-muted/40 p-4 rounded-lg">
-                <h4 className="font-medium mb-1">Limpeza automatizada</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Remoção de duplicidades de CNPJ</li>
-                  <li>• Correção de e-mails inválidos</li>
-                  <li>• Padronização de telefones e contatos</li>
-                </ul>
-              </div>
-              
-              <div className="bg-muted/40 p-4 rounded-lg">
-                <h4 className="font-medium mb-1">Enriquecimento com IA</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Preenchimento automático de dados faltantes</li>
-                  <li>• Classificação por segmento e porte</li>
-                  <li>• Detecção de potencial comercial</li>
-                </ul>
-              </div>
+              {campaignType === 'cnpj' ? (
+                <>
+                  <div className="bg-muted/40 p-4 rounded-lg">
+                    <h4 className="font-medium mb-1">Limpeza automatizada</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Remoção de duplicidades de CNPJ</li>
+                      <li>• Correção de e-mails inválidos</li>
+                      <li>• Padronização de telefones e contatos</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-muted/40 p-4 rounded-lg">
+                    <h4 className="font-medium mb-1">Enriquecimento com IA</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Preenchimento automático de dados faltantes</li>
+                      <li>• Classificação por segmento e porte</li>
+                      <li>• Detecção de potencial comercial</li>
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="bg-muted/40 p-4 rounded-lg">
+                    <h4 className="font-medium mb-1">🔐 Conformidade LGPD</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Declaração de consentimento obrigatória</li>
+                      <li>• Respeito automático a opt-outs</li>
+                      <li>• Logs de consentimento com timestamp</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-muted/40 p-4 rounded-lg">
+                    <h4 className="font-medium mb-1">📋 Validação de dados</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Verificação de formato de e-mails</li>
+                      <li>• Padronização de telefones</li>
+                      <li>• Remoção de contatos duplicados</li>
+                    </ul>
+                  </div>
+                </>
+              )}
               
               <div className="bg-muted/40 p-4 rounded-lg">
                 <h4 className="font-medium mb-1">Auditoria e rastreabilidade</h4>

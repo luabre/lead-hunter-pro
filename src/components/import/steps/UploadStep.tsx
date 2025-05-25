@@ -2,38 +2,48 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Download, File, Upload } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Download, File, Upload, Shield, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface UploadStepProps {
-  onComplete: (file: File) => void;
+  onComplete: (file: File, lgpdConsent?: boolean) => void;
+  campaignType?: "cnpj" | "cpf";
 }
 
 // Mock function to generate template file
-const generateTemplateFile = () => {
-  // In a real app, this would generate an actual Excel file
-  console.log("Generating template file");
+const generateTemplateFile = (campaignType: "cnpj" | "cpf" = "cnpj") => {
+  console.log("Generating template file for", campaignType);
   
-  // For demo purposes, create a blob that simulates an Excel file
-  const headers = "Empresa (Razão Social),CNPJ,Nome do Contato Principal,Email 1,Email 2,Email 3,Telefone Principal,Cargo do Contato,Website,Segmento,Estado,Observações\n";
-  const sampleData = "Empresa Exemplo LTDA,12345678000190,João Silva,joao@exemplo.com,,,11987654321,Diretor,www.exemplo.com.br,Tecnologia,SP,Cliente potencial\n";
+  let headers, sampleData;
+  
+  if (campaignType === "cpf") {
+    headers = "Nome Completo,Email,Telefone,Cidade,Estado,Interesse,Origem,Observações,Permissão LGPD\n";
+    sampleData = "João Silva Santos,joao@exemplo.com,11987654321,São Paulo,SP,Investimentos,Landing Page,Cliente potencial,Sim\n";
+  } else {
+    headers = "Empresa (Razão Social),CNPJ,Nome do Contato Principal,Email 1,Email 2,Email 3,Telefone Principal,Cargo do Contato,Website,Segmento,Estado,Observações\n";
+    sampleData = "Empresa Exemplo LTDA,12345678000190,João Silva,joao@exemplo.com,,,11987654321,Diretor,www.exemplo.com.br,Tecnologia,SP,Cliente potencial\n";
+  }
   
   const content = headers + sampleData;
   const blob = new Blob([content], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
   return blob;
 };
 
-const UploadStep = ({ onComplete }: UploadStepProps) => {
+const UploadStep = ({ onComplete, campaignType = "cnpj" }: UploadStepProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [lgpdConsent, setLgpdConsent] = useState(false);
   const { toast } = useToast();
 
   const downloadTemplate = () => {
-    const blob = generateTemplateFile();
+    const blob = generateTemplateFile(campaignType);
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "modelo_importacao_leads.xlsx";
+    a.download = campaignType === "cpf" 
+      ? "modelo_importacao_leads_pf.xlsx" 
+      : "modelo_importacao_leads.xlsx";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -102,18 +112,46 @@ const UploadStep = ({ onComplete }: UploadStepProps) => {
 
   const handleContinue = () => {
     if (selectedFile) {
-      onComplete(selectedFile);
+      if (campaignType === "cpf" && !lgpdConsent) {
+        toast({
+          title: "Consentimento necessário",
+          description: "Para campanhas PF, é necessário declarar o consentimento LGPD",
+          variant: "destructive",
+        });
+        return;
+      }
+      onComplete(selectedFile, campaignType === "cpf" ? lgpdConsent : undefined);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold">Upload da Base de Leads</h2>
+        <h2 className="text-2xl font-bold">
+          Upload da Base de {campaignType === "cpf" ? "Contatos PF" : "Leads"}
+        </h2>
         <p className="text-muted-foreground mt-1">
-          Carregue sua base de leads em formato .xlsx ou .csv
+          Carregue sua base de {campaignType === "cpf" ? "contatos" : "leads"} em formato .xlsx ou .csv
         </p>
       </div>
+      
+      {campaignType === "cpf" && (
+        <Alert className="border-amber-200 bg-amber-50">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800">⚠️ Importante - Conformidade LGPD</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            <p className="mb-2">
+              Para campanhas com pessoas físicas, você deve garantir que possui consentimento 
+              válido para uso dos dados conforme a LGPD.
+            </p>
+            <ul className="list-disc list-inside text-sm space-y-1">
+              <li>Dados devem ter sido coletados com consentimento explícito</li>
+              <li>Contatos podem exercer direitos de opt-out a qualquer momento</li>
+              <li>O RadarHunter não se responsabiliza por usos indevidos de bases não autorizadas</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
       
       <Alert>
         <AlertTitle>Dicas para uma importação bem-sucedida</AlertTitle>
@@ -122,7 +160,12 @@ const UploadStep = ({ onComplete }: UploadStepProps) => {
             <li>Use o formato do modelo para melhores resultados</li>
             <li>Verifique se os campos obrigatórios estão preenchidos</li>
             <li>O tamanho máximo do arquivo é 10MB</li>
-            <li>Usamos IA para enriquecer dados ausentes ou incompletos</li>
+            {campaignType === "cnpj" && (
+              <li>Usamos IA para enriquecer dados ausentes ou incompletos</li>
+            )}
+            {campaignType === "cpf" && (
+              <li>Inclua a coluna "Permissão LGPD" quando disponível</li>
+            )}
           </ul>
         </AlertDescription>
       </Alert>
@@ -176,15 +219,44 @@ const UploadStep = ({ onComplete }: UploadStepProps) => {
           </Button>
         </div>
       )}
+
+      {campaignType === "cpf" && selectedFile && (
+        <div className="border border-red-200 bg-red-50 rounded-lg p-4">
+          <div className="flex items-start space-x-3">
+            <Shield className="h-5 w-5 text-red-600 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-medium text-red-900 mb-2">
+                🔐 Declaração de Conformidade LGPD
+              </h4>
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="lgpd-consent"
+                  checked={lgpdConsent}
+                  onCheckedChange={(checked) => setLgpdConsent(checked as boolean)}
+                />
+                <div className="text-sm text-red-800">
+                  <label htmlFor="lgpd-consent" className="cursor-pointer font-medium">
+                    ☑️ Declaro que possuo consentimento válido conforme LGPD
+                  </label>
+                  <p className="mt-1 text-xs">
+                    Confirmo que tenho permissão legal para usar os dados dos contatos nesta base 
+                    para fins de marketing e que eles podem exercer seus direitos a qualquer momento.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="flex justify-between items-center">
         <Button variant="outline" onClick={downloadTemplate}>
           <Download className="h-4 w-4 mr-2" />
-          Baixar modelo
+          Baixar modelo {campaignType === "cpf" ? "PF" : ""}
         </Button>
         <Button 
           onClick={handleContinue} 
-          disabled={!selectedFile}
+          disabled={!selectedFile || (campaignType === "cpf" && !lgpdConsent)}
         >
           Continuar
         </Button>

@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Search, Database, Archive, Radar, Check, Play } from "lucide-react";
+import { ArrowLeft, Search, Database, Archive, Radar, Check, Play, Upload } from "lucide-react";
 import { LeadSourceSelector } from "./LeadSourceSelector";
 import { CampaignScriptSelector } from "./CampaignScriptSelector";
 import CampaignTypeSelector, { CampaignType } from "./CampaignTypeSelector";
@@ -97,6 +96,11 @@ const CampaignCreationFlow = ({ onCancel, onCreationComplete }: CampaignCreation
             <p className="text-muted-foreground">
               Para campanhas PF, você pode importar sua base própria de contatos ou utilizar leads já cadastrados.
             </p>
+            <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-800">
+                <strong>⚠️ Lembrete LGPD:</strong> Certifique-se de ter consentimento válido para todos os contatos.
+              </p>
+            </div>
           </div>
           
           <Tabs defaultValue="import" className="w-full">
@@ -112,11 +116,23 @@ const CampaignCreationFlow = ({ onCancel, onCreationComplete }: CampaignCreation
             </TabsList>
             
             <TabsContent value="import" className="mt-4">
-              <LeadSourceSelector 
-                sourceType="import-cpf"
-                campaignType="cpf"
-                onLeadsSelected={(leads) => handleCampaignDataChange("selectedLeads", leads)} 
-              />
+              <div className="text-center p-6 border-2 border-dashed border-muted-foreground/20 rounded-lg">
+                <Archive className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h4 className="font-medium mb-2">Importar nova base de contatos PF</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Faça upload de sua planilha com contatos de pessoas físicas
+                </p>
+                <Button 
+                  onClick={() => {
+                    // Redirecionar para importação com tipo CPF
+                    window.open('/lead-import?type=cpf', '_blank');
+                  }}
+                  className="gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  Ir para Importação PF
+                </Button>
+              </div>
             </TabsContent>
             
             <TabsContent value="existing" className="mt-4">
