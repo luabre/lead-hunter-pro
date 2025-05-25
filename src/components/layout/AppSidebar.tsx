@@ -31,6 +31,7 @@ const AppSidebar = () => {
           <SidebarItem icon={Building2} text="Empresas" to="/companies" />
           <SidebarItem icon={Users} text="Contatos" to="/contacts" />
           <SidebarItem icon={Calendar} text="Reuniões" to="/meetings" />
+          <SidebarItem icon={Rocket} text="Campanhas" to="/campaigns" />
           <SidebarItem icon={LineChart} text="Pipeline" to="/pipeline" />
           <SidebarItem icon={BarChart2} text="Performance IA" to="/performance" />
           <SidebarItem icon={PieChart} text="Meu Pipeline" to="/my-pipeline" />
@@ -38,7 +39,6 @@ const AppSidebar = () => {
           <SidebarItem icon={Linkedin} text="Social Selling" to="/social-selling" />
           <SidebarItem icon={TrendingUp} text="Inteligência" to="/market-intel" />
           <SidebarItem icon={Upload} text="Importar Leads" to="/lead-import" />
-          <SidebarItem icon={Rocket} text="Campanhas" to="/campaigns" />
           <SidebarItem icon={MessageSquare} text="IA SDR" to="/ia-sdr" badgeText="Novo" />
           <SidebarItem icon={MessageCircle} text="IA Closer" to="/ia-closer" />
           <SidebarItem icon={Brain} text="IA Manager" to="/ai-manager" badgeText="Novo" />
