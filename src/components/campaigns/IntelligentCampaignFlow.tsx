@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,13 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Save, ArrowLeft, Plus, X, Mail, MessageCircle, Phone, CheckSquare, Link, Upload } from "lucide-react";
+import { Brain, Save, ArrowLeft, Plus, X, Mail, MessageCircle, Phone, CheckSquare, Link, Upload, Linkedin } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface CampaignTouch {
   id: string;
   order: number;
-  type: "email" | "whatsapp" | "call" | "task" | "link" | "file";
+  type: "email" | "whatsapp" | "call" | "task" | "link" | "file" | "linkedin";
   title: string;
   message: string;
   scheduling: "relative" | "fixed";
@@ -99,11 +98,11 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
         {
           id: "3",
           order: 3,
-          type: "email",
-          title: "Email com Material de Apoio",
-          message: `Olá {{nome}},\n\nConforme prometido, segue material sobre como resolver ${aiFormData.mainPain}.\n\nEste case study mostra resultados reais de empresas similares à {{empresa}}.\n\nQue tal agendarmos 15 minutos para discutir?\n\nAtenciosamente,\n{{remetente}}`,
+          type: "linkedin",
+          title: "Conectar no LinkedIn",
+          message: `Olá {{nome}}, vi seu perfil e gostaria de conectar. Trabalho com soluções para ${aiFormData.mainPain} no setor de {{segmento}}. Vamos trocar uma ideia?`,
           scheduling: "relative",
-          relativeDays: 4,
+          relativeDays: 3,
           timeWindow: { start: "09:00", end: "18:00" }
         },
         {
@@ -113,7 +112,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
           title: "Ligação de Follow-up",
           message: "Ligar para {{nome}} para discutir oportunidades de parceria e agendar demonstração.",
           scheduling: "relative",
-          relativeDays: 6,
+          relativeDays: 5,
           timeWindow: { start: "10:00", end: "16:00" }
         },
         {
@@ -123,7 +122,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
           title: "Email de Encerramento",
           message: `Olá {{nome}},\n\nEsta é minha última tentativa de contato sobre como podemos ajudar a {{empresa}}.\n\nSe não for o momento ideal, sem problemas! Fico à disposição para quando precisar.\n\nSucesso!\n{{remetente}}`,
           scheduling: "relative",
-          relativeDays: 8,
+          relativeDays: 7,
           timeWindow: { start: "09:00", end: "18:00" }
         }
       ];
@@ -186,18 +185,20 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
       case "task": return <CheckSquare className="h-4 w-4" />;
       case "link": return <Link className="h-4 w-4" />;
       case "file": return <Upload className="h-4 w-4" />;
+      case "linkedin": return <Linkedin className="h-4 w-4" />;
       default: return <Mail className="h-4 w-4" />;
     }
   };
 
   const getChannelLabel = (type: string) => {
     switch (type) {
-      case "email": return "E-mail";
+      case "email": return "E-mail automático";
       case "whatsapp": return "WhatsApp";
-      case "call": return "Ligação";
-      case "task": return "Tarefa";
-      case "link": return "Link Externo";
-      case "file": return "Arquivo";
+      case "call": return "Ligação (tarefa)";
+      case "task": return "Tarefa personalizada";
+      case "link": return "Link externo";
+      case "file": return "Upload de arquivo";
+      case "linkedin": return "LinkedIn (manual)";
       default: return "E-mail";
     }
   };
@@ -270,7 +271,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
             { id: "email", label: "E-mail", icon: <Mail className="h-4 w-4" /> },
             { id: "whatsapp", label: "WhatsApp", icon: <MessageCircle className="h-4 w-4" /> },
             { id: "phone", label: "Telefone", icon: <Phone className="h-4 w-4" /> },
-            { id: "linkedin", label: "LinkedIn", icon: <Link className="h-4 w-4" /> }
+            { id: "linkedin", label: "LinkedIn", icon: <Linkedin className="h-4 w-4" /> }
           ].map((channel) => (
             <div key={channel.id} className="flex items-center space-x-2">
               <Checkbox 
@@ -451,6 +452,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
                       <SelectItem value="whatsapp">📱 WhatsApp</SelectItem>
                       <SelectItem value="call">📞 Ligação (tarefa)</SelectItem>
                       <SelectItem value="task">✅ Tarefa personalizada</SelectItem>
+                      <SelectItem value="linkedin">🔗 LinkedIn (manual)</SelectItem>
                       <SelectItem value="link">🔗 Link externo</SelectItem>
                       <SelectItem value="file">📎 Upload de arquivo</SelectItem>
                     </SelectContent>
