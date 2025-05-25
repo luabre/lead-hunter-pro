@@ -27,6 +27,7 @@ const AppSidebar = () => {
         <Logo />
         <nav className="space-y-1">
           <SidebarItem icon={Home} text="Home" to="/" />
+          <SidebarItem icon={Search} text="Busca Inteligente" to="/smart-search" />
           <SidebarItem icon={LayoutDashboard} text="Dashboard" to="/dashboard" />
           <SidebarItem icon={Building2} text="Empresas" to="/companies" />
           <SidebarItem icon={Users} text="Contatos" to="/contacts" />
@@ -35,7 +36,6 @@ const AppSidebar = () => {
           <SidebarItem icon={LineChart} text="Pipeline" to="/pipeline" />
           <SidebarItem icon={BarChart2} text="Performance IA" to="/performance" />
           <SidebarItem icon={PieChart} text="Meu Pipeline" to="/my-pipeline" />
-          <SidebarItem icon={Search} text="Busca Inteligente" to="/smart-search" />
           <SidebarItem icon={Linkedin} text="Social Selling" to="/social-selling" />
           <SidebarItem icon={TrendingUp} text="Inteligência" to="/market-intel" />
           <SidebarItem icon={Upload} text="Importar Leads" to="/lead-import" />
