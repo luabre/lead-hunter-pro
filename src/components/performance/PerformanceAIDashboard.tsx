@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -28,7 +27,7 @@ import ScenarioSimulatorModal from './ScenarioSimulatorModal';
 // Define the strict status type to match what StatusIndicator expects
 type StatusType = "onTrack" | "atRisk" | "critical";
 
-// Simulation scenario type
+// Simulation scenario type - updated to include missing properties
 interface AppliedScenario {
   id: string;
   name: string;
@@ -41,6 +40,9 @@ interface AppliedScenario {
   meetingsNeeded: number;
   leadsNeeded: number;
   effortReduction: number;
+  value: number;
+  target: number;
+  status: StatusType;
 }
 
 // Mock data for charts
@@ -239,14 +241,14 @@ const PerformanceAIDashboard = () => {
   const currentData = appliedScenario || originalData;
 
   // Calculate performance data based on current scenario
-  const performanceData = [
+  const currentPerformanceData = [
     { name: 'Leads Gerados', value: 428, target: currentData.leadsNeeded },
     { name: 'Reuniões', value: 74, target: currentData.meetingsNeeded },
     { name: 'Propostas', value: 32, target: currentData.proposalsNeeded },
     { name: 'Fechamentos', value: 12, target: currentData.closingsNeeded },
   ];
 
-  const radialData = [
+  const currentRadialData = [
     {
       name: 'Meta Mensal',
       value: currentData.value,
@@ -403,7 +405,7 @@ const PerformanceAIDashboard = () => {
                       cy="50%" 
                       innerRadius="60%" 
                       outerRadius="100%" 
-                      data={radialData} 
+                      data={currentRadialData} 
                       startAngle={180} 
                       endAngle={0}
                     >
@@ -461,7 +463,7 @@ const PerformanceAIDashboard = () => {
               <CardContent>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart
-                    data={performanceData}
+                    data={currentPerformanceData}
                     margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -484,7 +486,7 @@ const PerformanceAIDashboard = () => {
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
-                      data={performanceData}
+                      data={currentPerformanceData}
                       cx="50%"
                       cy="50%"
                       outerRadius={80}
@@ -493,7 +495,7 @@ const PerformanceAIDashboard = () => {
                       dataKey="value"
                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                     >
-                      {performanceData.map((entry, index) => (
+                      {currentPerformanceData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
