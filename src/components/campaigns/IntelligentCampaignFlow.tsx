@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Save, ArrowLeft, Plus, X, Mail, MessageCircle, Phone, CheckSquare, Link, Upload, Linkedin } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Brain, Save, ArrowLeft, Plus, X, Mail, MessageCircle, Phone, CheckSquare, Link, Upload, Linkedin, Info, AlertTriangle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface CampaignTouch {
@@ -32,6 +33,7 @@ interface IntelligentCampaignFlowProps {
 const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCampaignFlowProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAIGenerating, setIsAIGenerating] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const { toast } = useToast();
   
   const [campaignData, setCampaignData] = useState({
@@ -53,7 +55,18 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
     materialsDescription: ""
   });
 
+  // Auto-save functionality
+  const autoSave = () => {
+    setLastSaved(new Date());
+    toast({
+      title: "✅ Alterações salvas",
+      description: "Todas as modificações foram salvas automaticamente.",
+      duration: 2000,
+    });
+  };
+
   const handleNextStep = () => {
+    autoSave();
     setCurrentStep(currentStep + 1);
   };
 
@@ -67,6 +80,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
       : [...campaignData.preferredChannels, channel];
     
     setCampaignData({ ...campaignData, preferredChannels: updatedChannels });
+    autoSave();
   };
 
   const generateWithAI = async () => {
@@ -135,6 +149,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
       });
 
       setIsAIGenerating(false);
+      autoSave();
       toast({
         title: "Campanha gerada com IA!",
         description: "A IA criou uma sequência de 5 toques personalizados para seu objetivo.",
@@ -159,6 +174,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
       ...campaignData,
       touches: [...campaignData.touches, newTouch]
     });
+    autoSave();
   };
 
   const removeTouch = (touchId: string) => {
@@ -166,6 +182,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
       ...campaignData,
       touches: campaignData.touches.filter(t => t.id !== touchId)
     });
+    autoSave();
   };
 
   const updateTouch = (touchId: string, updates: Partial<CampaignTouch>) => {
@@ -175,6 +192,7 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
         t.id === touchId ? { ...t, ...updates } : t
       )
     });
+    autoSave();
   };
 
   const getChannelIcon = (type: string) => {
@@ -203,7 +221,12 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
     }
   };
 
+  const isManualTouch = (type: string) => {
+    return ["call", "task", "linkedin"].includes(type);
+  };
+
   const handleSubmit = () => {
+    autoSave();
     onCreationComplete(campaignData.name);
   };
 
@@ -300,6 +323,18 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
             Criar Manual
           </Button>
         </div>
+      </div>
+
+      {/* Feedback de salvamento automático */}
+      <div className="text-center">
+        <p className="text-sm text-muted-foreground">
+          💾 Todas as alterações são salvas automaticamente
+          {lastSaved && (
+            <span className="ml-2">
+              • Último salvamento: {lastSaved.toLocaleTimeString()}
+            </span>
+          )}
+        </p>
       </div>
     </div>
   );
@@ -400,162 +435,217 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
           )}
         </Button>
       </div>
+
+      {/* Feedback de salvamento automático */}
+      <div className="text-center">
+        <p className="text-sm text-muted-foreground">
+          💾 Todas as alterações são salvas automaticamente
+        </p>
+      </div>
     </div>
   );
 
   const renderTouchesStep = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-xl font-semibold">Toques da Campanha</h3>
-          <p className="text-muted-foreground">Configure até 5 toques para sua sequência</p>
+    <TooltipProvider>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-xl font-semibold">Toques da Campanha</h3>
+            <p className="text-muted-foreground">Configure até 5 toques para sua sequência</p>
+          </div>
+          <Button onClick={addNewTouch} disabled={campaignData.touches.length >= 5}>
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Toque
+          </Button>
         </div>
-        <Button onClick={addNewTouch} disabled={campaignData.touches.length >= 5}>
-          <Plus className="h-4 w-4 mr-2" />
-          Adicionar Toque
-        </Button>
-      </div>
-      
-      <div className="space-y-4">
-        {campaignData.touches.map((touch, index) => (
-          <Card key={touch.id} className="relative">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">Toque {touch.order}</Badge>
-                  {getChannelIcon(touch.type)}
-                  <span className="font-medium">{getChannelLabel(touch.type)}</span>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => removeTouch(touch.id)}
-                  className="h-8 w-8 p-0"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Tipo de Canal</Label>
-                  <Select 
-                    value={touch.type} 
-                    onValueChange={(value) => updateTouch(touch.id, { type: value as any })}
+        
+        <div className="space-y-4">
+          {campaignData.touches.map((touch, index) => (
+            <Card key={touch.id} className="relative">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">Toque {touch.order}</Badge>
+                    {getChannelIcon(touch.type)}
+                    <span className="font-medium">{getChannelLabel(touch.type)}</span>
+                    {isManualTouch(touch.type) && (
+                      <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                        Manual
+                      </Badge>
+                    )}
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => removeTouch(touch.id)}
+                    className="h-8 w-8 p-0"
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="email">📧 E-mail automático</SelectItem>
-                      <SelectItem value="whatsapp">📱 WhatsApp</SelectItem>
-                      <SelectItem value="call">📞 Ligação (tarefa)</SelectItem>
-                      <SelectItem value="task">✅ Tarefa personalizada</SelectItem>
-                      <SelectItem value="linkedin">🔗 LinkedIn (manual)</SelectItem>
-                      <SelectItem value="link">🔗 Link externo</SelectItem>
-                      <SelectItem value="file">📎 Upload de arquivo</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label>Tipo de Canal</Label>
+                      {touch.type === "linkedin" && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Info className="h-4 w-4 text-blue-500" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-sm">
+                            <div className="space-y-2">
+                              <p className="font-medium">🔧 Este toque é manual</p>
+                              <p className="text-sm">
+                                Como o LinkedIn não permite envios automáticos, a IA criará uma tarefa 
+                                com horário e mensagem sugerida. Você será notificado para acessar o 
+                                LinkedIn, localizar o contato e enviar manualmente.
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                A cadência da campanha continua normalmente com os demais toques.
+                              </p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                    <Select 
+                      value={touch.type} 
+                      onValueChange={(value) => updateTouch(touch.id, { type: value as any })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="email">📧 E-mail automático</SelectItem>
+                        <SelectItem value="whatsapp">📱 WhatsApp</SelectItem>
+                        <SelectItem value="call">📞 Ligação (tarefa)</SelectItem>
+                        <SelectItem value="task">✅ Tarefa personalizada</SelectItem>
+                        <SelectItem value="linkedin">🔗 LinkedIn (manual)</SelectItem>
+                        <SelectItem value="link">🔗 Link externo</SelectItem>
+                        <SelectItem value="file">📎 Upload de arquivo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Título do Toque</Label>
+                    <Input 
+                      placeholder="Ex: Email inicial de apresentação"
+                      value={touch.title}
+                      onChange={(e) => updateTouch(touch.id, { title: e.target.value })}
+                    />
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Título do Toque</Label>
-                  <Input 
-                    placeholder="Ex: Email inicial de apresentação"
-                    value={touch.title}
-                    onChange={(e) => updateTouch(touch.id, { title: e.target.value })}
+                  <Label>Mensagem</Label>
+                  <Textarea 
+                    placeholder="Digite sua mensagem usando variáveis como {{nome}}, {{empresa}}, etc."
+                    value={touch.message}
+                    onChange={(e) => updateTouch(touch.id, { message: e.target.value })}
+                    rows={4}
                   />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Mensagem</Label>
-                <Textarea 
-                  placeholder="Digite sua mensagem usando variáveis como {{nome}}, {{empresa}}, etc."
-                  value={touch.message}
-                  onChange={(e) => updateTouch(touch.id, { message: e.target.value })}
-                  rows={4}
-                />
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>Agendamento</Label>
-                  <Select 
-                    value={touch.scheduling} 
-                    onValueChange={(value) => updateTouch(touch.id, { scheduling: value as any })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="relative">🔘 Relativo (D+X)</SelectItem>
-                      <SelectItem value="fixed">🔘 Data fixa</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  
+                  {/* Aviso específico para LinkedIn */}
+                  {touch.type === "linkedin" && (
+                    <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-md">
+                      <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm">
+                        <p className="font-medium text-orange-800">⚠️ Este toque exige ação manual</p>
+                        <p className="text-orange-700 mt-1">
+                          A IA criará uma tarefa no seu painel com a mensagem pronta, mas você deverá 
+                          acessar o LinkedIn pessoalmente para enviar.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
-                {touch.scheduling === "relative" && (
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label>Dias após entrada</Label>
-                    <Input 
-                      type="number"
-                      min="0"
-                      max="30"
-                      value={touch.relativeDays || 0}
-                      onChange={(e) => updateTouch(touch.id, { relativeDays: parseInt(e.target.value) })}
-                    />
+                    <Label>Agendamento</Label>
+                    <Select 
+                      value={touch.scheduling} 
+                      onValueChange={(value) => updateTouch(touch.id, { scheduling: value as any })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="relative">🔘 Relativo (D+X)</SelectItem>
+                        <SelectItem value="fixed">🔘 Data fixa</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                )}
-                
-                {touch.scheduling === "fixed" && (
+                  
+                  {touch.scheduling === "relative" && (
+                    <div className="space-y-2">
+                      <Label>Dias após entrada</Label>
+                      <Input 
+                        type="number"
+                        min="0"
+                        max="30"
+                        value={touch.relativeDays || 0}
+                        onChange={(e) => updateTouch(touch.id, { relativeDays: parseInt(e.target.value) })}
+                      />
+                    </div>
+                  )}
+                  
+                  {touch.scheduling === "fixed" && (
+                    <div className="space-y-2">
+                      <Label>Data e hora</Label>
+                      <Input 
+                        type="datetime-local"
+                        value={touch.fixedDate || ""}
+                        onChange={(e) => updateTouch(touch.id, { fixedDate: e.target.value })}
+                      />
+                    </div>
+                  )}
+                  
                   <div className="space-y-2">
-                    <Label>Data e hora</Label>
-                    <Input 
-                      type="datetime-local"
-                      value={touch.fixedDate || ""}
-                      onChange={(e) => updateTouch(touch.id, { fixedDate: e.target.value })}
-                    />
-                  </div>
-                )}
-                
-                <div className="space-y-2">
-                  <Label>Janela de envio</Label>
-                  <div className="flex gap-1 items-center">
-                    <Input 
-                      type="time"
-                      value={touch.timeWindow.start}
-                      onChange={(e) => updateTouch(touch.id, { 
-                        timeWindow: { ...touch.timeWindow, start: e.target.value }
-                      })}
-                    />
-                    <span>até</span>
-                    <Input 
-                      type="time"
-                      value={touch.timeWindow.end}
-                      onChange={(e) => updateTouch(touch.id, { 
-                        timeWindow: { ...touch.timeWindow, end: e.target.value }
-                      })}
-                    />
+                    <Label>Janela de envio</Label>
+                    <div className="flex gap-1 items-center">
+                      <Input 
+                        type="time"
+                        value={touch.timeWindow.start}
+                        onChange={(e) => updateTouch(touch.id, { 
+                          timeWindow: { ...touch.timeWindow, start: e.target.value }
+                        })}
+                      />
+                      <span>até</span>
+                      <Input 
+                        type="time"
+                        value={touch.timeWindow.end}
+                        onChange={(e) => updateTouch(touch.id, { 
+                          timeWindow: { ...touch.timeWindow, end: e.target.value }
+                        })}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        
+        <div className="flex justify-between items-center">
+          <Button variant="outline" onClick={handlePreviousStep}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar
+          </Button>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              💾 Todas as alterações são salvas automaticamente
+            </p>
+            <Button onClick={() => setCurrentStep(4)}>
+              Próximo
+            </Button>
+          </div>
+        </div>
       </div>
-      
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={handlePreviousStep}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar
-        </Button>
-        <Button onClick={() => setCurrentStep(4)}>
-          Próximo
-        </Button>
-      </div>
-    </div>
+    </TooltipProvider>
   );
 
   const renderReviewStep = () => (
@@ -586,7 +676,14 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
                 <Badge>{touch.order}</Badge>
                 {getChannelIcon(touch.type)}
                 <div className="flex-1">
-                  <div className="font-medium">{touch.title}</div>
+                  <div className="font-medium flex items-center gap-2">
+                    {touch.title}
+                    {isManualTouch(touch.type) && (
+                      <Badge variant="secondary" className="bg-orange-100 text-orange-800 text-xs">
+                        Manual
+                      </Badge>
+                    )}
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     {touch.scheduling === "relative" 
                       ? `D+${touch.relativeDays} (${touch.timeWindow.start}-${touch.timeWindow.end})`
@@ -600,6 +697,33 @@ const IntelligentCampaignFlow = ({ onCancel, onCreationComplete }: IntelligentCa
           </div>
         </CardContent>
       </Card>
+      
+      {/* Resumo de toques manuais */}
+      {campaignData.touches.some(t => isManualTouch(t.type)) && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-blue-800 flex items-center gap-2">
+              <Info className="h-5 w-5" />
+              Toques Manuais na Campanha
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-blue-700 text-sm mb-3">
+              Esta campanha inclui {campaignData.touches.filter(t => isManualTouch(t.type)).length} toque(s) manual(is). 
+              A IA criará tarefas agendadas para você executar essas ações pessoalmente.
+            </p>
+            <ul className="space-y-1 text-sm text-blue-600">
+              {campaignData.touches.filter(t => isManualTouch(t.type)).map(touch => (
+                <li key={touch.id} className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">{touch.order}</Badge>
+                  {getChannelIcon(touch.type)}
+                  {touch.title}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
       
       <div className="flex justify-between">
         <Button variant="outline" onClick={handlePreviousStep}>
