@@ -33,7 +33,7 @@ const AppSidebar = () => {
           <SidebarItem icon={Users} text="Contatos" to="/contacts" />
           <SidebarItem icon={Calendar} text="Reuniões" to="/meetings" />
           <SidebarItem icon={Rocket} text="Campanhas" to="/campaigns" />
-          <SidebarItem icon={LineChart} text="Pipeline" to="/pipeline" />
+          <SidebarItem icon={LineChart} text="Pipeline Gerencial" to="/pipeline" />
           <SidebarItem icon={BarChart2} text="Performance IA" to="/performance" />
           <SidebarItem icon={PieChart} text="Meu Pipeline" to="/my-pipeline" />
           <SidebarItem icon={Linkedin} text="Social Selling" to="/social-selling" />
