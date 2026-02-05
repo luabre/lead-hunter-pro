@@ -4,6 +4,7 @@
    AccordionItem,
    AccordionTrigger,
  } from "@/components/ui/accordion";
+ import { HelpCircle } from "lucide-react";
  
  const faqs = [
    {
@@ -16,7 +17,7 @@
    },
    {
      question: "A plataforma está em conformidade com a LGPD?",
-     answer: "Sim! O Lead Hunter Pro foi desenvolvido 100% em conformidade com a LGPD. Todos os dados são tratados de forma segura, e oferecemos ferramentas para gestão de consentimento e opt-out."
+     answer: "Sim! O Radar Hunter Pro foi desenvolvido 100% em conformidade com a LGPD. Todos os dados são tratados de forma segura, e oferecemos ferramentas para gestão de consentimento e opt-out."
    },
    {
      question: "Posso integrar com meu CRM atual?",
@@ -42,14 +43,21 @@
  
  export const FAQSection = () => {
    return (
-     <section className="py-20 bg-leadhunter-gray">
-       <div className="container mx-auto px-4">
+     <section className="py-20 radar-bg relative overflow-hidden">
+       {/* Grid Background */}
+       <div className="absolute inset-0 radar-grid opacity-20" />
+       
+       <div className="container mx-auto px-4 relative z-10">
          <div className="text-center max-w-3xl mx-auto mb-16">
-           <h2 className="font-poppins text-3xl md:text-4xl font-bold text-leadhunter-blue-dark mb-4">
-             Perguntas Frequentes
+           <div className="inline-flex items-center gap-2 text-radar-cyan mb-4">
+             <HelpCircle className="h-5 w-5 animate-pulse-soft" />
+             <span className="font-inter text-sm uppercase tracking-wider">FAQ</span>
+           </div>
+           <h2 className="font-poppins text-3xl md:text-4xl font-bold text-white mb-4">
+             Perguntas <span className="gradient-text-radar">Frequentes</span>
            </h2>
-           <p className="font-inter text-lg text-gray-600">
-             Tire suas dúvidas sobre o Lead Hunter Pro.
+           <p className="font-inter text-lg text-white/60">
+             Tire suas dúvidas sobre o Radar Hunter Pro.
            </p>
          </div>
          
@@ -59,12 +67,12 @@
                <AccordionItem 
                  key={index} 
                  value={`item-${index}`}
-                 className="bg-white rounded-lg border-none shadow-sm px-6"
+                 className="card-tech rounded-lg px-6"
                >
-                 <AccordionTrigger className="font-poppins font-semibold text-left text-leadhunter-blue-dark hover:text-leadhunter-blue hover:no-underline">
+                 <AccordionTrigger className="font-poppins font-semibold text-left text-white hover:text-radar-cyan hover:no-underline">
                    {faq.question}
                  </AccordionTrigger>
-                 <AccordionContent className="font-inter text-gray-600">
+                 <AccordionContent className="font-inter text-white/60">
                    {faq.answer}
                  </AccordionContent>
                </AccordionItem>

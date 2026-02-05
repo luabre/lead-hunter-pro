@@ -72,6 +72,17 @@ export default {
 					'red': '#FF5252',
 					'green': '#4CAF50',
 					'gray': '#F5F7FA'
+				},
+				// Radar Hunter Pro theme colors
+				radar: {
+					'dark': '#0a0f1c',
+					'darker': '#050810',
+					'cyan': '#00f0ff',
+					'cyan-glow': 'rgba(0, 240, 255, 0.25)',
+					'indigo': '#6366f1',
+					'purple': '#8b5cf6',
+					'grid': '#1e293b',
+					'accent': '#22d3ee'
 				}
 			},
 			fontFamily: {
@@ -117,13 +128,62 @@ export default {
 					'50%': {
 						opacity: '0.8'
 					}
+				},
+				'radar-sweep': {
+					'0%': {
+						transform: 'rotate(0deg)'
+					},
+					'100%': {
+						transform: 'rotate(360deg)'
+					}
+				},
+				'radar-pulse': {
+					'0%': {
+						transform: 'scale(0.5)',
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'scale(2)',
+						opacity: '0'
+					}
+				},
+				'glow-pulse': {
+					'0%, 100%': {
+						opacity: '1',
+						boxShadow: '0 0 20px rgba(0, 240, 255, 0.5)'
+					},
+					'50%': {
+						opacity: '0.8',
+						boxShadow: '0 0 40px rgba(0, 240, 255, 0.8)'
+					}
+				},
+				'float': {
+					'0%, 100%': {
+						transform: 'translateY(0px)'
+					},
+					'50%': {
+						transform: 'translateY(-10px)'
+					}
+				},
+				'scan-line': {
+					'0%': {
+						transform: 'translateY(-100%)'
+					},
+					'100%': {
+						transform: 'translateY(100%)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
-				'pulse-soft': 'pulse-soft 2s infinite'
+				'pulse-soft': 'pulse-soft 2s infinite',
+				'radar-sweep': 'radar-sweep 4s linear infinite',
+				'radar-pulse': 'radar-pulse 3s ease-out infinite',
+				'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+				'float': 'float 3s ease-in-out infinite',
+				'scan-line': 'scan-line 3s linear infinite'
 			}
 		}
 	},

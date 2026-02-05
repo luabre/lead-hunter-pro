@@ -122,4 +122,62 @@
   .opportunity-cold {
     @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300;
   }
+
+  /* Radar Theme Styles */
+  .radar-bg {
+    background: linear-gradient(135deg, #0a0f1c 0%, #0d1529 50%, #0a0f1c 100%);
+  }
+
+  .radar-grid {
+    background-image: 
+      linear-gradient(rgba(30, 41, 59, 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 41, 59, 0.5) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  .radar-glow {
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.3), 0 0 60px rgba(0, 240, 255, 0.1);
+  }
+
+  .radar-glow-intense {
+    box-shadow: 0 0 40px rgba(0, 240, 255, 0.5), 0 0 80px rgba(0, 240, 255, 0.2);
+  }
+
+  .text-glow-cyan {
+    text-shadow: 0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3);
+  }
+
+  .border-glow {
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.1), inset 0 0 15px rgba(0, 240, 255, 0.05);
+  }
+
+  .card-tech {
+    background: rgba(10, 15, 28, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+  }
+
+  .card-tech:hover {
+    border-color: rgba(0, 240, 255, 0.5);
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+  }
+
+  .btn-radar {
+    background: linear-gradient(135deg, #00f0ff 0%, #6366f1 100%);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .btn-radar:hover {
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.6), 0 0 60px rgba(0, 240, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .gradient-text-radar {
+    background: linear-gradient(135deg, #00f0ff 0%, #6366f1 50%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }

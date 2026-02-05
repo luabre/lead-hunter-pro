@@ -1,109 +1,139 @@
  import { Button } from "@/components/ui/button";
  import { Badge } from "@/components/ui/badge";
- import { ArrowRight, Play, Users, TrendingUp, Target } from "lucide-react";
+ import { ArrowRight, Play, Users, TrendingUp, Target, Radar } from "lucide-react";
  import { Link } from "react-router-dom";
  
  export const HeroSection = () => {
    return (
-     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-leadhunter-blue-dark via-leadhunter-blue to-leadhunter-teal">
-       {/* Background Pattern */}
-       <div className="absolute inset-0 opacity-10">
-         <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
-         <div className="absolute bottom-20 right-10 w-96 h-96 bg-leadhunter-teal rounded-full blur-3xl" />
+     <section className="relative min-h-screen flex items-center justify-center overflow-hidden radar-bg">
+       {/* Radar Grid Background */}
+       <div className="absolute inset-0 radar-grid opacity-30" />
+       
+       {/* Radar Animation Container */}
+       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-20">
+         {/* Radar Circles */}
+         <div className="absolute inset-0 border-2 border-radar-cyan/30 rounded-full" />
+         <div className="absolute inset-[15%] border border-radar-cyan/20 rounded-full" />
+         <div className="absolute inset-[30%] border border-radar-cyan/15 rounded-full" />
+         <div className="absolute inset-[45%] border border-radar-cyan/10 rounded-full" />
+         
+         {/* Radar Sweep Line */}
+         <div className="absolute inset-0 animate-radar-sweep origin-center">
+           <div className="absolute top-1/2 left-1/2 w-1/2 h-0.5 bg-gradient-to-r from-radar-cyan to-transparent origin-left" />
+         </div>
+         
+         {/* Pulsing Circles */}
+         <div className="absolute inset-[20%] border border-radar-cyan/40 rounded-full animate-radar-pulse" style={{ animationDelay: '0s' }} />
+         <div className="absolute inset-[20%] border border-radar-cyan/40 rounded-full animate-radar-pulse" style={{ animationDelay: '1s' }} />
+         <div className="absolute inset-[20%] border border-radar-cyan/40 rounded-full animate-radar-pulse" style={{ animationDelay: '2s' }} />
+       </div>
+       
+       {/* Floating Dots (detected leads) */}
+       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+         <div className="absolute top-[20%] left-[15%] w-2 h-2 bg-radar-cyan rounded-full animate-glow-pulse" />
+         <div className="absolute top-[35%] left-[25%] w-1.5 h-1.5 bg-radar-accent rounded-full animate-pulse-soft" />
+         <div className="absolute top-[60%] left-[10%] w-2 h-2 bg-radar-indigo rounded-full animate-float" />
+         <div className="absolute top-[25%] right-[20%] w-2.5 h-2.5 bg-radar-cyan rounded-full animate-glow-pulse" style={{ animationDelay: '0.5s' }} />
+         <div className="absolute top-[45%] right-[15%] w-1.5 h-1.5 bg-radar-purple rounded-full animate-pulse-soft" />
+         <div className="absolute top-[70%] right-[25%] w-2 h-2 bg-radar-accent rounded-full animate-float" style={{ animationDelay: '1s' }} />
+         <div className="absolute bottom-[20%] left-[30%] w-1.5 h-1.5 bg-radar-cyan rounded-full animate-pulse-soft" />
+         <div className="absolute bottom-[30%] right-[35%] w-2 h-2 bg-radar-indigo rounded-full animate-glow-pulse" style={{ animationDelay: '1.5s' }} />
        </div>
        
        <div className="container mx-auto px-4 py-20 relative z-10">
          <div className="grid lg:grid-cols-2 gap-12 items-center">
            {/* Left Content */}
            <div className="text-center lg:text-left space-y-8">
-             <Badge className="bg-leadhunter-gold/20 text-leadhunter-gold border-leadhunter-gold/30 hover:bg-leadhunter-gold/30">
-               🚀 Plataforma #1 em Prospecção com IA
+             <Badge className="bg-radar-cyan/10 text-radar-cyan border-radar-cyan/30 hover:bg-radar-cyan/20 font-medium">
+               <Radar className="w-4 h-4 mr-2 animate-pulse-soft" />
+               Tecnologia de Detecção Avançada
              </Badge>
              
              <h1 className="font-poppins text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-               Transforme Leads em <span className="text-leadhunter-teal">Vendas</span> com Inteligência Artificial
+               Detecte Leads com{" "}
+               <span className="gradient-text-radar text-glow-cyan">Precisão de RADAR</span>
              </h1>
              
-             <p className="font-inter text-lg md:text-xl text-white/80 max-w-xl">
-               Automatize sua prospecção, qualifique leads automaticamente e feche mais negócios com nossa plataforma de vendas inteligente.
+             <p className="font-inter text-lg md:text-xl text-white/70 max-w-xl">
+               Nossa IA varre o mercado em tempo real, identifica oportunidades e qualifica leads automaticamente. Como um radar, nada escapa.
              </p>
              
              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                <Button 
                  size="lg" 
-                 className="bg-leadhunter-teal hover:bg-leadhunter-teal/90 text-white font-semibold px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
+                 className="btn-radar text-white font-semibold px-8 py-6 text-lg rounded-lg"
                  asChild
                >
                  <Link to="/login">
-                   Comece Grátis <ArrowRight className="ml-2 h-5 w-5" />
+                   Ativar Radar <ArrowRight className="ml-2 h-5 w-5" />
                  </Link>
                </Button>
                
                <Button 
                  size="lg" 
                  variant="outline" 
-                 className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-lg"
+                 className="border-radar-cyan/30 text-radar-cyan hover:bg-radar-cyan/10 px-8 py-6 text-lg rounded-lg"
                >
                  <Play className="mr-2 h-5 w-5" /> Ver Demo
                </Button>
              </div>
              
              {/* Stats */}
-             <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/20">
+             <div className="grid grid-cols-3 gap-6 pt-8 border-t border-radar-grid">
                <div className="text-center lg:text-left">
                  <div className="flex items-center justify-center lg:justify-start gap-2">
-                   <Users className="h-5 w-5 text-leadhunter-teal" />
+                   <Users className="h-5 w-5 text-radar-cyan" />
                    <span className="font-poppins text-2xl md:text-3xl font-bold text-white">5.000+</span>
                  </div>
-                 <p className="text-white/60 text-sm mt-1">Empresas ativas</p>
+                 <p className="text-white/50 text-sm mt-1">Empresas ativas</p>
                </div>
                <div className="text-center lg:text-left">
                  <div className="flex items-center justify-center lg:justify-start gap-2">
-                   <TrendingUp className="h-5 w-5 text-leadhunter-teal" />
+                   <TrendingUp className="h-5 w-5 text-radar-accent" />
                    <span className="font-poppins text-2xl md:text-3xl font-bold text-white">300%</span>
                  </div>
-                 <p className="text-white/60 text-sm mt-1">Mais conversão</p>
+                 <p className="text-white/50 text-sm mt-1">Mais conversão</p>
                </div>
                <div className="text-center lg:text-left">
                  <div className="flex items-center justify-center lg:justify-start gap-2">
-                   <Target className="h-5 w-5 text-leadhunter-teal" />
+                   <Target className="h-5 w-5 text-radar-indigo" />
                    <span className="font-poppins text-2xl md:text-3xl font-bold text-white">2M+</span>
                  </div>
-                 <p className="text-white/60 text-sm mt-1">Leads qualificados</p>
+                 <p className="text-white/50 text-sm mt-1">Leads detectados</p>
                </div>
              </div>
            </div>
            
            {/* Right Content - Dashboard Preview */}
            <div className="relative hidden lg:block">
-             <div className="relative bg-white/10 backdrop-blur-lg rounded-2xl p-4 shadow-2xl border border-white/20">
+             <div className="relative card-tech rounded-2xl p-4 radar-glow">
                <img 
                  src="/lovable-uploads/039c9c09-384f-4a6e-a325-10972460bfe1.png" 
-                 alt="Lead Hunter Pro Dashboard Preview"
+                 alt="Radar Hunter Pro Dashboard Preview"
                  className="rounded-xl shadow-lg w-full"
                />
                
                {/* Floating Cards */}
-               <div className="absolute -left-8 top-1/4 bg-white rounded-lg p-4 shadow-xl animate-fade-in">
+               <div className="absolute -left-8 top-1/4 card-tech rounded-lg p-4 animate-float">
                  <div className="flex items-center gap-3">
-                   <div className="w-10 h-10 bg-leadhunter-green/20 rounded-full flex items-center justify-center">
-                     <TrendingUp className="h-5 w-5 text-leadhunter-green" />
+                   <div className="w-10 h-10 bg-radar-cyan/20 rounded-full flex items-center justify-center">
+                     <TrendingUp className="h-5 w-5 text-radar-cyan" />
                    </div>
                    <div>
-                     <p className="text-xs text-gray-500">Conversão</p>
-                     <p className="font-semibold text-leadhunter-blue-dark">+47% hoje</p>
+                     <p className="text-xs text-white/50">Detectado</p>
+                     <p className="font-semibold text-radar-cyan">+47% hoje</p>
                    </div>
                  </div>
                </div>
                
-               <div className="absolute -right-8 bottom-1/4 bg-white rounded-lg p-4 shadow-xl animate-fade-in">
+               <div className="absolute -right-8 bottom-1/4 card-tech rounded-lg p-4 animate-float" style={{ animationDelay: '1.5s' }}>
                  <div className="flex items-center gap-3">
-                   <div className="w-10 h-10 bg-leadhunter-teal/20 rounded-full flex items-center justify-center">
-                     <Target className="h-5 w-5 text-leadhunter-teal" />
+                   <div className="w-10 h-10 bg-radar-indigo/20 rounded-full flex items-center justify-center">
+                     <Target className="h-5 w-5 text-radar-indigo" />
                    </div>
                    <div>
-                     <p className="text-xs text-gray-500">Leads qualificados</p>
-                     <p className="font-semibold text-leadhunter-blue-dark">128 novos</p>
+                     <p className="text-xs text-white/50">Leads no radar</p>
+                     <p className="font-semibold text-radar-accent">128 novos</p>
                    </div>
                  </div>
                </div>
@@ -114,8 +144,8 @@
        
        {/* Scroll Indicator */}
        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-         <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-           <div className="w-1 h-3 bg-white/50 rounded-full mt-2" />
+         <div className="w-6 h-10 border-2 border-radar-cyan/30 rounded-full flex justify-center">
+           <div className="w-1 h-3 bg-radar-cyan/50 rounded-full mt-2" />
          </div>
        </div>
      </section>
