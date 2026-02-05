@@ -1,87 +1,83 @@
 
-# Plano: Corrigir Imagem LeadHunter e Faixa Branca Lateral
+
+# Plano: Ajustar Botao Ver Demo e Posicao do Card Detectado
 
 ## Problemas Identificados
 
-### 1. Imagem com "LeadHunter Pro"
-A imagem do dashboard `/lovable-uploads/039c9c09-384f-4a6e-a325-10972460bfe1.png` e uma imagem estatica que mostra "LeadHunter Pro" no texto. Nao e possivel editar o texto dentro de uma imagem PNG via codigo.
+### 1. Botao "Ver Demo" com Fundo Branco/Cinza
+O botao atualmente tem um fundo que nao deveria ter. Precisa ser transparente com borda sutil e texto branco.
 
-**Solucao**: Ocultar completamente a imagem com um overlay mais forte e/ou substituir por um visual puramente CSS que mostre "RadarHunter Pro".
-
-### 2. Faixa Branca Lateral
-A faixa branca vem de multiplas camadas:
-- `App.tsx` tem `<div className="flex flex-col min-h-screen">` sem fundo escuro
-- `LandingPage.tsx` tem `<main className="min-h-screen">` sem fundo escuro
-- A variavel CSS `--background` no modo light e clara
-
-**Solucao**: Adicionar fundo escuro forcado no `LandingPage.tsx` e garantir que todas as secoes tenham o background radar.
+### 2. Card "Detectado +47% hoje" Posicionado Alto Demais
+O card flutuante esta em `top-1/4` (25% do topo), bloqueando a visao do nome "RadarHunter Pro" no dashboard CSS.
 
 ---
 
-## Arquivos a Modificar
+## Solucoes
 
-### 1. src/pages/LandingPage.tsx
-Adicionar classe de fundo escuro no `<main>`:
+### Correcao 1: Botao Ver Demo
+
+**Arquivo:** `src/components/landing/HeroSection.tsx`
+
+**De (linha 72-78):**
 ```jsx
-<main className="min-h-screen bg-[#0a0f1c]">
+<Button 
+  size="lg" 
+  variant="outline" 
+  className="border-radar-cyan/30 text-radar-cyan hover:bg-radar-cyan/10 px-8 py-6 text-lg rounded-lg"
+>
+  <Play className="mr-2 h-5 w-5" /> Ver Demo
+</Button>
 ```
 
-### 2. src/components/landing/HeroSection.tsx
-Duas opcoes para resolver a imagem com LeadHunter:
-
-**Opcao A - Overlay Total (Recomendada)**
-Cobrir a imagem completamente com um overlay escuro e criar um visual CSS simulando um dashboard tech com o texto "RadarHunter Pro".
-
-**Opcao B - Remover Imagem**
-Remover a imagem do dashboard e manter apenas os floating cards animados com efeito radar visual.
-
-**Implementacao Opcao A:**
-- Adicionar overlay com opacidade 100% sobre a imagem
-- Criar um visual de "terminal/dashboard" com CSS puro
-- Exibir "RadarHunter Pro" em texto estilizado
-- Manter os floating cards animados
-
----
-
-## Detalhes Tecnicos
-
-### LandingPage.tsx - Novo codigo
+**Para:**
 ```jsx
-const LandingPage = () => {
-  return (
-    <main className="min-h-screen bg-[#0a0f1c]">
-      <HeroSection />
-      <PainPointsSection />
-      ...
-    </main>
-  );
-};
+<Button 
+  size="lg" 
+  variant="outline" 
+  className="bg-transparent border-radar-cyan/30 text-white hover:bg-radar-cyan/10 hover:text-white px-8 py-6 text-lg rounded-lg"
+>
+  <Play className="mr-2 h-5 w-5" /> Ver Demo
+</Button>
 ```
 
-### HeroSection.tsx - Dashboard Visual Substituido
-
-Substituir a imagem do dashboard por:
-1. Um container escuro com borda neon
-2. Texto "RadarHunter Pro" com efeito gradient
-3. Linhas simulando interface de dashboard
-4. Animacoes de radar/pulse
+**Mudancas:**
+- Adicionar `bg-transparent` para garantir fundo transparente
+- Mudar `text-radar-cyan` para `text-white` (texto branco)
+- Adicionar `hover:text-white` para manter texto branco no hover
 
 ---
 
-## Ordem de Implementacao
+### Correcao 2: Reposicionar Card "Detectado"
 
-1. Adicionar fundo escuro forcado em `LandingPage.tsx`
-2. Modificar `HeroSection.tsx`:
-   - Remover/ocultar imagem PNG
-   - Criar visual CSS do "dashboard" com RadarHunter Pro
-   - Manter floating cards animados
-3. Testar e verificar se a faixa branca desapareceu
+**Arquivo:** `src/components/landing/HeroSection.tsx`
+
+**De (linha 181):**
+```jsx
+<div className="absolute -left-6 top-1/4 rounded-lg p-4 animate-float z-10" ...>
+```
+
+**Para:**
+```jsx
+<div className="absolute -left-6 top-[55%] rounded-lg p-4 animate-float z-10" ...>
+```
+
+**Mudanca:**
+- Alterar `top-1/4` (25%) para `top-[55%]` (55%) para mover o card para baixo
+- Isso deixa o nome "RadarHunter Pro" visivel no topo do dashboard
+
+---
+
+## Arquivo a Modificar
+
+| Arquivo | Linha | Mudanca |
+|---------|-------|---------|
+| `src/components/landing/HeroSection.tsx` | 74-75 | Adicionar `bg-transparent` e `text-white` no botao |
+| `src/components/landing/HeroSection.tsx` | 181 | Mudar `top-1/4` para `top-[55%]` |
 
 ---
 
 ## Resultado Esperado
 
-- Fundo totalmente escuro em toda a landing page
-- Nenhuma faixa branca lateral visivel
-- Card do dashboard mostrando "RadarHunter Pro" em vez da imagem antiga
-- Visual tech/radar mantido e impactante
+- Botao "Ver Demo" com fundo transparente e texto branco
+- Card "Detectado +47% hoje" posicionado mais abaixo, sem bloquear o nome do produto
+
