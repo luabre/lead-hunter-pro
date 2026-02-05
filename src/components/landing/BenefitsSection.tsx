@@ -47,7 +47,7 @@
  
  export const BenefitsSection = () => {
    return (
-     <section className="py-20 radar-bg relative overflow-hidden">
+     <section id="beneficios" className="py-20 radar-bg relative overflow-hidden">
        {/* Grid Background */}
        <div className="absolute inset-0 radar-grid opacity-20" />
        
