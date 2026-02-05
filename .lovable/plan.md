@@ -1,290 +1,136 @@
 
-# Plano: Redesign Completo da Landing Page - Radar Hunter Pro
+# Plano: Corrigir Problemas Visuais da Landing Page
 
-## Visao Geral
+## Problemas Identificados
 
-Transformar a landing page atual em uma experiencia visual moderna, impactante e tecnologica, com tema de RADAR. O novo design tera um visual dark/tech com elementos animados que remetem a radar, ondas de sonar, e tecnologia de ponta.
+### 1. Cards Brancos Sem Texto
+Os componentes `Card` usam classes CSS que entram em conflito com o tema escuro. A classe `bg-card` do Tailwind aplica fundo branco (do CSS variables), sobrescrevendo a classe `card-tech` que deveria criar o visual escuro glassmorphism.
 
----
+### 2. Barra Lateral Branca na Hero
+A imagem do dashboard usada na Hero (`039c9c09-384f-4a6e-a325-10972460bfe1.png`) mostra uma sidebar branca que destoa do visual tech escuro. Como você mencionou na imagem 2, a Hero mostra "LeadHunter Pro" - precisamos atualizar isso.
 
-## Mudancas Principais
-
-### 1. Renomear Produto
-- **De:** Lead Hunter Pro
-- **Para:** Radar Hunter Pro
-- Atualizar em todos os componentes da landing
-- Atualizar Logo component
-- Atualizar Footer
-- Atualizar textos de referencia
-
-### 2. Nova Paleta de Cores (Tech/Radar)
-
-```text
-Cores Principais:
-- Background escuro: #0a0f1c (azul escuro profundo)
-- Accent primario: #00f0ff (ciano neon)
-- Accent secundario: #6366f1 (indigo)
-- Gradientes: Ciano para indigo
-- Destaques: #22d3ee (cyan-400)
-- Texto: Branco e tons de cinza azulado
-```
-
-### 3. Elementos Visuais de Radar
-
-**Hero Section:**
-- Fundo animado com circulos concentricos de radar
-- Efeito de "sweep" de radar girando (CSS animation)
-- Pontos pulsantes representando "leads detectados"
-- Grid de linhas finas no background (estilo HUD)
-- Particulas flutuantes tech
-
-**Visual Pattern:**
-- Circulos concentricos expandindo (radar pulse)
-- Linhas de grid tipo interface de radar
-- Icones com glow effect (neon)
-- Cards com bordas brilhantes (glow borders)
+### 3. Nome na Hero Incorreto
+O nome precisa ser alterado para **RadarHunter Pro** (palavra unica composta).
 
 ---
 
-## Componentes a Modificar
+## Solucoes
 
-### 1. HeroSection.tsx - Redesign Completo
+### Correcao 1: Forcar Estilos Escuros nos Cards
 
-```text
-Novos elementos:
-- Animacao de radar girando no background
-- Circulos concentricos pulsantes
-- Grid de linhas tech
-- Headline com efeito de digitacao ou glow
-- Stats com icones animados
-- Botoes com efeito neon/glow
-- Imagem do dashboard com moldura tech
+Modificar todos os componentes da landing para:
+- Remover a dependencia do componente `Card` da UI library
+- Usar divs com estilos inline/classes diretas que garantam o fundo escuro
+- Aplicar `!important` ou especificidade maior nas classes
+
+**Arquivos afetados:**
+- `src/components/landing/BenefitsSection.tsx`
+- `src/components/landing/FeaturesSection.tsx`
+- `src/components/landing/PricingSection.tsx`
+- `src/components/landing/TestimonialsSection.tsx`
+- `src/components/landing/PainPointsSection.tsx`
+
+**Solucao tecnica:** Substituir:
+```jsx
+<Card className="card-tech">
+```
+Por:
+```jsx
+<div className="bg-[#0a0f1c]/80 backdrop-blur-md border border-[#00f0ff]/20 rounded-lg hover:border-[#00f0ff]/50 transition-all">
 ```
 
-### 2. PainPointsSection.tsx
+### Correcao 2: Atualizar Nome na Hero
 
-```text
-Mudancas:
-- Background escuro com grid sutil
-- Cards com borda glow
-- Icones com efeito neon
-- Transicao suave entre secoes
-```
+**Arquivo:** `src/components/landing/HeroSection.tsx`
 
-### 3. BenefitsSection.tsx
+Alterar o texto do headline e alt da imagem:
+- De: "Radar Hunter Pro" ou "LeadHunter Pro"  
+- Para: **"RadarHunter Pro"**
 
-```text
-Mudancas:
-- Grid tech no background
-- Cards com hover glow effect
-- Icones com animacao pulse
-- Gradientes tech nos icones
-```
+### Correcao 3: Remover Imagem da Sidebar Branca
 
-### 4. HowItWorksSection.tsx
+Opcoes para a Hero:
+1. **Remover a imagem do dashboard** temporariamente e usar visual abstrato
+2. **Adicionar overlay escuro** sobre a imagem para disfarcar a sidebar
+3. **Criar mockup visual com CSS** simulando um dashboard tech
 
-```text
-Mudancas:
-- Timeline com efeito de radar sweep
-- Linhas de conexao animadas
-- Numeros com glow effect
-- Background com ondas de radar
-```
-
-### 5. FeaturesSection.tsx
-
-```text
-Mudancas:
-- Grid escuro com accent points
-- Cards minimalistas com borda sutil
-- Hover effects com glow
-```
-
-### 6. PricingSection.tsx
-
-```text
-Mudancas:
-- Cards com borda gradiente
-- Plano destaque com glow intenso
-- Badges com efeito neon
-- Background tech escuro
-```
-
-### 7. TestimonialsSection.tsx
-
-```text
-Mudancas:
-- Cards com glassmorphism aprimorado
-- Fotos com borda glow
-- Estrelas com efeito dourado brilhante
-```
-
-### 8. FAQSection.tsx
-
-```text
-Mudancas:
-- Accordion com bordas sutis
-- Hover effects tech
-- Icones animados
-```
-
-### 9. CTASection.tsx
-
-```text
-Mudancas:
-- Background com animacao de radar
-- Botao principal com glow pulsante
-- Efeitos de particulas
-```
-
-### 10. LandingFooter.tsx
-
-```text
-Mudancas:
-- Nome atualizado para Radar Hunter Pro
-- Visual tech consistente
-- Links com hover glow
-```
-
-### 11. Logo.tsx
-
-```text
-Mudancas:
-- Nome atualizado para Radar Hunter Pro
-```
-
----
-
-## Novas Animacoes CSS (tailwind.config.ts)
-
-```text
-Keyframes a adicionar:
-- radar-sweep: Rotacao 360 graus para efeito de radar
-- radar-pulse: Circulos expandindo do centro
-- glow-pulse: Brilho pulsante em elementos
-- float: Elementos flutuando suavemente
-- scan-line: Linha de escaneamento vertical
-- typing: Efeito de digitacao no headline
-```
-
----
-
-## Estrutura Visual do Hero (Conceito)
-
-```text
-+--------------------------------------------------+
-|  [Logo] Radar Hunter Pro          [Login]        |
-+--------------------------------------------------+
-|                                                  |
-|     +---------+                                  |
-|    /  RADAR   \     Detecte Leads com           |
-|   |  CIRCLES   |    Precisao de RADAR           |
-|   |   o   o   |                                  |
-|    \    o    /     [Comece Gratis] [Ver Demo]   |
-|     +---------+                                  |
-|                                                  |
-|  [5.000+]    [300%]    [2M+]                     |
-|  Empresas    Conversao  Leads                   |
-+--------------------------------------------------+
-|       Background: Grid + Radar Animation         |
-+--------------------------------------------------+
-```
-
----
-
-## Cores Personalizadas (tailwind.config.ts)
-
-```text
-radar: {
-  'dark': '#0a0f1c',
-  'darker': '#050810',
-  'cyan': '#00f0ff',
-  'cyan-glow': '#00f0ff40',
-  'indigo': '#6366f1',
-  'purple': '#8b5cf6',
-  'grid': '#1e293b',
-  'accent': '#22d3ee'
-}
-```
-
----
-
-## Animacoes Detalhadas
-
-### Radar Sweep (Linha girando)
-```text
-- Linha que gira 360 graus
-- Opacidade gradiente do centro para fora
-- Duracao: 4s linear infinite
-```
-
-### Radar Pulse (Circulos expandindo)
-```text
-- 3-4 circulos concentricos
-- Expandem do centro
-- Opacidade diminui ao expandir
-- Staggered animation (delay entre cada)
-```
-
-### Glow Effect
-```text
-- Box-shadow com cor cyan/indigo
-- Pulsante com opacidade variavel
-- Hover intensifica o glow
-```
-
-### Grid Background
-```text
-- Linhas finas em grid
-- Cor sutil (#1e293b)
-- Gradiente de opacidade do centro
-```
+Recomendacao: Opcao 2 - Aplicar overlay gradiente escuro sobre a imagem.
 
 ---
 
 ## Arquivos a Modificar
 
-1. `tailwind.config.ts` - Adicionar cores radar e animacoes
-2. `src/index.css` - Adicionar classes CSS customizadas
-3. `src/components/landing/HeroSection.tsx` - Redesign completo
-4. `src/components/landing/PainPointsSection.tsx` - Tema tech
-5. `src/components/landing/BenefitsSection.tsx` - Cards glow
-6. `src/components/landing/HowItWorksSection.tsx` - Timeline radar
-7. `src/components/landing/FeaturesSection.tsx` - Grid tech
-8. `src/components/landing/PricingSection.tsx` - Cards premium
-9. `src/components/landing/TestimonialsSection.tsx` - Glassmorphism
-10. `src/components/landing/FAQSection.tsx` - Accordion tech
-11. `src/components/landing/CTASection.tsx` - CTA animado
-12. `src/components/landing/LandingFooter.tsx` - Renomear + style
-13. `src/components/layout/Logo.tsx` - Renomear para Radar Hunter Pro
+| Arquivo | Mudanca |
+|---------|---------|
+| `src/components/landing/HeroSection.tsx` | Corrigir nome para RadarHunter Pro, adicionar overlay na imagem |
+| `src/components/landing/BenefitsSection.tsx` | Substituir Card por div com estilos diretos |
+| `src/components/landing/FeaturesSection.tsx` | Substituir Card por div com estilos diretos |
+| `src/components/landing/PricingSection.tsx` | Substituir Card por div com estilos diretos |
+| `src/components/landing/TestimonialsSection.tsx` | Substituir Card por div com estilos diretos |
+| `src/components/landing/PainPointsSection.tsx` | Substituir Card por div com estilos diretos |
+| `src/components/landing/FAQSection.tsx` | Verificar e corrigir nome |
+| `src/components/landing/CTASection.tsx` | Corrigir nome |
+| `src/components/landing/LandingFooter.tsx` | Corrigir nome |
+| `src/components/layout/Logo.tsx` | Corrigir nome |
 
 ---
 
 ## Ordem de Implementacao
 
-1. Atualizar tailwind.config.ts com novas cores e animacoes
-2. Adicionar classes CSS customizadas no index.css
-3. Redesenhar HeroSection com animacao de radar
-4. Atualizar PainPointsSection com tema escuro
-5. Redesenhar BenefitsSection com cards glow
-6. Atualizar HowItWorksSection com timeline tech
-7. Redesenhar FeaturesSection com grid escuro
-8. Atualizar PricingSection com visual premium
-9. Redesenhar TestimonialsSection
-10. Atualizar FAQSection
-11. Redesenhar CTASection com animacoes
-12. Atualizar LandingFooter
-13. Atualizar Logo component
-14. Testar responsividade e animacoes
+1. Corrigir nome para RadarHunter Pro em HeroSection
+2. Adicionar overlay escuro na imagem do dashboard na Hero
+3. Substituir Cards por divs em BenefitsSection
+4. Substituir Cards por divs em FeaturesSection  
+5. Substituir Cards por divs em PricingSection
+6. Substituir Cards por divs em TestimonialsSection
+7. Substituir Cards por divs em PainPointsSection
+8. Corrigir nome nos demais arquivos (FAQ, CTA, Footer, Logo)
+9. Testar responsividade e visual
+
+---
+
+## Secao Tecnica
+
+### Classe card-tech Atualizada
+
+Garantir que a classe `card-tech` tenha especificidade suficiente no CSS:
+
+```css
+.card-tech {
+  background: rgba(10, 15, 28, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+}
+```
+
+### Alternativa: Override Inline
+
+Para garantir que funcione, usar estilos inline com Tailwind:
+
+```jsx
+<div 
+  className="rounded-lg border backdrop-blur-md transition-all"
+  style={{ 
+    background: 'rgba(10, 15, 28, 0.9)', 
+    borderColor: 'rgba(0, 240, 255, 0.2)' 
+  }}
+>
+```
+
+### Overlay na Imagem do Dashboard
+
+```jsx
+<div className="relative">
+  <img src="..." className="..." />
+  <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1c] via-transparent to-[#0a0f1c] rounded-xl" />
+</div>
+```
 
 ---
 
 ## Resultado Esperado
 
-Uma landing page dark, moderna e impactante que:
-- Remete imediatamente a tecnologia de radar/deteccao
-- Tem animacoes suaves e profissionais
-- Usa cores neon (cyan/indigo) para destacar elementos
-- Transmite inovacao e precisao
-- Diferencia-se completamente do visual anterior
-- Mantem excelente legibilidade e UX
+- Cards com fundo escuro e texto visivel em branco
+- Imagem do dashboard com transicao suave para o fundo escuro
+- Nome consistente "RadarHunter Pro" em toda a pagina
+- Visual tech/radar mantido e funcional
