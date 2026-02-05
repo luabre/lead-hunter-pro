@@ -72,7 +72,7 @@
                <Button 
                  size="lg" 
                  variant="outline" 
-                 className="border-radar-cyan/30 text-radar-cyan hover:bg-radar-cyan/10 px-8 py-6 text-lg rounded-lg"
+                 className="bg-transparent border-radar-cyan/30 text-white hover:bg-radar-cyan/10 hover:text-white px-8 py-6 text-lg rounded-lg"
                >
                  <Play className="mr-2 h-5 w-5" /> Ver Demo
                </Button>
@@ -178,7 +178,7 @@
               </div>
                
                {/* Floating Cards */}
-              <div className="absolute -left-6 top-1/4 rounded-lg p-4 animate-float z-10" style={{ background: 'rgba(10, 15, 28, 0.98)', border: '1px solid rgba(0, 240, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 240, 255, 0.2)' }}>
+              <div className="absolute -left-6 top-[55%] rounded-lg p-4 animate-float z-10" style={{ background: 'rgba(10, 15, 28, 0.98)', border: '1px solid rgba(0, 240, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 240, 255, 0.2)' }}>
                  <div className="flex items-center gap-3">
                    <div className="w-10 h-10 bg-radar-cyan/20 rounded-full flex items-center justify-center">
                      <TrendingUp className="h-5 w-5 text-radar-cyan" />
