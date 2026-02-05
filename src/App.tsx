@@ -2,6 +2,7 @@
 import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+ import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import Companies from "./pages/Companies";
 import Contacts from "./pages/Contacts";
@@ -36,6 +37,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+         <Route path="/vendas" element={<LandingPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/companies" element={<Companies />} />
         <Route path="/contacts" element={<Contacts />} />
