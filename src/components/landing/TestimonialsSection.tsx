@@ -1,5 +1,5 @@
  import { Card, CardContent } from "@/components/ui/card";
- import { Star, Quote } from "lucide-react";
+ import { Star, Quote, MessageSquare } from "lucide-react";
  import {
    Carousel,
    CarouselContent,
@@ -10,7 +10,7 @@
  
  const testimonials = [
    {
-     quote: "O Lead Hunter Pro triplicou nossa taxa de conversão em apenas 2 meses! A IA SDR é simplesmente incrível.",
+     quote: "O Radar Hunter Pro triplicou nossa taxa de conversão em apenas 2 meses! A IA SDR é simplesmente incrível.",
      author: "Maria Silva",
      role: "Diretora Comercial",
      company: "TechCorp",
@@ -61,14 +61,21 @@
  
  export const TestimonialsSection = () => {
    return (
-     <section className="py-20 bg-gradient-to-b from-leadhunter-blue-dark to-leadhunter-blue overflow-hidden">
-       <div className="container mx-auto px-4">
+     <section className="py-20 radar-bg relative overflow-hidden">
+       {/* Grid Background */}
+       <div className="absolute inset-0 radar-grid opacity-20" />
+       
+       <div className="container mx-auto px-4 relative z-10">
          <div className="text-center max-w-3xl mx-auto mb-16">
+           <div className="inline-flex items-center gap-2 text-radar-cyan mb-4">
+             <MessageSquare className="h-5 w-5 animate-pulse-soft" />
+             <span className="font-inter text-sm uppercase tracking-wider">Depoimentos</span>
+           </div>
            <h2 className="font-poppins text-3xl md:text-4xl font-bold text-white mb-4">
-             O Que Nossos Clientes Dizem
+             O Que Nossos <span className="gradient-text-radar">Clientes Dizem</span>
            </h2>
-           <p className="font-inter text-lg text-white/80">
-             Mais de 5.000 empresas já transformaram suas vendas com o Lead Hunter Pro.
+           <p className="font-inter text-lg text-white/60">
+             Mais de 5.000 empresas já transformaram suas vendas com o Radar Hunter Pro.
            </p>
          </div>
          
@@ -82,17 +89,17 @@
            <CarouselContent className="-ml-4">
              {testimonials.map((testimonial, index) => (
                <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                 <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-full">
+                 <Card className="card-tech h-full">
                    <CardContent className="p-6 flex flex-col h-full">
-                     <Quote className="h-8 w-8 text-leadhunter-teal mb-4" />
+                     <Quote className="h-8 w-8 text-radar-cyan mb-4" />
                      
-                     <p className="font-inter text-white/90 flex-grow mb-6">
+                     <p className="font-inter text-white/80 flex-grow mb-6">
                        "{testimonial.quote}"
                      </p>
                      
                      <div className="flex items-center gap-1 mb-4">
                        {[...Array(testimonial.rating)].map((_, i) => (
-                         <Star key={i} className="h-4 w-4 text-leadhunter-gold fill-leadhunter-gold" />
+                         <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                        ))}
                      </div>
                      
@@ -100,13 +107,13 @@
                        <img 
                          src={testimonial.image} 
                          alt={testimonial.author}
-                         className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+                         className="w-12 h-12 rounded-full object-cover border-2 border-radar-cyan/30"
                        />
                        <div>
                          <p className="font-poppins font-semibold text-white">
                            {testimonial.author}
                          </p>
-                         <p className="font-inter text-sm text-white/60">
+                         <p className="font-inter text-sm text-white/50">
                            {testimonial.role}, {testimonial.company}
                          </p>
                        </div>
@@ -116,8 +123,8 @@
                </CarouselItem>
              ))}
            </CarouselContent>
-           <CarouselPrevious className="hidden md:flex -left-4 bg-white/20 border-white/30 text-white hover:bg-white/30" />
-           <CarouselNext className="hidden md:flex -right-4 bg-white/20 border-white/30 text-white hover:bg-white/30" />
+           <CarouselPrevious className="hidden md:flex -left-4 bg-radar-grid border-radar-cyan/30 text-radar-cyan hover:bg-radar-cyan/20" />
+           <CarouselNext className="hidden md:flex -right-4 bg-radar-grid border-radar-cyan/30 text-radar-cyan hover:bg-radar-cyan/20" />
          </Carousel>
        </div>
      </section>

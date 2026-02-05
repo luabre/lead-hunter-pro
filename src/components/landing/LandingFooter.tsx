@@ -1,80 +1,81 @@
  import { Link } from "react-router-dom";
- import { Linkedin, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
+ import { Linkedin, Instagram, Youtube, Mail, Phone, MapPin, Radar } from "lucide-react";
  
  export const LandingFooter = () => {
    return (
-     <footer className="bg-leadhunter-blue-dark text-white">
-       <div className="container mx-auto px-4 py-16">
+     <footer className="radar-bg relative overflow-hidden border-t border-radar-grid">
+       {/* Grid Background */}
+       <div className="absolute inset-0 radar-grid opacity-10" />
+       
+       <div className="container mx-auto px-4 py-16 relative z-10">
          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
            {/* Brand */}
            <div className="space-y-4">
              <div className="flex items-center gap-2">
-               <img 
-                 src="/lovable-uploads/f0e9edb7-59e3-486c-b794-16df510819f5.png" 
-                 alt="Lead Hunter Pro" 
-                 className="h-10 w-auto"
-               />
-               <span className="font-poppins font-semibold text-lg">Lead Hunter Pro</span>
+               <div className="w-10 h-10 bg-gradient-to-br from-radar-cyan to-radar-indigo rounded-lg flex items-center justify-center">
+                 <Radar className="h-6 w-6 text-white" />
+               </div>
+               <span className="font-poppins font-semibold text-lg text-white">Radar Hunter Pro</span>
              </div>
-             <p className="font-inter text-white/70 text-sm">
-               A plataforma de vendas com IA mais completa do Brasil. Transforme leads em clientes de forma inteligente e escalável.
+             <p className="font-inter text-white/50 text-sm">
+               A plataforma de vendas com IA mais completa do Brasil. Detecte leads com precisão de radar.
              </p>
              <div className="flex gap-4">
-               <a href="#" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-                 <Linkedin className="h-5 w-5" />
+               <a href="#" className="w-10 h-10 bg-radar-grid rounded-full flex items-center justify-center hover:bg-radar-cyan/20 transition-colors border border-radar-cyan/20">
+                 <Linkedin className="h-5 w-5 text-radar-cyan" />
                </a>
-               <a href="#" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-                 <Instagram className="h-5 w-5" />
+               <a href="#" className="w-10 h-10 bg-radar-grid rounded-full flex items-center justify-center hover:bg-radar-cyan/20 transition-colors border border-radar-cyan/20">
+                 <Instagram className="h-5 w-5 text-radar-cyan" />
                </a>
-               <a href="#" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-                 <Youtube className="h-5 w-5" />
+               <a href="#" className="w-10 h-10 bg-radar-grid rounded-full flex items-center justify-center hover:bg-radar-cyan/20 transition-colors border border-radar-cyan/20">
+                 <Youtube className="h-5 w-5 text-radar-cyan" />
                </a>
              </div>
            </div>
            
            {/* Product */}
            <div>
-             <h4 className="font-poppins font-semibold mb-4">Produto</h4>
+             <h4 className="font-poppins font-semibold mb-4 text-white">Produto</h4>
              <ul className="space-y-3">
-               <li><a href="#" className="font-inter text-white/70 hover:text-white transition-colors text-sm">IA SDR</a></li>
-               <li><a href="#" className="font-inter text-white/70 hover:text-white transition-colors text-sm">IA Closer</a></li>
-               <li><a href="#" className="font-inter text-white/70 hover:text-white transition-colors text-sm">IA Manager</a></li>
-               <li><a href="#" className="font-inter text-white/70 hover:text-white transition-colors text-sm">Busca Inteligente</a></li>
-               <li><a href="#precos" className="font-inter text-white/70 hover:text-white transition-colors text-sm">Preços</a></li>
+               <li><a href="#" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">IA SDR</a></li>
+               <li><a href="#" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">IA Closer</a></li>
+               <li><a href="#" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">IA Manager</a></li>
+               <li><a href="#" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">Busca Inteligente</a></li>
+               <li><a href="#precos" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">Preços</a></li>
              </ul>
            </div>
            
            {/* Resources */}
            <div>
-             <h4 className="font-poppins font-semibold mb-4">Recursos</h4>
+             <h4 className="font-poppins font-semibold mb-4 text-white">Recursos</h4>
              <ul className="space-y-3">
-               <li><a href="#" className="font-inter text-white/70 hover:text-white transition-colors text-sm">Blog</a></li>
-               <li><a href="#" className="font-inter text-white/70 hover:text-white transition-colors text-sm">Central de Ajuda</a></li>
-               <li><a href="#" className="font-inter text-white/70 hover:text-white transition-colors text-sm">API Docs</a></li>
-               <li><a href="#" className="font-inter text-white/70 hover:text-white transition-colors text-sm">Status</a></li>
-               <li><a href="#" className="font-inter text-white/70 hover:text-white transition-colors text-sm">Integrações</a></li>
+               <li><a href="#" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">Blog</a></li>
+               <li><a href="#" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">Central de Ajuda</a></li>
+               <li><a href="#" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">API Docs</a></li>
+               <li><a href="#" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">Status</a></li>
+               <li><a href="#" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">Integrações</a></li>
              </ul>
            </div>
            
            {/* Contact */}
            <div>
-             <h4 className="font-poppins font-semibold mb-4">Contato</h4>
+             <h4 className="font-poppins font-semibold mb-4 text-white">Contato</h4>
              <ul className="space-y-3">
                <li className="flex items-center gap-2">
-                 <Mail className="h-4 w-4 text-leadhunter-teal" />
-                 <a href="mailto:contato@leadhunterpro.com.br" className="font-inter text-white/70 hover:text-white transition-colors text-sm">
-                   contato@leadhunterpro.com.br
+                 <Mail className="h-4 w-4 text-radar-cyan" />
+                 <a href="mailto:contato@radarhunterpro.com.br" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">
+                   contato@radarhunterpro.com.br
                  </a>
                </li>
                <li className="flex items-center gap-2">
-                 <Phone className="h-4 w-4 text-leadhunter-teal" />
-                 <a href="tel:+5511999999999" className="font-inter text-white/70 hover:text-white transition-colors text-sm">
+                 <Phone className="h-4 w-4 text-radar-cyan" />
+                 <a href="tel:+5511999999999" className="font-inter text-white/50 hover:text-radar-cyan transition-colors text-sm">
                    (11) 99999-9999
                  </a>
                </li>
                <li className="flex items-start gap-2">
-                 <MapPin className="h-4 w-4 text-leadhunter-teal mt-0.5" />
-                 <span className="font-inter text-white/70 text-sm">
+                 <MapPin className="h-4 w-4 text-radar-cyan mt-0.5" />
+                 <span className="font-inter text-white/50 text-sm">
                    São Paulo, SP - Brasil
                  </span>
                </li>
@@ -82,18 +83,18 @@
            </div>
          </div>
          
-         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-           <p className="font-inter text-white/50 text-sm">
-             © 2024 Lead Hunter Pro. Todos os direitos reservados.
+         <div className="border-t border-radar-grid mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+           <p className="font-inter text-white/40 text-sm">
+             © 2024 Radar Hunter Pro. Todos os direitos reservados.
            </p>
            <div className="flex gap-6">
-             <a href="#" className="font-inter text-white/50 hover:text-white text-sm transition-colors">
+             <a href="#" className="font-inter text-white/40 hover:text-radar-cyan text-sm transition-colors">
                Termos de Uso
              </a>
-             <a href="#" className="font-inter text-white/50 hover:text-white text-sm transition-colors">
+             <a href="#" className="font-inter text-white/40 hover:text-radar-cyan text-sm transition-colors">
                Política de Privacidade
              </a>
-             <a href="#" className="font-inter text-white/50 hover:text-white text-sm transition-colors">
+             <a href="#" className="font-inter text-white/40 hover:text-radar-cyan text-sm transition-colors">
                LGPD
              </a>
            </div>
