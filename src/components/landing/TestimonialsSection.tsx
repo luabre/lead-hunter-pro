@@ -1,4 +1,3 @@
- import { Card, CardContent } from "@/components/ui/card";
  import { Star, Quote, MessageSquare } from "lucide-react";
  import {
    Carousel,
@@ -10,7 +9,7 @@
  
  const testimonials = [
    {
-     quote: "O Radar Hunter Pro triplicou nossa taxa de conversão em apenas 2 meses! A IA SDR é simplesmente incrível.",
+    quote: "O RadarHunter Pro triplicou nossa taxa de conversão em apenas 2 meses! A IA SDR é simplesmente incrível.",
      author: "Maria Silva",
      role: "Diretora Comercial",
      company: "TechCorp",
@@ -75,7 +74,7 @@
              O Que Nossos <span className="gradient-text-radar">Clientes Dizem</span>
            </h2>
            <p className="font-inter text-lg text-white/60">
-             Mais de 5.000 empresas já transformaram suas vendas com o Radar Hunter Pro.
+            Mais de 5.000 empresas já transformaram suas vendas com o RadarHunter Pro.
            </p>
          </div>
          
@@ -89,8 +88,11 @@
            <CarouselContent className="-ml-4">
              {testimonials.map((testimonial, index) => (
                <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                 <Card className="card-tech h-full">
-                   <CardContent className="p-6 flex flex-col h-full">
+                <div 
+                  className="h-full rounded-lg"
+                  style={{ background: 'rgba(10, 15, 28, 0.9)', border: '1px solid rgba(0, 240, 255, 0.2)' }}
+                >
+                  <div className="p-6 flex flex-col h-full">
                      <Quote className="h-8 w-8 text-radar-cyan mb-4" />
                      
                      <p className="font-inter text-white/80 flex-grow mb-6">
@@ -118,8 +120,8 @@
                          </p>
                        </div>
                      </div>
-                   </CardContent>
-                 </Card>
+                  </div>
+                </div>
                </CarouselItem>
              ))}
            </CarouselContent>

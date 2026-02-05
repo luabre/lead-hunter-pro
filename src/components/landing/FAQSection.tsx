@@ -17,7 +17,7 @@
    },
    {
      question: "A plataforma está em conformidade com a LGPD?",
-     answer: "Sim! O Radar Hunter Pro foi desenvolvido 100% em conformidade com a LGPD. Todos os dados são tratados de forma segura, e oferecemos ferramentas para gestão de consentimento e opt-out."
+    answer: "Sim! O RadarHunter Pro foi desenvolvido 100% em conformidade com a LGPD. Todos os dados são tratados de forma segura, e oferecemos ferramentas para gestão de consentimento e opt-out."
    },
    {
      question: "Posso integrar com meu CRM atual?",

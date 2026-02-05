@@ -1,4 +1,3 @@
- import { Card, CardContent } from "@/components/ui/card";
  import { 
    Globe, 
    Filter, 
@@ -52,11 +51,12 @@
          
          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
            {features.map((feature, index) => (
-             <Card 
+              <div 
                key={index}
-               className="card-tech transition-all duration-200 group"
+                className="transition-all duration-200 group rounded-lg hover:border-[rgba(0,240,255,0.5)]"
+                style={{ background: 'rgba(10, 15, 28, 0.9)', border: '1px solid rgba(0, 240, 255, 0.2)' }}
              >
-               <CardContent className="p-4 flex items-start gap-3">
+                <div className="p-4 flex items-start gap-3">
                  <div className="w-10 h-10 bg-radar-cyan/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-radar-cyan/20 transition-colors border border-radar-cyan/20">
                    <feature.icon className="h-5 w-5 text-radar-cyan" />
                  </div>
@@ -68,8 +68,8 @@
                      {feature.description}
                    </p>
                  </div>
-               </CardContent>
-             </Card>
+                </div>
+              </div>
            ))}
          </div>
        </div>

@@ -15,7 +15,7 @@
                <div className="w-10 h-10 bg-gradient-to-br from-radar-cyan to-radar-indigo rounded-lg flex items-center justify-center">
                  <Radar className="h-6 w-6 text-white" />
                </div>
-               <span className="font-poppins font-semibold text-lg text-white">Radar Hunter Pro</span>
+                <span className="font-poppins font-semibold text-lg text-white">RadarHunter Pro</span>
              </div>
              <p className="font-inter text-white/50 text-sm">
                A plataforma de vendas com IA mais completa do Brasil. Detecte leads com precisão de radar.
@@ -85,7 +85,7 @@
          
          <div className="border-t border-radar-grid mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
            <p className="font-inter text-white/40 text-sm">
-             © 2024 Radar Hunter Pro. Todos os direitos reservados.
+              © 2024 RadarHunter Pro. Todos os direitos reservados.
            </p>
            <div className="flex gap-6">
              <a href="#" className="font-inter text-white/40 hover:text-radar-cyan text-sm transition-colors">

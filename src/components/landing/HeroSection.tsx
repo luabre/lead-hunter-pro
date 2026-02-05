@@ -51,7 +51,7 @@
              
              <h1 className="font-poppins text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
                Detecte Leads com{" "}
-               <span className="gradient-text-radar text-glow-cyan">Precisão de RADAR</span>
+              <span className="gradient-text-radar text-glow-cyan">RadarHunter Pro</span>
              </h1>
              
              <p className="font-inter text-lg md:text-xl text-white/70 max-w-xl">
@@ -106,15 +106,18 @@
            
            {/* Right Content - Dashboard Preview */}
            <div className="relative hidden lg:block">
-             <div className="relative card-tech rounded-2xl p-4 radar-glow">
+            <div className="relative rounded-2xl p-4 radar-glow overflow-hidden" style={{ background: 'rgba(10, 15, 28, 0.9)', border: '1px solid rgba(0, 240, 255, 0.2)' }}>
                <img 
                  src="/lovable-uploads/039c9c09-384f-4a6e-a325-10972460bfe1.png" 
-                 alt="Radar Hunter Pro Dashboard Preview"
+                alt="RadarHunter Pro Dashboard Preview"
                  className="rounded-xl shadow-lg w-full"
                />
+              {/* Dark overlay to blend sidebar */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1c] via-transparent to-[#0a0f1c] rounded-xl pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1c]/80 via-transparent to-[#0a0f1c]/50 rounded-xl pointer-events-none" />
                
                {/* Floating Cards */}
-               <div className="absolute -left-8 top-1/4 card-tech rounded-lg p-4 animate-float">
+              <div className="absolute -left-8 top-1/4 rounded-lg p-4 animate-float" style={{ background: 'rgba(10, 15, 28, 0.95)', border: '1px solid rgba(0, 240, 255, 0.3)' }}>
                  <div className="flex items-center gap-3">
                    <div className="w-10 h-10 bg-radar-cyan/20 rounded-full flex items-center justify-center">
                      <TrendingUp className="h-5 w-5 text-radar-cyan" />
@@ -126,7 +129,7 @@
                  </div>
                </div>
                
-               <div className="absolute -right-8 bottom-1/4 card-tech rounded-lg p-4 animate-float" style={{ animationDelay: '1.5s' }}>
+              <div className="absolute -right-8 bottom-1/4 rounded-lg p-4 animate-float" style={{ background: 'rgba(10, 15, 28, 0.95)', border: '1px solid rgba(0, 240, 255, 0.3)', animationDelay: '1.5s' }}>
                  <div className="flex items-center gap-3">
                    <div className="w-10 h-10 bg-radar-indigo/20 rounded-full flex items-center justify-center">
                      <Target className="h-5 w-5 text-radar-indigo" />
