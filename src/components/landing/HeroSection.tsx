@@ -106,18 +106,79 @@
            
            {/* Right Content - Dashboard Preview */}
            <div className="relative hidden lg:block">
-            <div className="relative rounded-2xl p-4 radar-glow overflow-hidden" style={{ background: 'rgba(10, 15, 28, 0.9)', border: '1px solid rgba(0, 240, 255, 0.2)' }}>
-               <img 
-                 src="/lovable-uploads/039c9c09-384f-4a6e-a325-10972460bfe1.png" 
-                alt="RadarHunter Pro Dashboard Preview"
-                 className="rounded-xl shadow-lg w-full"
-               />
-              {/* Dark overlay to blend sidebar */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1c] via-transparent to-[#0a0f1c] rounded-xl pointer-events-none" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1c]/80 via-transparent to-[#0a0f1c]/50 rounded-xl pointer-events-none" />
+            <div className="relative rounded-2xl p-6 radar-glow overflow-hidden" style={{ background: 'rgba(10, 15, 28, 0.95)', border: '1px solid rgba(0, 240, 255, 0.3)' }}>
+              {/* CSS Dashboard Visual */}
+              <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #0d1529 0%, #0a0f1c 100%)' }}>
+                {/* Dashboard Header */}
+                <div className="flex items-center gap-2 p-4 border-b border-[#00f0ff]/20">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                  </div>
+                  <div className="flex-1 text-center">
+                    <span className="text-xs text-white/50 font-mono">radarhunter.pro/dashboard</span>
+                  </div>
+                </div>
+                
+                {/* Dashboard Content */}
+                <div className="p-4 space-y-4">
+                  {/* Logo Area */}
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #00f0ff 0%, #6366f1 100%)' }}>
+                      <Radar className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-poppins font-bold text-lg gradient-text-radar">RadarHunter Pro</h3>
+                      <p className="text-xs text-white/50">Enterprise Dashboard</p>
+                    </div>
+                  </div>
+                  
+                  {/* Stats Row */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="p-3 rounded-lg" style={{ background: 'rgba(0, 240, 255, 0.1)', border: '1px solid rgba(0, 240, 255, 0.2)' }}>
+                      <p className="text-xs text-white/50">Leads Ativos</p>
+                      <p className="text-xl font-bold text-radar-cyan">2,847</p>
+                    </div>
+                    <div className="p-3 rounded-lg" style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                      <p className="text-xs text-white/50">Conversões</p>
+                      <p className="text-xl font-bold text-radar-indigo">89%</p>
+                    </div>
+                    <div className="p-3 rounded-lg" style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+                      <p className="text-xs text-white/50">ROI</p>
+                      <p className="text-xl font-bold text-radar-purple">340%</p>
+                    </div>
+                  </div>
+                  
+                  {/* Activity Lines */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-radar-cyan animate-pulse" />
+                      <div className="flex-1 h-2 rounded bg-gradient-to-r from-radar-cyan/30 to-transparent" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-radar-indigo animate-pulse" style={{ animationDelay: '0.5s' }} />
+                      <div className="flex-1 h-2 rounded bg-gradient-to-r from-radar-indigo/30 to-transparent" style={{ width: '75%' }} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-radar-accent animate-pulse" style={{ animationDelay: '1s' }} />
+                      <div className="flex-1 h-2 rounded bg-gradient-to-r from-radar-accent/30 to-transparent" style={{ width: '60%' }} />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Radar Overlay Effect */}
+                <div className="absolute bottom-4 right-4 w-24 h-24 opacity-30">
+                  <div className="absolute inset-0 border border-radar-cyan/50 rounded-full" />
+                  <div className="absolute inset-[25%] border border-radar-cyan/30 rounded-full" />
+                  <div className="absolute inset-0 animate-radar-sweep origin-center">
+                    <div className="absolute top-1/2 left-1/2 w-1/2 h-0.5 bg-gradient-to-r from-radar-cyan to-transparent origin-left" />
+                  </div>
+                </div>
+              </div>
                
                {/* Floating Cards */}
-              <div className="absolute -left-8 top-1/4 rounded-lg p-4 animate-float" style={{ background: 'rgba(10, 15, 28, 0.95)', border: '1px solid rgba(0, 240, 255, 0.3)' }}>
+              <div className="absolute -left-6 top-1/4 rounded-lg p-4 animate-float z-10" style={{ background: 'rgba(10, 15, 28, 0.98)', border: '1px solid rgba(0, 240, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 240, 255, 0.2)' }}>
                  <div className="flex items-center gap-3">
                    <div className="w-10 h-10 bg-radar-cyan/20 rounded-full flex items-center justify-center">
                      <TrendingUp className="h-5 w-5 text-radar-cyan" />
@@ -129,7 +190,7 @@
                  </div>
                </div>
                
-              <div className="absolute -right-8 bottom-1/4 rounded-lg p-4 animate-float" style={{ background: 'rgba(10, 15, 28, 0.95)', border: '1px solid rgba(0, 240, 255, 0.3)', animationDelay: '1.5s' }}>
+              <div className="absolute -right-6 bottom-1/4 rounded-lg p-4 animate-float z-10" style={{ background: 'rgba(10, 15, 28, 0.98)', border: '1px solid rgba(0, 240, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 240, 255, 0.2)', animationDelay: '1.5s' }}>
                  <div className="flex items-center gap-3">
                    <div className="w-10 h-10 bg-radar-indigo/20 rounded-full flex items-center justify-center">
                      <Target className="h-5 w-5 text-radar-indigo" />

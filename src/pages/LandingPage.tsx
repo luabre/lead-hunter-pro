@@ -1,17 +1,17 @@
  import { HeroSection } from "@/components/landing/HeroSection";
- import { PainPointsSection } from "@/components/landing/PainPointsSection";
- import { BenefitsSection } from "@/components/landing/BenefitsSection";
- import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
- import { FeaturesSection } from "@/components/landing/FeaturesSection";
- import { PricingSection } from "@/components/landing/PricingSection";
- import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
- import { FAQSection } from "@/components/landing/FAQSection";
- import { CTASection } from "@/components/landing/CTASection";
- import { LandingFooter } from "@/components/landing/LandingFooter";
+import { PainPointsSection } from "@/components/landing/PainPointsSection";
+import { BenefitsSection } from "@/components/landing/BenefitsSection";
+import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { PricingSection } from "@/components/landing/PricingSection";
+import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import { FAQSection } from "@/components/landing/FAQSection";
+import { CTASection } from "@/components/landing/CTASection";
+import { LandingFooter } from "@/components/landing/LandingFooter";
  
  const LandingPage = () => {
    return (
-     <main className="min-h-screen">
+    <main className="min-h-screen bg-[#0a0f1c]">
        <HeroSection />
        <PainPointsSection />
        <BenefitsSection />
