@@ -1,4 +1,3 @@
- import { Card, CardContent } from "@/components/ui/card";
  import { Bot, Target, Brain, Search, Users, BarChart3, Radar } from "lucide-react";
  
  const benefits = [
@@ -68,11 +67,12 @@
          
          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
            {benefits.map((benefit, index) => (
-             <Card 
+              <div 
                key={index}
-               className="group card-tech transition-all duration-300 hover:-translate-y-2 overflow-hidden"
+                className="group transition-all duration-300 hover:-translate-y-2 overflow-hidden rounded-lg"
+                style={{ background: 'rgba(10, 15, 28, 0.9)', border: '1px solid rgba(0, 240, 255, 0.2)' }}
              >
-               <CardContent className="p-8">
+                <div className="p-8">
                  <div className={`w-14 h-14 bg-gradient-to-br ${benefit.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform group-hover:shadow-lg group-hover:shadow-radar-cyan/20`}>
                    <benefit.icon className="h-7 w-7 text-white" />
                  </div>
@@ -89,8 +89,8 @@
                  <p className="font-inter text-white/60">
                    {benefit.description}
                  </p>
-               </CardContent>
-             </Card>
+                </div>
+              </div>
            ))}
          </div>
        </div>

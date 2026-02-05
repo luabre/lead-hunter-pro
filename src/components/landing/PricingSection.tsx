@@ -1,5 +1,4 @@
  import { Button } from "@/components/ui/button";
- import { Card, CardContent, CardHeader } from "@/components/ui/card";
  import { Badge } from "@/components/ui/badge";
  import { Check, Star, Zap } from "lucide-react";
  import { Link } from "react-router-dom";
@@ -78,13 +77,17 @@
          
          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
            {plans.map((plan, index) => (
-             <Card 
+              <div 
                key={index}
-               className={`relative overflow-hidden transition-all duration-300 hover:-translate-y-2 ${
+                className={`relative overflow-hidden transition-all duration-300 hover:-translate-y-2 rounded-lg ${
                  plan.recommended 
-                   ? 'card-tech border-radar-cyan radar-glow-intense scale-105' 
-                   : 'card-tech'
+                    ? 'radar-glow-intense scale-105' 
+                    : ''
                }`}
+                style={{ 
+                  background: 'rgba(10, 15, 28, 0.9)', 
+                  border: plan.recommended ? '1px solid rgba(0, 240, 255, 0.5)' : '1px solid rgba(0, 240, 255, 0.2)' 
+                }}
              >
                {plan.recommended && (
                  <div className="absolute top-0 right-0 bg-gradient-to-r from-radar-cyan to-radar-indigo text-white text-xs font-semibold px-4 py-1 rounded-bl-lg flex items-center gap-1">
@@ -92,7 +95,7 @@
                  </div>
                )}
                
-               <CardHeader className="text-center pb-4">
+                <div className="text-center pb-4 pt-6 px-6">
                  <h3 className="font-poppins font-bold text-2xl text-white">
                    {plan.name}
                  </h3>
@@ -114,9 +117,9 @@
                  <p className="font-inter text-sm text-white/50 mt-2">
                    {plan.description}
                  </p>
-               </CardHeader>
+                </div>
                
-               <CardContent className="pt-0">
+                <div className="pt-0 px-6 pb-6">
                  <ul className="space-y-3 mb-8">
                    {plan.features.map((feature, featureIndex) => (
                      <li key={featureIndex} className="flex items-start gap-3">
@@ -142,8 +145,8 @@
                      {plan.cta}
                    </Link>
                  </Button>
-               </CardContent>
-             </Card>
+                </div>
+              </div>
            ))}
          </div>
          

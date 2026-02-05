@@ -1,4 +1,3 @@
- import { Card, CardContent } from "@/components/ui/card";
  import { Clock, Users, TrendingDown, Target, AlertTriangle } from "lucide-react";
  
  const painPoints = [
@@ -46,11 +45,12 @@
          
          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
            {painPoints.map((point, index) => (
-             <Card 
+              <div 
                key={index} 
-               className="card-tech transition-all duration-300 hover:-translate-y-1 border-red-500/20 hover:border-red-500/40"
+                className="transition-all duration-300 hover:-translate-y-1 rounded-lg"
+                style={{ background: 'rgba(10, 15, 28, 0.9)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
              >
-               <CardContent className="p-6 text-center">
+                <div className="p-6 text-center">
                  <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
                    <point.icon className="h-8 w-8 text-red-400" />
                  </div>
@@ -60,8 +60,8 @@
                  <p className="font-inter text-white/60 text-sm">
                    {point.description}
                  </p>
-               </CardContent>
-             </Card>
+                </div>
+              </div>
            ))}
          </div>
          

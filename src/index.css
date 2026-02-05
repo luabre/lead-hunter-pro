@@ -153,7 +153,7 @@
   }
 
   .card-tech {
-    background: rgba(10, 15, 28, 0.8);
+    background: rgba(10, 15, 28, 0.9) !important;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 240, 255, 0.2);
   }
@@ -161,6 +161,11 @@
   .card-tech:hover {
     border-color: rgba(0, 240, 255, 0.5);
     box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+  }
+
+  /* Force dark background on Card components in landing */
+  .card-tech[class*="bg-card"] {
+    background: rgba(10, 15, 28, 0.9) !important;
   }
 
   .btn-radar {

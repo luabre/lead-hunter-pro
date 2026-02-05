@@ -26,7 +26,7 @@
            </h2>
            
            <p className="font-inter text-xl text-white/70 mb-8 max-w-2xl mx-auto">
-             Junte-se a mais de 5.000 empresas que já estão fechando mais negócios com o Radar Hunter Pro.
+            Junte-se a mais de 5.000 empresas que já estão fechando mais negócios com o RadarHunter Pro.
            </p>
            
            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
